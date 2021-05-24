@@ -33,9 +33,15 @@ public class AddressProvider {
         GetAddressesRes getAddressesRes = new GetAddressesRes();
         try{
             List<GetAddressRes> getAddressRes = addressDao.selectAddressList(userIdx);
-            int seletedAddressIdx = userDao.selectUserAddressIdx(userIdx);
-            getAddressesRes.setGetAddressList(getAddressRes);
-            getAddressesRes.setSeletedAddressIdx(seletedAddressIdx);
+            if (getAddressRes.isEmpty()) {
+                getAddressesRes.setAddressList(null);
+            } else {
+                getAddressesRes.setAddressList(getAddressRes);
+            }
+            Integer seletedAddressIdx = userDao.selectUserAddressIdx(userIdx);
+            if (seletedAddressIdx != null) {
+                getAddressesRes.setSeletedAddressIdx(seletedAddressIdx);
+            }
             return getAddressesRes;
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);

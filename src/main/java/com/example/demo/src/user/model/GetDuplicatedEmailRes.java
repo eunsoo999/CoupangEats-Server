@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class GetDuplicatedRes {
+public class GetDuplicatedEmailRes {
     private Boolean isDuplicated;
 }

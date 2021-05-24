@@ -84,10 +84,19 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(checkUserIdxQuery, int.class, checkUserIdxParams);
     }
 
-    public int selectUserAddressIdx(int userIdx) {
+    public Integer selectUserAddressIdx(int userIdx) {
         String selectUserAddressIdxQuery = "select addressIdx from User where idx= ? and status != 'N'";
         int selectUserAddressParams = userIdx;
 
-        return this.jdbcTemplate.queryForObject(selectUserAddressIdxQuery, int.class, selectUserAddressParams);
+        return this.jdbcTemplate.queryForObject(selectUserAddressIdxQuery, Integer.class, selectUserAddressParams);
+    }
+
+    public String selectMaskingEmailByPhone(String phone) {
+        String selectMaskingEmailByPhoneQuery = "select concat(REGEXP_REPLACE(substring_index(email, '@', 1), " +
+                "'(?<=.{2}).', '*'), '@',SUBSTRING_INDEX(email, '@', -1)) AS duplicatedEmail " +
+                "from User where status != 'N' and phone = ?";
+        String selectMaskingEmailByPhoneParams = phone;
+
+        return this.jdbcTemplate.queryForObject(selectMaskingEmailByPhoneQuery, String.class, selectMaskingEmailByPhoneParams);
     }
 }

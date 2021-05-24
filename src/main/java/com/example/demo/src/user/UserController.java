@@ -88,10 +88,11 @@ public class UserController {
             PostUserPhoneRes postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone());
             return new BaseResponse<>(postUserPhoneRes);
         } catch(BaseException exception){
+            logger.warn("");
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
+    
     /**
      * 1. 회원가입 API
      * [POST] /users
@@ -132,6 +133,7 @@ public class UserController {
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
         } catch(BaseException exception){
+            logger.warn("회원가입 API 실패 (" + postUserReq.getEmail() + ", " + postUserReq.getPassword() + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -158,6 +160,7 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception){
+            logger.warn("Post /login (" + postLoginReq.getEmail() + ", " + postLoginReq.getPassword());
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -169,21 +172,22 @@ public class UserController {
      */
     @ResponseBody
     @GetMapping("/email/check")
-    public BaseResponse<GetDuplicatedRes> checkDuplicatedEmail(@RequestParam String email) {
+    public BaseResponse<GetDuplicatedEmailRes> checkDuplicatedEmail(@RequestParam String email) {
         // request 값 확인
         if (email.isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
         try {
-            GetDuplicatedRes getDuplicatedRes;
+            GetDuplicatedEmailRes getDuplicatedRes;
             // 중복된 이메일일 경우
             if (userProvider.checkEmail(email) == 1) {
-                getDuplicatedRes = new GetDuplicatedRes(true);
+                getDuplicatedRes = new GetDuplicatedEmailRes(true);
             } else {
-                getDuplicatedRes = new GetDuplicatedRes(false);
+                getDuplicatedRes = new GetDuplicatedEmailRes(false);
             }
             return new BaseResponse<>(getDuplicatedRes);
         } catch (BaseException exception) {
+            logger.warn("GET /users/email/check?email= (" + email + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -195,21 +199,22 @@ public class UserController {
      */
     @ResponseBody
     @GetMapping("/phone/check")
-    public BaseResponse<GetDuplicatedRes> checkDuplicatedPhone(@RequestParam String phone) {
+    public BaseResponse<GetDuplicatedPhoneRes> checkDuplicatedPhone(@RequestParam String phone) {
         // request 값 확인
         if (phone.isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
         }
         try {
-            GetDuplicatedRes getDuplicatedRes;
-            // 중복된 전화번호일 경우
-            if (userProvider.checkPhone(phone) == 1) {
-                getDuplicatedRes = new GetDuplicatedRes(true);
+            GetDuplicatedPhoneRes getDuplicatedPhoneRes;
+            if(userProvider.checkPhone(phone) == 1) {
+                String duplicatedEmail = userProvider.getMaskingEmailByPhone(phone);
+                getDuplicatedPhoneRes = new GetDuplicatedPhoneRes(true, duplicatedEmail);
             } else {
-                getDuplicatedRes = new GetDuplicatedRes(false);
+                getDuplicatedPhoneRes = new GetDuplicatedPhoneRes(false, null);
             }
-            return new BaseResponse<>(getDuplicatedRes);
+            return new BaseResponse<>(getDuplicatedPhoneRes);
         } catch (BaseException exception) {
+            logger.warn("전화번호 중복 확인 API 실패 (" + phone + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -232,6 +237,7 @@ public class UserController {
             GetAddressesRes getAddressesRes = addressProvider.getAddreses(userIdx);
             return new BaseResponse<>(getAddressesRes);
         } catch (BaseException exception) {
+            logger.warn("로그인 유저 배달 주소 조회 API 실패 (" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }

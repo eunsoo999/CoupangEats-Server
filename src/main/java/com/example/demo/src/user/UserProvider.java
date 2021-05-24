@@ -78,12 +78,18 @@ public class UserProvider {
     }
 
     public int checkPhone(String phone) throws BaseException {
-        try{
+        try {
             return userDao.checkPhone(phone);
-        } catch (Exception exception){
+        } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
     }
 
-
+    public String getMaskingEmailByPhone(String phone) throws BaseException {
+        try{
+            return userDao.selectMaskingEmailByPhone(phone);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
