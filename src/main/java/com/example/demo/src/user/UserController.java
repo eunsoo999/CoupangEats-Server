@@ -1,5 +1,7 @@
 package com.example.demo.src.user;
 
+import com.example.demo.src.address.AddressProvider;
+import com.example.demo.src.address.model.GetAddressesRes;
 import com.example.demo.utils.SmsAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,12 +28,15 @@ public class UserController {
     private final JwtService jwtService;
     @Autowired
     private final SmsAuthService smsAuthService;
+    @Autowired
+    private final AddressProvider addressProvider;
 
-    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService, SmsAuthService smsAuthService){
+    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService, SmsAuthService smsAuthService, AddressProvider addressProvider){
         this.userProvider = userProvider;
         this.userService = userService;
         this.jwtService = jwtService;
         this.smsAuthService = smsAuthService;
+        this.addressProvider = addressProvider;
     }
 
     /**
@@ -204,6 +209,28 @@ public class UserController {
                 getDuplicatedRes = new GetDuplicatedRes(false);
             }
             return new BaseResponse<>(getDuplicatedRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 8. 로그인 유저 배달 주소 조회 API
+     * [GET] /users/:userIdx/addresses
+     * @return BaseResponse<GetAddressesRes>
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}/addresses")
+    public BaseResponse<GetAddressesRes> getUserAddresses(@PathVariable int userIdx) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetAddressesRes getAddressesRes = addressProvider.getAddreses(userIdx);
+            return new BaseResponse<>(getAddressesRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

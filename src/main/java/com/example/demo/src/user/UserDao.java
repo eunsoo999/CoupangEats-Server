@@ -83,4 +83,11 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(checkUserIdxQuery, int.class, checkUserIdxParams);
     }
+
+    public int selectUserAddressIdx(int userIdx) {
+        String selectUserAddressIdxQuery = "select addressIdx from User where idx= ? and status != 'N'";
+        int selectUserAddressParams = userIdx;
+
+        return this.jdbcTemplate.queryForObject(selectUserAddressIdxQuery, int.class, selectUserAddressParams);
+    }
 }
