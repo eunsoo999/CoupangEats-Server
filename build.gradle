@@ -53,7 +53,8 @@ dependencies {
     implementation('org.springframework.boot:spring-boot-starter')
     compile('org.springframework.boot:spring-boot-starter-web')
 
-
+    // JSON Simple
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
 
 
 
