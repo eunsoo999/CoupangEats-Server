@@ -33,7 +33,8 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_PASSWORD(false, 2019, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_PASSWORD(false, 2020, "비밀번호는 영문/숫자/특수문자 2가지 이상 조합 8~20자로 입력해주세요."),
     POST_USERS_INVALID_PASSWORD_SEQ(false, 2021, "비밀번호 3개 이상 연속되거나 동일한 문자/숫자는 불가능합니다."),
-    POST_USERS_EMPTY_USERNAME(false, 2022, "이름을 입력해주세요."),
+    POST_USERS_INVALID_PASSWORD_ID(false, 2022, "비밀번호는 아이디(이메일) 제외여야합니다."),
+    POST_USERS_EMPTY_USERNAME(false, 2023, "이름을 입력해주세요."),
 
 
     /**
@@ -46,8 +47,9 @@ public enum BaseResponseStatus {
     DUPLICATED_EMAIL(false, 3013, "중복된 이메일입니다."),
     DUPLICATED_PHONE(false, 3014, "중복된 전화번호입니다."),
     USERS_DELETED(false, 3015, "탈퇴된 회원입니다."),
-
-    FAILED_TO_LOGIN(false,3015,"없는 아이디거나 비밀번호가 틀렸습니다."),
+    USERS_NOT_FOUND(false, 3016, "존재하지않는 회원입니다."),
+    FAILED_TO_LOGIN(false,3017,"없는 아이디거나 비밀번호가 틀렸습니다."),
+    FAILED_TO_SEND_PHONE_AUTH(false, 3018, "인증번호 발송 실패하였습니다."),
 
 
 

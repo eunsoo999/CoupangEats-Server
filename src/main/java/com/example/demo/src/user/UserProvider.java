@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
-import static com.example.demo.config.BaseResponseStatus.USERS_DELETED;
 
 @Service
 public class UserProvider {
@@ -28,22 +27,6 @@ public class UserProvider {
     public UserProvider(UserDao userDao, JwtService jwtService) {
         this.userDao = userDao;
         this.jwtService = jwtService;
-    }
-
-    public int checkEmail(String email) throws BaseException{
-        try{
-            return userDao.checkEmail(email);
-        } catch (Exception exception){
-            throw new BaseException(DATABASE_ERROR);
-        }
-    }
-
-    public int checkPhone(String phone) throws BaseException {
-        try{
-            return userDao.checkPhone(phone);
-        } catch (Exception exception){
-            throw new BaseException(DATABASE_ERROR);
-        }
     }
 
     public PostLoginRes logIn(PostLoginReq postLoginReq) throws BaseException{
@@ -73,4 +56,34 @@ public class UserProvider {
             throw new BaseException(FAILED_TO_LOGIN);
         }
     }
+    
+    public GetUserRes retrieveUser(int userIdx) throws BaseException{
+        // 유저 존재 확인
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND);
+        }
+        try{
+            return userDao.getUser(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public int checkEmail(String email) throws BaseException{
+        try{
+            return userDao.checkEmail(email);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public int checkPhone(String phone) throws BaseException {
+        try{
+            return userDao.checkPhone(phone);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+
 }

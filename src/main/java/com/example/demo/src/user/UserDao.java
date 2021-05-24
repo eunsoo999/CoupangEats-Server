@@ -41,6 +41,17 @@ public class UserDao {
                 ), getPwdParams);
     }
 
+    public GetUserRes getUser(int userIdx) {
+        String getUserQuery = "select userName, concat(left(phone, 3), '-****-', right(phone, 4)) as 'phone' from User where status != 'N' and idx = ?";
+        int getUserParams = userIdx;
+
+        return this.jdbcTemplate.queryForObject(getUserQuery,
+                (rs,rowNum)-> new GetUserRes(
+                        rs.getString("userName"),
+                        rs.getString("phone")
+                ), getUserParams);
+    }
+
     // 이메일 중복 확인
     public int checkEmail(String email){
         String checkEmailQuery = "select exists(select email from User where email = ? and status != 'N')";
@@ -63,5 +74,13 @@ public class UserDao {
         String checkDeletedUserParams = email;
 
         return this.jdbcTemplate.queryForObject(checkDeletedUserQuery, int.class, checkDeletedUserParams);
+    }
+
+    // 활성화 userIdx가 있는지 확인
+    public int checkUserIdx(int userIdx) {
+        String checkUserIdxQuery = "select exists(select idx from User where idx = ? AND User.status != 'N')";
+        int checkUserIdxParams = userIdx;
+
+        return this.jdbcTemplate.queryForObject(checkUserIdxQuery, int.class, checkUserIdxParams);
     }
 }

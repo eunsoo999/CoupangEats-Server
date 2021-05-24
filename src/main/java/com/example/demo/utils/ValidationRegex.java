@@ -12,7 +12,7 @@ public class ValidationRegex {
     }
 
     public static boolean isRegexPhone(String target) {
-        String regex = "^\\d{3}-\\d{3,4}-\\d{4}$";
+        String regex = "^01(?:0|1|[6-9])[0-9]{4}[0-9]{4}$";
         Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
         Matcher matcher = pattern.matcher(target);
         return matcher.find();
@@ -41,6 +41,7 @@ public class ValidationRegex {
         }
         return true;
     }
+
     public static boolean isRegexPasswordSequence(String target) {
         // 3개 이상 연속되거나 동일한 문자/숫자 제외
         String regexSequence = "(\\w)\\1\\1";

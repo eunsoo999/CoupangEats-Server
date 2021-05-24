@@ -1,5 +1,6 @@
 package com.example.demo.src.user;
 
+import com.example.demo.utils.SmsAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.example.demo.config.BaseException;
@@ -23,15 +24,71 @@ public class UserController {
     private final UserService userService;
     @Autowired
     private final JwtService jwtService;
+    @Autowired
+    private final SmsAuthService smsAuthService;
 
-    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService){
+    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService, SmsAuthService smsAuthService){
         this.userProvider = userProvider;
         this.userService = userService;
         this.jwtService = jwtService;
+        this.smsAuthService = smsAuthService;
     }
 
     /**
-     * 회원가입 API
+     * 로그인 유저 정보 조회 API
+     * [GET] /users/:userIdx
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}")
+    public BaseResponse<GetUserRes> getUser(@PathVariable int userIdx) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+
+            GetUserRes getUserRes = userProvider.retrieveUser(userIdx);
+            return new BaseResponse<>(getUserRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 휴대폰 인증번호 발송 API
+     * [POST] /users/auth/phone
+     */
+    @ResponseBody
+    @PostMapping("/auth/phone")
+    public BaseResponse<PostUserPhoneRes> sendMessage(@RequestBody PostUserPhoneReq postUserPhoneReq) throws BaseException {
+        if(postUserPhoneReq.getPhone() == null || postUserPhoneReq.getPhone().isEmpty()) {
+            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
+        }
+        if(!isRegexPhone(postUserPhoneReq.getPhone())) {
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+        }
+        // 중복 체크
+        try {
+            if(userProvider.checkPhone(postUserPhoneReq.getPhone()) == 1) {
+                return new BaseResponse<>(DUPLICATED_PHONE);
+            }
+        } catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+        try{
+            PostUserPhoneRes postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone());
+            return new BaseResponse<>(postUserPhoneRes);
+        } catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 1. 회원가입 API
      * [POST] /users
      * @return BaseResponse<PostUserRes>
      */
@@ -56,6 +113,9 @@ public class UserController {
         if(!isRegexPassword(postUserReq.getPassword())) {
             return new BaseResponse<>(POST_USERS_INVALID_PASSWORD);
         }
+        if(postUserReq.getPassword().contains(postUserReq.getEmail().split("@")[0])) {
+            return new BaseResponse<>(POST_USERS_INVALID_PASSWORD_ID);
+        }
         if(!isRegexPasswordSequence(postUserReq.getPassword())) {
             return new BaseResponse<>(POST_USERS_INVALID_PASSWORD_SEQ);
         }
@@ -72,7 +132,7 @@ public class UserController {
     }
 
     /**
-     * 로그인 API
+     * 2. 로그인 API
      * [POST] /users/login
      * @return BaseResponse<PostLoginRes>
      */
@@ -93,6 +153,58 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 3. 이메일 중복 확인 API
+     * [GET] /users/email/check?email=silver@naver.com
+     * @return BaseResponse<GetDuplicatedRes>
+     */
+    @ResponseBody
+    @GetMapping("/email/check")
+    public BaseResponse<GetDuplicatedRes> checkDuplicatedEmail(@RequestParam String email) {
+        // request 값 확인
+        if (email.isEmpty()) {
+            return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        }
+        try {
+            GetDuplicatedRes getDuplicatedRes;
+            // 중복된 이메일일 경우
+            if (userProvider.checkEmail(email) == 1) {
+                getDuplicatedRes = new GetDuplicatedRes(true);
+            } else {
+                getDuplicatedRes = new GetDuplicatedRes(false);
+            }
+            return new BaseResponse<>(getDuplicatedRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 4. 전화번호 중복 확인 API
+     * [GET] /users/phone/check?phone=01029292929
+     * @return BaseResponse<GetDuplicatedRes>
+     */
+    @ResponseBody
+    @GetMapping("/phone/check")
+    public BaseResponse<GetDuplicatedRes> checkDuplicatedPhone(@RequestParam String phone) {
+        // request 값 확인
+        if (phone.isEmpty()) {
+            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
+        }
+        try {
+            GetDuplicatedRes getDuplicatedRes;
+            // 중복된 전화번호일 경우
+            if (userProvider.checkPhone(phone) == 1) {
+                getDuplicatedRes = new GetDuplicatedRes(true);
+            } else {
+                getDuplicatedRes = new GetDuplicatedRes(false);
+            }
+            return new BaseResponse<>(getDuplicatedRes);
+        } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
