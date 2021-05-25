@@ -99,4 +99,18 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(selectMaskingEmailByPhoneQuery, String.class, selectMaskingEmailByPhoneParams);
     }
+
+    public Integer getUserHomeIdx(int userIdx) {
+        String getUserHomeIdxQuery = "select homeAddressIdx from User where idx = ? and status != 'N'";
+        int checkHomeIdxParams = userIdx;
+
+        return this.jdbcTemplate.queryForObject(getUserHomeIdxQuery, Integer.class, checkHomeIdxParams);
+    }
+
+    public Integer getCompanyIdx(int userIdx) {
+        String checkCompanyIdxQuery = "select companyAddressIdx from User where idx = ? and status != 'N'";
+        int checkCompanyIdxParams = userIdx;
+
+        return this.jdbcTemplate.queryForObject(checkCompanyIdxQuery, Integer.class, checkCompanyIdxParams);
+    }
 }

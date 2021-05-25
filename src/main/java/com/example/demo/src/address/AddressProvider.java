@@ -33,7 +33,6 @@ public class AddressProvider {
 
     public GetAddressesRes getAddreses(int userIdx) throws BaseException {
         GetAddressesRes getAddressesRes = new GetAddressesRes();
-
         try{
             // 집 주소
             GetHomeAddress homeAddress;
@@ -45,10 +44,10 @@ public class AddressProvider {
             GetCompanyAddress companyAddress;
             if (userDao.getCompanyIdx(userIdx) != null) {
                 companyAddress = addressDao.selectCompanyAddress(userIdx);
-                getAddressesRes.setCompany(companyAddress);
+                getAddressesRes.setCompany(companyAddress); // 회사 주소
             }
             //전체 주소
-            List<GetAddressRes> getAddressRes = addressDao.selectAddressList(userIdx);
+            List<GetAddressRes> getAddressRes = addressDao.selectAddressList(userIdx); //전체 주소
             if (getAddressRes.isEmpty()) {
                 getAddressesRes.setAddressList(null);
             } else {
