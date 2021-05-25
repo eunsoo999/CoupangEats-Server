@@ -91,4 +91,29 @@ public class AddressService {
         }
 
     }
+
+    public int updateStatusAddress(int addressIdx, int userIdx) throws BaseException {
+        // 주소 존재 확인
+        if (addressDao.checkAddressIdx(addressIdx) == 0) {
+            throw new BaseException(ADDRESSES_NOT_FOUND);
+        }
+        // 본인이 등록한 주소가 맞는지 확인
+        if (addressDao.checkAddressByOwner(addressIdx, userIdx) == 0) {
+            throw new BaseException(INVALID_USER_JWT);
+        }
+        // 기본주소 삭제 시 유저의 기본주소 null처리
+        if (userDao.checkUserAddressIdx(userIdx, addressIdx) == 1) {
+            userDao.updateUserAddressIdx(userIdx, null);
+        }
+        try{
+            int updatedCount = addressDao.updateStatusAddress(addressIdx);
+            if(updatedCount == 0){
+                throw new BaseException(FAILED_TO_UPDATE_STATUS_ADDRESSES);
+            }
+            return updatedCount;
+        } catch(Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

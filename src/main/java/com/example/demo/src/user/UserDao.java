@@ -127,4 +127,18 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(checkUserCompanyAddressQuery, int.class, checkUserCompanyAddressParams);
     }
+
+    // 유저의 기본 주소 변경
+    public int updateUserAddressIdx(int userIdx, Integer addressIdx) {
+        String updateUserAddressIdxQuery = "update User set addressIdx = ? where idx = ?";
+        Object[] updateUserAddressIdxParams = new Object[]{addressIdx, userIdx};
+
+        return this.jdbcTemplate.update(updateUserAddressIdxQuery, updateUserAddressIdxParams);
+    }
+
+    // 해당 유저의 기본주소가 addressIdx가 맞는지 확인
+    public int checkUserAddressIdx(int userIdx, int addressIdx) {
+        String checkUserCompanyAddressQuery = "select exists(select idx from User where idx = ? and addressIdx = ?)";
+        return this.jdbcTemplate.queryForObject(checkUserCompanyAddressQuery, int.class, userIdx, addressIdx);
+    }
 }

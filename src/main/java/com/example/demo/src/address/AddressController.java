@@ -120,4 +120,28 @@ public class AddressController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 12. 배달 주소 삭제 API
+     * [PATCH] /:addressIdx/status/users/:userIdx
+     * @return BaseResponse<PatchAddressRes>
+     */
+    @ResponseBody
+    @PatchMapping("/{addressIdx}/status/users/{userIdx}")
+    public BaseResponse<PatchAddressRes> patchAddress(@PathVariable int addressIdx, @PathVariable int userIdx) {
+        try {
+            // jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            int updatedCount = addressService.updateStatusAddress(addressIdx, userIdx);
+            return new BaseResponse<>(new PatchAddressRes(updatedCount));
+        } catch (BaseException exception) {
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn("(" + addressIdx + ", " + userIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+    }
 }

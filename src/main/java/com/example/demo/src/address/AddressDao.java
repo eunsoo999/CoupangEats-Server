@@ -82,7 +82,7 @@ public class AddressDao {
     }
 
     public int checkAddressIdx(int addressIdx) {
-        String checkAddressQuery = "select exists(select idx from Address where idx = ?)";
+        String checkAddressQuery = "select exists(select idx from Address where idx = ? and status != 'N')";
         int checkAddressParams = addressIdx;
 
         return this.jdbcTemplate.queryForObject(checkAddressQuery, int.class, checkAddressParams);
@@ -102,17 +102,17 @@ public class AddressDao {
     }
 
     public int checkAddressByOwner(int addressIdx, int userIdx) {
-        String checkAddressQuery = "select exists(select idx from Address where idx = ? and userIdx = ?)";
+        String checkAddressQuery = "select exists(select idx from Address where idx = ? and userIdx = ? and status != 'N')";
         Object[] checkAddressParams = new Object[] {addressIdx, userIdx};
 
         return this.jdbcTemplate.queryForObject(checkAddressQuery, int.class, checkAddressParams);
     }
 
     public int updateAddress(int addressIdx, PatchAddressReq patchAddressReq) {
-        String updateStatusAddressQuery = "update Address set detailAddress = ?, alias = ?, status = ? where idx = ?";
+        String updateAddressQuery = "update Address set detailAddress = ?, alias = ?, status = ? where idx = ?";
         Object[] updateAddressParams = new Object[]{patchAddressReq.getDetailAddress(), patchAddressReq.getAlias(), patchAddressReq.getAliasType(), addressIdx};
 
-        return this.jdbcTemplate.update(updateStatusAddressQuery, updateAddressParams); // 개수 반환
+        return this.jdbcTemplate.update(updateAddressQuery, updateAddressParams); // 개수 반환
     }
 
     public int updateAddressTypeAndInitAlias(int beforeHomeIdx, String typeStr) {
@@ -120,5 +120,12 @@ public class AddressDao {
         Object[] updateAddressTypeParams = new Object[]{typeStr, beforeHomeIdx};
 
         return this.jdbcTemplate.update(updateAddressTypeQuery, updateAddressTypeParams);
+    }
+
+    public int updateStatusAddress(int addressIdx) {
+        String updateStatusAddressQuery = "update Address set status = 'N' where idx = ?";
+        int updateStatusAddressParams = addressIdx;
+
+        return this.jdbcTemplate.update(updateStatusAddressQuery, updateStatusAddressParams);
     }
 }
