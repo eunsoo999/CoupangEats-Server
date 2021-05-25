@@ -36,6 +36,10 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_PASSWORD_ID(false, 2022, "비밀번호는 아이디(이메일) 제외여야합니다."),
     POST_USERS_EMPTY_USERNAME(false, 2023, "이름을 입력해주세요."),
 
+    // Address
+    ADDRESSES_EMPTY_ADDRESS(false, 2050, "주소를 입력해주세요."),
+    ADDRESSES_EMPTY_ROADADDRESS(false, 2051, "도로명주소를 입력해주세요."),
+    ADDRESSES_INVALID_ALIASTYPE(false, 2052, "별칭 타입 형태가 잘못되었습니다."),
 
     /**
      * 3000 : Response 오류

@@ -1,7 +1,6 @@
 package com.example.demo.src.address;
 
 import com.example.demo.src.address.model.*;
-import com.example.demo.src.user.model.GetUserRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -24,7 +23,7 @@ public class AddressDao {
                 "concat(roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress', " +
                 "latitude, longitude " +
                 "from Address inner join User on Address.userIdx = User.idx " +
-                "where userIdx = ? and Address.status != 'N' and User.status != 'N' and Address.idx != User.companyAddressIdx and Address.idx != User.homeAddressIdx " +
+                "where userIdx = ? and Address.status = 'ETC' and User.status != 'N' " +
                 "order by Address.updatedAt DESC";
         int selectAddressListParams = userIdx;
 
@@ -38,9 +37,9 @@ public class AddressDao {
     }
 
     public int insertAddress(PostAddressReq postAddressReq) {
-        String insertAddressQuery = "INSERT INTO Address (address, roadAddress, detailAddress, alias, latitude, longitude, userIdx) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String insertAddressQuery = "INSERT INTO Address (address, roadAddress, detailAddress, alias, latitude, longitude, userIdx, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         Object[] insertAddressParams = new Object[]{postAddressReq.getAddress(), postAddressReq.getRoadAddress(), postAddressReq.getDetailAddress(),
-                postAddressReq.getAlias(), postAddressReq.getLatitude(), postAddressReq.getLongitude(), postAddressReq.getUserIdx()};
+                postAddressReq.getAlias(), postAddressReq.getLatitude(), postAddressReq.getLongitude(), postAddressReq.getUserIdx(), postAddressReq.getAliasType().toUpperCase()};
         this.jdbcTemplate.update(insertAddressQuery, insertAddressParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
@@ -48,10 +47,10 @@ public class AddressDao {
     }
 
     public GetHomeAddress selectHomeAddress(int userIdx) {
-        String selectHomeAddressQuery = "select User.homeAddressIdx as 'addressIdx', '집' as 'mainAddress', " +
+        String selectHomeAddressQuery = "select idx as 'addressIdx', '집' as 'mainAddress', " +
                 "concat(Address.roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress', " +
-                "Address.latitude, Address.longitude " +
-                "from User inner join Address on User.homeAddressIdx = Address.idx where User.status != 'N' and User.idx = ?";
+                "latitude, longitude " +
+                "from Address where userIdx = ? and status = 'HOME'";
 
         int selectHomeAddressParams = userIdx;
 
@@ -65,10 +64,11 @@ public class AddressDao {
     }
 
     public GetCompanyAddress selectCompanyAddress(int userIdx) {
-        String selectCompanyAddressQuery = "select User.companyAddressIdx as 'addressIdx', '회사' as 'mainAddress', " +
+        String selectCompanyAddressQuery = "select idx as 'addressIdx', '회사' as 'mainAddress', " +
                 "concat(Address.roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress', " +
-                "Address.latitude, Address.longitude " +
-                "from User inner join Address on User.companyAddressIdx = Address.idx where User.status != 'N' and User.idx = ?";
+                "latitude, longitude " +
+                "from Address " +
+                "where userIdx = ? and status = 'COMPANY'";
 
         int selectCompanyAddressParams = userIdx;
 

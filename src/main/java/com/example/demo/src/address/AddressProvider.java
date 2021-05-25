@@ -36,13 +36,13 @@ public class AddressProvider {
         try{
             // 집 주소
             GetHomeAddress homeAddress;
-            if (userDao.getUserHomeIdx(userIdx) != null) {
+            if (userDao.checkUserHomeAddress(userIdx) == 1) {
                 homeAddress =  addressDao.selectHomeAddress(userIdx);
                 getAddressesRes.setHome(homeAddress);
             }
             // 회사 주소
             GetCompanyAddress companyAddress;
-            if (userDao.getCompanyIdx(userIdx) != null) {
+            if (userDao.checkUserCompanyAddress(userIdx) == 1) {
                 companyAddress = addressDao.selectCompanyAddress(userIdx);
                 getAddressesRes.setCompany(companyAddress); // 회사 주소
             }
@@ -63,5 +63,4 @@ public class AddressProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
-
 }

@@ -100,17 +100,39 @@ public class UserDao {
         return this.jdbcTemplate.queryForObject(selectMaskingEmailByPhoneQuery, String.class, selectMaskingEmailByPhoneParams);
     }
 
-    public Integer getUserHomeIdx(int userIdx) {
-        String getUserHomeIdxQuery = "select homeAddressIdx from User where idx = ? and status != 'N'";
+    public int getUserHomeIdx(int userIdx) {
+        String getUserHomeIdxQuery = "select idx from Address where userIdx = ? and status = 'HOME'";
         int checkHomeIdxParams = userIdx;
 
-        return this.jdbcTemplate.queryForObject(getUserHomeIdxQuery, Integer.class, checkHomeIdxParams);
+        return this.jdbcTemplate.queryForObject(getUserHomeIdxQuery, int.class, checkHomeIdxParams);
     }
 
-    public Integer getCompanyIdx(int userIdx) {
-        String checkCompanyIdxQuery = "select companyAddressIdx from User where idx = ? and status != 'N'";
-        int checkCompanyIdxParams = userIdx;
+    public int checkUserHomeAddress(int userIdx) {
+        String checkUserHomeAddressQuery = "select exists(select idx from Address where userIdx = ? and status = 'HOME')";
+        int checkUserHomeAddressParams = userIdx;
 
-        return this.jdbcTemplate.queryForObject(checkCompanyIdxQuery, Integer.class, checkCompanyIdxParams);
+        return this.jdbcTemplate.queryForObject(checkUserHomeAddressQuery, int.class, checkUserHomeAddressParams);
+    }
+
+    public int getUserCompanyIdx(int userIdx) {
+        String getUserCompanyIdxQuery = "select idx from Address where userIdx = ? and status = 'COMPANY'";
+        int getUserCompanyIdxParams = userIdx;
+
+        return this.jdbcTemplate.queryForObject(getUserCompanyIdxQuery, int.class, getUserCompanyIdxParams);
+    }
+
+    public int checkUserCompanyAddress(int userIdx) {
+        String checkUserCompanyAddressQuery = "select exists(select idx from Address where userIdx = ? and status = 'COMPANY')";
+        int checkUserCompanyAddressParams = userIdx;
+
+        return this.jdbcTemplate.queryForObject(checkUserCompanyAddressQuery, int.class, checkUserCompanyAddressParams);
+    }
+
+
+    public int updateStatusAddress(int homeIdx) {
+        String updateStatusAddressQuery = "update Address set status = 'N' where idx = ? ";
+        int updateStatusAddressParams = homeIdx;
+
+        return this.jdbcTemplate.update(updateStatusAddressQuery, updateStatusAddressParams); // 개수 반환
     }
 }

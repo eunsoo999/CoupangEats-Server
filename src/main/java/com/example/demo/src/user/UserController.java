@@ -92,7 +92,7 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-    
+
     /**
      * 1. 회원가입 API
      * [POST] /users
@@ -133,7 +133,8 @@ public class UserController {
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
         } catch(BaseException exception){
-            logger.warn("회원가입 API 실패 (" + postUserReq.getEmail() + ", " + postUserReq.getPassword() + ")");
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn(postUserReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -160,7 +161,8 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception){
-            logger.warn("Post /login (" + postLoginReq.getEmail() + ", " + postLoginReq.getPassword());
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn(postLoginReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -187,7 +189,8 @@ public class UserController {
             }
             return new BaseResponse<>(getDuplicatedRes);
         } catch (BaseException exception) {
-            logger.warn("GET /users/email/check?email= (" + email + ")");
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn("(" + email + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -214,7 +217,8 @@ public class UserController {
             }
             return new BaseResponse<>(getDuplicatedPhoneRes);
         } catch (BaseException exception) {
-            logger.warn("전화번호 중복 확인 API 실패 (" + phone + ")");
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn("(" + phone + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -237,7 +241,8 @@ public class UserController {
             GetAddressesRes getAddressesRes = addressProvider.getAddreses(userIdx);
             return new BaseResponse<>(getAddressesRes);
         } catch (BaseException exception) {
-            logger.warn("로그인 유저 배달 주소 조회 API 실패 (" + userIdx + ")");
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
