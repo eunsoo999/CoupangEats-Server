@@ -23,7 +23,7 @@ public class AddressDao {
                 "concat(roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress', " +
                 "latitude, longitude " +
                 "from Address inner join User on Address.userIdx = User.idx " +
-                "where userIdx = ? and Address.status = 'ETC' and User.status != 'N' " +
+                "where userIdx = ? and (Address.status = 'ETC' or Address.status = 'NONE') and User.status != 'N' " +
                 "order by Address.updatedAt DESC";
         int selectAddressListParams = userIdx;
 
@@ -79,5 +79,32 @@ public class AddressDao {
                         rs.getString("subAddress"),
                         rs.getBigDecimal("latitude"),
                         rs.getBigDecimal("longitude")), selectCompanyAddressParams);
+    }
+
+    public int checkAddressIdx(int addressIdx) {
+        String checkAddressQuery = "select exists(select idx from Address where idx = ?)";
+        int checkAddressParams = addressIdx;
+
+        return this.jdbcTemplate.queryForObject(checkAddressQuery, int.class, checkAddressParams);
+    }
+
+    public GetAddressDetailRes getAddress(int addressIdx) {
+        String getAddressDetailQuery = "select address, roadAddress, detailAddress, alias, status as 'aliasType' from Address where idx = ?";
+        int getAddressParams = addressIdx;
+
+        return this.jdbcTemplate.queryForObject(getAddressDetailQuery,
+                (rs,rowNum) -> new GetAddressDetailRes(
+                        rs.getString("address"),
+                        rs.getString("roadAddress"),
+                        rs.getString("detailAddress"),
+                        rs.getString("alias"),
+                        rs.getString("aliasType")), getAddressParams);
+    }
+
+    public int checkAddressByOwner(int addressIdx, int userIdx) {
+        String checkAddressQuery = "select exists(select idx from Address where idx = ? and userIdx = ?)";
+        Object[] checkAddressParams = new Object[] {addressIdx, userIdx};
+
+        return this.jdbcTemplate.queryForObject(checkAddressQuery, int.class, checkAddressParams);
     }
 }

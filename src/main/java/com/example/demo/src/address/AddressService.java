@@ -30,9 +30,6 @@ public class AddressService {
 
     public int createAddress(PostAddressReq postAddressReq) throws BaseException {
             try {
-                if (postAddressReq.getAliasType() == null) {
-                    postAddressReq.setAliasType("ETC");
-                }
                 // 집 주소를 등록할 때, 기존 집을 대체하는 경우
                 if (postAddressReq.getAliasType().equalsIgnoreCase("HOME") && userDao.checkUserHomeAddress(postAddressReq.getUserIdx()) == 1) {
                     int beforeHomeIdx = userDao.getUserHomeIdx(postAddressReq.getUserIdx());

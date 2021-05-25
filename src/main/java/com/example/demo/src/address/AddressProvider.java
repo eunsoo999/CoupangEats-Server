@@ -1,10 +1,7 @@
 package com.example.demo.src.address;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.src.address.model.GetAddressRes;
-import com.example.demo.src.address.model.GetAddressesRes;
-import com.example.demo.src.address.model.GetCompanyAddress;
-import com.example.demo.src.address.model.GetHomeAddress;
+import com.example.demo.src.address.model.*;
 import com.example.demo.src.user.UserDao;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -59,6 +56,23 @@ public class AddressProvider {
                 getAddressesRes.setSeletedAddressIdx(seletedAddressIdx);
             }
             return getAddressesRes;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public GetAddressDetailRes getAddress(int addressIdx, int userIdx) throws BaseException {
+        // 주소 존재 확인
+        if (addressDao.checkAddressIdx(addressIdx) == 0) {
+            throw new BaseException(ADDRESSES_NOT_FOUND);
+        }
+        // 주소를 등록한 유저인지 확인
+        if (addressDao.checkAddressByOwner(addressIdx, userIdx) == 0) {
+            throw new BaseException(INVALID_USER_JWT);
+        }
+
+        try {
+            return addressDao.getAddress(addressIdx);
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }

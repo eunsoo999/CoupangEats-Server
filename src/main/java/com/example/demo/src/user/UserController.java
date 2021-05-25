@@ -1,6 +1,7 @@
 package com.example.demo.src.user;
 
 import com.example.demo.src.address.AddressProvider;
+import com.example.demo.src.address.model.GetAddressDetailRes;
 import com.example.demo.src.address.model.GetAddressesRes;
 import com.example.demo.utils.SmsAuthService;
 import org.slf4j.Logger;
@@ -224,7 +225,7 @@ public class UserController {
     }
 
     /**
-     * 8. 로그인 유저 배달 주소 조회 API
+     * 8. 유저의 배달 주소 목록 조회 API
      * [GET] /users/:userIdx/addresses
      * @return BaseResponse<GetAddressesRes>
      */

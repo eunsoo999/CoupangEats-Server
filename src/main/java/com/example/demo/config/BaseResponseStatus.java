@@ -39,7 +39,8 @@ public enum BaseResponseStatus {
     // Address
     ADDRESSES_EMPTY_ADDRESS(false, 2050, "주소를 입력해주세요."),
     ADDRESSES_EMPTY_ROADADDRESS(false, 2051, "도로명주소를 입력해주세요."),
-    ADDRESSES_INVALID_ALIASTYPE(false, 2052, "별칭 타입 형태가 잘못되었습니다."),
+    ADDRESSES_EMPTY_ALIASTYPE(false, 2052, "별칭 타입을 입력해주세요."),
+    ADDRESSES_INVALID_ALIASTYPE(false, 2053, "별칭 타입 형태가 잘못되었습니다."),
 
     /**
      * 3000 : Response 오류
@@ -55,6 +56,8 @@ public enum BaseResponseStatus {
     FAILED_TO_LOGIN(false,3017,"없는 아이디거나 비밀번호가 틀렸습니다."),
     FAILED_TO_SEND_PHONE_AUTH(false, 3018, "인증번호 발송 실패하였습니다."),
 
+    // Address
+    ADDRESSES_NOT_FOUND(false, 3050, "존재하지않는 배달주소입니다."),
 
 
     /**
