@@ -3,6 +3,8 @@ package com.example.demo.src.address;
 import com.example.demo.config.BaseException;
 import com.example.demo.src.address.model.GetAddressRes;
 import com.example.demo.src.address.model.GetAddressesRes;
+import com.example.demo.src.address.model.GetCompanyAddress;
+import com.example.demo.src.address.model.GetHomeAddress;
 import com.example.demo.src.user.UserDao;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -12,7 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
+import static com.example.demo.config.BaseResponseStatus.*;
 
 @Service
 public class AddressProvider {
@@ -31,13 +33,28 @@ public class AddressProvider {
 
     public GetAddressesRes getAddreses(int userIdx) throws BaseException {
         GetAddressesRes getAddressesRes = new GetAddressesRes();
+
         try{
+            // 집 주소
+            GetHomeAddress homeAddress;
+            if (userDao.getUserHomeIdx(userIdx) != null) {
+                homeAddress =  addressDao.selectHomeAddress(userIdx);
+                getAddressesRes.setHome(homeAddress);
+            }
+            // 회사 주소
+            GetCompanyAddress companyAddress;
+            if (userDao.getCompanyIdx(userIdx) != null) {
+                companyAddress = addressDao.selectCompanyAddress(userIdx);
+                getAddressesRes.setCompany(companyAddress);
+            }
+            //전체 주소
             List<GetAddressRes> getAddressRes = addressDao.selectAddressList(userIdx);
             if (getAddressRes.isEmpty()) {
                 getAddressesRes.setAddressList(null);
             } else {
                 getAddressesRes.setAddressList(getAddressRes);
             }
+            //유저가 기본선택한 주소
             Integer seletedAddressIdx = userDao.selectUserAddressIdx(userIdx);
             if (seletedAddressIdx != null) {
                 getAddressesRes.setSeletedAddressIdx(seletedAddressIdx);
@@ -47,4 +64,5 @@ public class AddressProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
 }

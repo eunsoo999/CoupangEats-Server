@@ -16,5 +16,7 @@ import java.util.List;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetAddressesRes {
     private int seletedAddressIdx;
+    private GetHomeAddress home;
+    private GetCompanyAddress company;
     private List<GetAddressRes> addressList = new ArrayList<>();
 }
