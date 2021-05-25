@@ -1,6 +1,7 @@
 package com.example.demo.src.address;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.address.model.PatchAddressReq;
 import com.example.demo.src.address.model.PostAddressReq;
 import com.example.demo.src.user.UserDao;
 import com.example.demo.utils.JwtService;
@@ -9,9 +10,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
+import javax.transaction.Transactional;
+
+import static com.example.demo.config.BaseResponseStatus.*;
+import static com.example.demo.config.BaseResponseStatus.FAILED_TO_UPDATE_ADDRESSES;
 
 @Service
+@Transactional(rollbackOn = BaseException.class)
 public class AddressService {
     private final AddressProvider addressProvider;
     private final AddressDao addressDao;
@@ -29,20 +34,61 @@ public class AddressService {
     }
 
     public int createAddress(PostAddressReq postAddressReq) throws BaseException {
-            try {
-                // 집 주소를 등록할 때, 기존 집을 대체하는 경우
-                if (postAddressReq.getAliasType().equalsIgnoreCase("HOME") && userDao.checkUserHomeAddress(postAddressReq.getUserIdx()) == 1) {
-                    int beforeHomeIdx = userDao.getUserHomeIdx(postAddressReq.getUserIdx());
-                    userDao.updateStatusAddress(beforeHomeIdx); // 기존 집 삭제
-                }
-                // 회사 주소를 등록할 때, 기존 회사를 대체하는 경우
-                if (postAddressReq.getAliasType().equalsIgnoreCase("COMPANY") && userDao.checkUserCompanyAddress(postAddressReq.getUserIdx()) == 1) {
-                    int beforeCompanyIdx = userDao.getUserCompanyIdx(postAddressReq.getUserIdx());
-                    userDao.updateStatusAddress(beforeCompanyIdx); // 기존 회사 삭제
-                }
-                return addressDao.insertAddress(postAddressReq);
-            } catch (Exception exception) {
-                throw new BaseException(DATABASE_ERROR);
+        // alias가 공백인 경우 null로 저장
+        if (postAddressReq.getAlias() != null && postAddressReq.getAlias().replace(" ", "").length() == 0) {
+            postAddressReq.setAlias(null);
+        }
+
+        try {
+            // 집 주소를 등록할 때, 기존 집을 대체하는 경우
+            if (postAddressReq.getAliasType().equalsIgnoreCase("HOME") && userDao.checkUserHomeAddress(postAddressReq.getUserIdx()) == 1) {
+                int beforeHomeIdx = userDao.getUserHomeIdx(postAddressReq.getUserIdx());
+                addressDao.updateAddressTypeAndInitAlias(beforeHomeIdx, "ETC"); // 기존 집 "ETC" 변경, alias 제거
             }
+            // 회사 주소를 등록할 때, 기존 회사를 대체하는 경우
+            if (postAddressReq.getAliasType().equalsIgnoreCase("COMPANY") && userDao.checkUserCompanyAddress(postAddressReq.getUserIdx()) == 1) {
+                int beforeCompanyIdx = userDao.getUserCompanyIdx(postAddressReq.getUserIdx());
+                addressDao.updateAddressTypeAndInitAlias(beforeCompanyIdx,"ETC"); // 기존 회사 "ETC" 변경, alias 제거
+                }
+            return addressDao.insertAddress(postAddressReq);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public int updateAddress(PatchAddressReq patchAddressReq, int addressIdx, int userIdx) throws BaseException {
+        // 주소 존재 확인
+        if (addressDao.checkAddressIdx(addressIdx) == 0) {
+            throw new BaseException(ADDRESSES_NOT_FOUND);
+        }
+        // 주소를 등록한 유저인지 확인
+        if (addressDao.checkAddressByOwner(addressIdx, userIdx) == 0) {
+            throw new BaseException(INVALID_USER_JWT);
+        }
+        // 입력받은 alias가 공백인 경우 null로 저장하기위해 변경
+        if (patchAddressReq.getAlias() != null && patchAddressReq.getAlias().replace(" ", "").length() == 0) {
+            patchAddressReq.setAlias(null);
+        }
+
+        try {
+            // 집 주소 대체일 경우 기존 집 주소 "ETC"으로 변경, , alias 제거
+            if (patchAddressReq.getAliasType().equalsIgnoreCase("HOME") && userDao.checkUserHomeAddress(userIdx) == 1) {
+                int beforeHomeIdx = userDao.getUserHomeIdx(userIdx);
+                addressDao.updateAddressTypeAndInitAlias(beforeHomeIdx, "ETC");
+            } else if (patchAddressReq.getAliasType().equalsIgnoreCase("COMPANY") && userDao.checkUserCompanyAddress(userIdx) == 1) {
+                // 회사 주소 대체일 경우 기존 회사 주소 "ETC"으로 변경, alias 제거
+                int beforeCompanyIdx = userDao.getUserCompanyIdx(userIdx);
+                addressDao.updateAddressTypeAndInitAlias(beforeCompanyIdx, "ETC");
+            }
+
+            int updatedCount = addressDao.updateAddress(addressIdx, patchAddressReq);
+            if (updatedCount != 1) {
+                throw new BaseException(FAILED_TO_UPDATE_ADDRESSES);
+            }
+            return updatedCount;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
     }
 }

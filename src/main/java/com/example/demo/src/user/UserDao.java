@@ -127,12 +127,4 @@ public class UserDao {
 
         return this.jdbcTemplate.queryForObject(checkUserCompanyAddressQuery, int.class, checkUserCompanyAddressParams);
     }
-
-
-    public int updateStatusAddress(int homeIdx) {
-        String updateStatusAddressQuery = "update Address set status = 'N' where idx = ? ";
-        int updateStatusAddressParams = homeIdx;
-
-        return this.jdbcTemplate.update(updateStatusAddressQuery, updateStatusAddressParams); // 개수 반환
-    }
 }

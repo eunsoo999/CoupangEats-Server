@@ -2,10 +2,7 @@ package com.example.demo.src.address;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.address.model.GetAddressDetailRes;
-import com.example.demo.src.address.model.GetAddressesRes;
-import com.example.demo.src.address.model.PostAddressReq;
-import com.example.demo.src.address.model.PostAddressRes;
+import com.example.demo.src.address.model.*;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,8 +46,7 @@ public class AddressController {
         }
         else if (postAddressReq.getAliasType() != null && !(postAddressReq.getAliasType().equalsIgnoreCase("HOME")
                 || postAddressReq.getAliasType().equalsIgnoreCase("COMPANY")
-                || postAddressReq.getAliasType().equalsIgnoreCase("ETC")
-                || postAddressReq.getAliasType().equalsIgnoreCase("NONE"))) {
+                || postAddressReq.getAliasType().equalsIgnoreCase("ETC"))) {
             return new BaseResponse<>(ADDRESSES_INVALID_ALIASTYPE);
         } // 별칭 타입 검증
 
@@ -89,6 +85,38 @@ public class AddressController {
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ", " + addressIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 11. 배달 주소 수정 API
+     * [PATCH] /addresses/:addressIdx/users/:userIdx
+     * @return BaseResponse<PatchAddressRes>
+     */
+    @ResponseBody
+    @PatchMapping("/{addressIdx}/users/{userIdx}")
+    public BaseResponse<PatchAddressRes> patchAddress(@RequestBody PatchAddressReq patchAddressReq, @PathVariable int addressIdx, @PathVariable int userIdx) {
+        // request 검증
+        if (patchAddressReq.getAliasType() == null) {
+            return new BaseResponse<>(ADDRESSES_EMPTY_ALIASTYPE);
+        } else if (patchAddressReq.getAliasType() != null && !(patchAddressReq.getAliasType().equalsIgnoreCase("HOME")
+                || patchAddressReq.getAliasType().equalsIgnoreCase("COMPANY")
+                || patchAddressReq.getAliasType().equalsIgnoreCase("ETC"))) {
+            return new BaseResponse<>(ADDRESSES_INVALID_ALIASTYPE);
+        }
+
+        try {
+            // jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            int updatedCount = addressService.updateAddress(patchAddressReq, addressIdx, userIdx);
+            return new BaseResponse<>(new PatchAddressRes(updatedCount));
+        } catch (BaseException exception) {
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn(patchAddressReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }

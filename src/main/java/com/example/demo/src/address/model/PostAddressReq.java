@@ -15,8 +15,8 @@ public class PostAddressReq {
     private String address;
     private String roadAddress;
     private String detailAddress;
-    private String alias;
     private String aliasType;
+    private String alias;
     private BigDecimal latitude;
     private BigDecimal longitude;
     private int userIdx;

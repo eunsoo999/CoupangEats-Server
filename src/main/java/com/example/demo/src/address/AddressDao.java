@@ -19,11 +19,11 @@ public class AddressDao {
     }
 
     public List<GetAddressRes> selectAddressList(int userIdx) {
-        String selectAddressListQuery = "select Address.idx as 'addressIdx', if (alias is null, address, alias) as 'mainAddress', " +
-                "concat(roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress', " +
+        String selectAddressListQuery = "select Address.idx as 'addressIdx', if ((alias is null || length(replace(Address.alias, ' ', '')) = 0), address, alias) as 'mainAddress', " +
+                "concat(roadAddress, if((Address.detailAddress is not null), concat(' ', Address.detailAddress), '')) as 'subAddress', " +
                 "latitude, longitude " +
                 "from Address inner join User on Address.userIdx = User.idx " +
-                "where userIdx = ? and (Address.status = 'ETC' or Address.status = 'NONE') and User.status != 'N' " +
+                "where userIdx = ? and Address.status = 'ETC' and User.status != 'N' " +
                 "order by Address.updatedAt DESC";
         int selectAddressListParams = userIdx;
 
@@ -89,7 +89,7 @@ public class AddressDao {
     }
 
     public GetAddressDetailRes getAddress(int addressIdx) {
-        String getAddressDetailQuery = "select address, roadAddress, detailAddress, alias, status as 'aliasType' from Address where idx = ?";
+        String getAddressDetailQuery = "select address, roadAddress, detailAddress, status as 'aliasType', alias from Address where idx = ?";
         int getAddressParams = addressIdx;
 
         return this.jdbcTemplate.queryForObject(getAddressDetailQuery,
@@ -97,8 +97,8 @@ public class AddressDao {
                         rs.getString("address"),
                         rs.getString("roadAddress"),
                         rs.getString("detailAddress"),
-                        rs.getString("alias"),
-                        rs.getString("aliasType")), getAddressParams);
+                        rs.getString("aliasType"),
+                        rs.getString("alias")), getAddressParams);
     }
 
     public int checkAddressByOwner(int addressIdx, int userIdx) {
@@ -106,5 +106,19 @@ public class AddressDao {
         Object[] checkAddressParams = new Object[] {addressIdx, userIdx};
 
         return this.jdbcTemplate.queryForObject(checkAddressQuery, int.class, checkAddressParams);
+    }
+
+    public int updateAddress(int addressIdx, PatchAddressReq patchAddressReq) {
+        String updateStatusAddressQuery = "update Address set detailAddress = ?, alias = ?, status = ? where idx = ?";
+        Object[] updateAddressParams = new Object[]{patchAddressReq.getDetailAddress(), patchAddressReq.getAlias(), patchAddressReq.getAliasType(), addressIdx};
+
+        return this.jdbcTemplate.update(updateStatusAddressQuery, updateAddressParams); // 개수 반환
+    }
+
+    public int updateAddressTypeAndInitAlias(int beforeHomeIdx, String typeStr) {
+        String updateAddressTypeQuery = "update Address set status = ?, alias = null where idx = ?";
+        Object[] updateAddressTypeParams = new Object[]{typeStr, beforeHomeIdx};
+
+        return this.jdbcTemplate.update(updateAddressTypeQuery, updateAddressTypeParams);
     }
 }
