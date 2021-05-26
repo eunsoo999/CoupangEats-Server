@@ -76,8 +76,8 @@ public enum BaseResponseStatus {
     PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
 
     FAILED_TO_UPDATE_ADDRESSES(false,4020,"배달 주소 수정에 실패하였습니다."),
-    FAILED_TO_UPDATE_STATUS_ADDRESSES(false, 4021, "배달 주소 삭제에 실패하였습니다.");
-
+    FAILED_TO_UPDATE_STATUS_ADDRESSES(false, 4021, "배달 주소 삭제에 실패하였습니다."),
+    FAILED_TO_UPDATE_USER_ADDRESS(false, 4022, "주소 선택에 실패하였습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요

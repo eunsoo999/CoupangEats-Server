@@ -119,4 +119,14 @@ public class AddressDao {
 
         return this.jdbcTemplate.update(updateStatusAddressQuery, updateStatusAddressParams);
     }
+
+    public GetLocationRes getLocation(int addressIdx) {
+        String getLocationQuery = "select latitude, longitude from Address where idx = ?";
+        int getLocationParams = addressIdx;
+
+        return this.jdbcTemplate.queryForObject(getLocationQuery,
+                (rs,rowNum) -> new GetLocationRes(
+                        rs.getString("latitude"),
+                        rs.getString("longitude")), getLocationParams);
+    }
 }

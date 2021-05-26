@@ -1,6 +1,7 @@
 package com.example.demo.src.user;
 
 import com.example.demo.src.address.AddressProvider;
+import com.example.demo.src.address.model.GetLocationRes;
 import com.example.demo.utils.SmsAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +47,6 @@ public class UserController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
-        logger.warn("#1. " + postUserReq.toString());
         if(postUserReq.getEmail() == null || postUserReq.getEmail().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         } else if(!isRegexEmail(postUserReq.getEmail())) {
@@ -89,7 +89,6 @@ public class UserController {
     @ResponseBody
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq){
-        logger.warn("#2. " + postLoginReq.toString());
         if(postLoginReq.getEmail() == null || postLoginReq.getEmail().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
@@ -118,7 +117,6 @@ public class UserController {
     @ResponseBody
     @GetMapping("/email/check")
     public BaseResponse<GetDuplicatedEmailRes> checkDuplicatedEmail(@RequestParam String email) {
-        logger.warn("#3. " + email);
         // request 값 확인
         if (email.isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
@@ -147,7 +145,6 @@ public class UserController {
     @ResponseBody
     @GetMapping("/phone/check")
     public BaseResponse<GetDuplicatedPhoneRes> checkDuplicatedPhone(@RequestParam String phone) {
-        logger.warn("#4. " + phone);
         // request 값 확인
         if (phone.isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
@@ -246,6 +243,29 @@ public class UserController {
         } catch (BaseException exception) {
             logger.warn("#13. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ", "+ type + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 14. 기본 배달 주소 선택 API 추가
+     * [PATCH] /users/:userIdx/pick/addresses/:addressIdx
+     * @return BaseResponse<PatchUserRes>
+     */
+    @ResponseBody
+    @PatchMapping("/{userIdx}/pick/addresses/{addressIdx}")
+    public BaseResponse<GetLocationRes> patchUserAddressIdx(@PathVariable int userIdx, @PathVariable int addressIdx) {
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetLocationRes result = userService.updateUserAddressIdx(userIdx, addressIdx);
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            logger.warn("#14. " + exception.getStatus().getMessage());
+            logger.warn("(" + userIdx + ", "+ addressIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
