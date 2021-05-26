@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -15,6 +13,4 @@ public class GetHomeAddress {
     private int addressIdx;
     private String mainAddress;
     private String subAddress;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
 }

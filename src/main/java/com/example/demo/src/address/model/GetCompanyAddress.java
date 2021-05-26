@@ -15,6 +15,4 @@ public class GetCompanyAddress {
     private int addressIdx;
     private String mainAddress;
     private String subAddress;
-    private BigDecimal latitude;
-    private BigDecimal longitude;
 }

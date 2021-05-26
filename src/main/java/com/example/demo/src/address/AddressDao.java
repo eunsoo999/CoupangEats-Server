@@ -20,8 +20,7 @@ public class AddressDao {
 
     public List<GetAddressRes> selectAddressList(int userIdx) {
         String selectAddressListQuery = "select Address.idx as 'addressIdx', if ((alias is null || length(replace(Address.alias, ' ', '')) = 0), address, alias) as 'mainAddress', " +
-                "concat(roadAddress, if((Address.detailAddress is not null), concat(' ', Address.detailAddress), '')) as 'subAddress', " +
-                "latitude, longitude " +
+                "concat(roadAddress, if((Address.detailAddress is not null), concat(' ', Address.detailAddress), '')) as 'subAddress' " +
                 "from Address inner join User on Address.userIdx = User.idx " +
                 "where userIdx = ? and Address.status = 'ETC' and User.status != 'N' " +
                 "order by Address.updatedAt DESC";
@@ -31,9 +30,7 @@ public class AddressDao {
                 (rs,rowNum) -> new GetAddressRes(
                         rs.getInt("addressIdx"),
                         rs.getString("mainAddress"),
-                        rs.getString("subAddress"),
-                        rs.getBigDecimal("latitude"),
-                        rs.getBigDecimal("longitude")), selectAddressListParams);
+                        rs.getString("subAddress")), selectAddressListParams);
     }
 
     public int insertAddress(PostAddressReq postAddressReq) {
@@ -48,8 +45,7 @@ public class AddressDao {
 
     public GetHomeAddress selectHomeAddress(int userIdx) {
         String selectHomeAddressQuery = "select idx as 'addressIdx', '집' as 'mainAddress', " +
-                "concat(Address.roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress', " +
-                "latitude, longitude " +
+                "concat(Address.roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress' " +
                 "from Address where userIdx = ? and status = 'HOME'";
 
         int selectHomeAddressParams = userIdx;
@@ -58,15 +54,12 @@ public class AddressDao {
                 (rs,rowNum) -> new GetHomeAddress(
                         rs.getInt("addressIdx"),
                         rs.getString("mainAddress"),
-                        rs.getString("subAddress"),
-                        rs.getBigDecimal("latitude"),
-                        rs.getBigDecimal("longitude")), selectHomeAddressParams);
+                        rs.getString("subAddress")), selectHomeAddressParams);
     }
 
     public GetCompanyAddress selectCompanyAddress(int userIdx) {
         String selectCompanyAddressQuery = "select idx as 'addressIdx', '회사' as 'mainAddress', " +
-                "concat(Address.roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress', " +
-                "latitude, longitude " +
+                "concat(Address.roadAddress, if(Address.detailAddress is not null, concat(' ', Address.detailAddress), '')) as 'subAddress' " +
                 "from Address " +
                 "where userIdx = ? and status = 'COMPANY'";
 
@@ -76,9 +69,7 @@ public class AddressDao {
                 (rs,rowNum) -> new GetCompanyAddress(
                         rs.getInt("addressIdx"),
                         rs.getString("mainAddress"),
-                        rs.getString("subAddress"),
-                        rs.getBigDecimal("latitude"),
-                        rs.getBigDecimal("longitude")), selectCompanyAddressParams);
+                        rs.getString("subAddress")), selectCompanyAddressParams);
     }
 
     public int checkAddressIdx(int addressIdx) {
