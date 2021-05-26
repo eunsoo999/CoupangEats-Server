@@ -46,6 +46,7 @@ public class UserController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
+        logger.warn("#1. " + postUserReq.toString());
         if(postUserReq.getEmail() == null || postUserReq.getEmail().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         } else if(!isRegexEmail(postUserReq.getEmail())) {
@@ -88,6 +89,7 @@ public class UserController {
     @ResponseBody
     @PostMapping("/login")
     public BaseResponse<PostLoginRes> logIn(@RequestBody PostLoginReq postLoginReq){
+        logger.warn("#2. " + postLoginReq.toString());
         if(postLoginReq.getEmail() == null || postLoginReq.getEmail().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
         }
@@ -116,6 +118,7 @@ public class UserController {
     @ResponseBody
     @GetMapping("/email/check")
     public BaseResponse<GetDuplicatedEmailRes> checkDuplicatedEmail(@RequestParam String email) {
+        logger.warn("#3. " + email);
         // request 값 확인
         if (email.isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
@@ -144,6 +147,7 @@ public class UserController {
     @ResponseBody
     @GetMapping("/phone/check")
     public BaseResponse<GetDuplicatedPhoneRes> checkDuplicatedPhone(@RequestParam String phone) {
+        logger.warn("#4. " + phone);
         // request 값 확인
         if (phone.isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
@@ -242,29 +246,6 @@ public class UserController {
         } catch (BaseException exception) {
             logger.warn("#13. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ", "+ type + ")");
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
-     * 14. 유저의 기본 주소 선택 API
-     * [PATCH] /users/:userIdx/pick/addresses/:addressIdx
-     * @return BaseResponse<PatchUserRes>
-     */
-    @ResponseBody
-    @PatchMapping("/{userIdx}/pick/addresses/{addressIdx}")
-    public BaseResponse<PatchUserRes> patchUserAddressIdx(@PathVariable int userIdx, @PathVariable int addressIdx) {
-        try {
-            //jwt 확인
-            int userIdxByJwt = jwtService.getUserIdx();
-            if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
-            }
-            PatchUserRes patchUserRes = userService.updateUserAddressIdx(userIdx, addressIdx);
-            return new BaseResponse<>(patchUserRes);
-        } catch (BaseException exception) {
-            logger.warn("#14. " + exception.getStatus().getMessage());
-            logger.warn("(" + userIdx + ", "+ addressIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
