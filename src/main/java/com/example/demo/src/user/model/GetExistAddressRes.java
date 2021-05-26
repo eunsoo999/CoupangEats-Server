@@ -12,5 +12,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetExistAddressRes {
-    private boolean existsStatus;
+    private String existsStatus;
 }

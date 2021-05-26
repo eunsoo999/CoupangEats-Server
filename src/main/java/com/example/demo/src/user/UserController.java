@@ -1,8 +1,6 @@
 package com.example.demo.src.user;
 
 import com.example.demo.src.address.AddressProvider;
-import com.example.demo.src.address.model.GetAddressDetailRes;
-import com.example.demo.src.address.model.GetAddressesRes;
 import com.example.demo.utils.SmsAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,9 +127,9 @@ public class UserController {
             GetDuplicatedEmailRes getDuplicatedRes;
             // 중복된 이메일일 경우
             if (userProvider.checkEmail(email) == 1) {
-                getDuplicatedRes = new GetDuplicatedEmailRes(true);
+                getDuplicatedRes = new GetDuplicatedEmailRes("Y");
             } else {
-                getDuplicatedRes = new GetDuplicatedEmailRes(false);
+                getDuplicatedRes = new GetDuplicatedEmailRes("N");
             }
             return new BaseResponse<>(getDuplicatedRes);
         } catch (BaseException exception) {
@@ -158,9 +156,9 @@ public class UserController {
             GetDuplicatedPhoneRes getDuplicatedPhoneRes;
             if(userProvider.checkPhone(phone) == 1) {
                 String duplicatedEmail = userProvider.getMaskingEmailByPhone(phone);
-                getDuplicatedPhoneRes = new GetDuplicatedPhoneRes(true, duplicatedEmail);
+                getDuplicatedPhoneRes = new GetDuplicatedPhoneRes("Y", duplicatedEmail);
             } else {
-                getDuplicatedPhoneRes = new GetDuplicatedPhoneRes(false, null);
+                getDuplicatedPhoneRes = new GetDuplicatedPhoneRes("N", null);
             }
             return new BaseResponse<>(getDuplicatedPhoneRes);
         } catch (BaseException exception) {

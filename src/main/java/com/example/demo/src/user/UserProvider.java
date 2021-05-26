@@ -99,16 +99,16 @@ public class UserProvider {
             if(type.equalsIgnoreCase("HOME")) {
                 int result = userDao.checkUserHomeAddress(userIdx);
                 if (result == 1) {
-                    getExistAddressRes.setExistsStatus(true);
+                    getExistAddressRes.setExistsStatus("Y");
                 } else {
-                    getExistAddressRes.setExistsStatus(false);
+                    getExistAddressRes.setExistsStatus("N");
                 }
             } else if(type.equalsIgnoreCase("COMPANY")) {
                 int result = userDao.checkUserCompanyAddress(userIdx);
                 if (result == 1) {
-                    getExistAddressRes.setExistsStatus(true);
+                    getExistAddressRes.setExistsStatus("Y");
                 } else {
-                    getExistAddressRes.setExistsStatus(false);
+                    getExistAddressRes.setExistsStatus("N");
                 }
             }
             return getExistAddressRes;

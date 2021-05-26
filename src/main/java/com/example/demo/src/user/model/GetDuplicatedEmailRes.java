@@ -8,5 +8,5 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 public class GetDuplicatedEmailRes {
-    private boolean isDuplicated;
+    private String isDuplicated;
 }
