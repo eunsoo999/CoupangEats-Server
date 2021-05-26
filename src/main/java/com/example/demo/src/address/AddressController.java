@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import static com.example.demo.config.BaseResponseStatus.*;
 
 @RestController
-@RequestMapping("/addresses")
+@RequestMapping("")
 public class AddressController {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -30,12 +30,36 @@ public class AddressController {
     }
 
     /**
+     * 8. 유저의 배달 주소 목록 조회 API
+     * [GET] /users/:userIdx/addresses
+     * @return BaseResponse<GetAddressesRes>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/addresses")
+    public BaseResponse<GetAddressesRes> getUserAddresses(@PathVariable int userIdx) {
+        try {
+            //jwt에서 idx 추출.
+            int userIdxByJwt = jwtService.getUserIdx();
+            //userIdx와 접근한 유저가 같은지 확인
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetAddressesRes getAddressesRes = addressProvider.getAddreses(userIdx);
+            return new BaseResponse<>(getAddressesRes);
+        } catch (BaseException exception) {
+            logger.warn(exception.getStatus().getMessage());
+            logger.warn("(" + userIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 9. 배달 주소 추가 API
      * [POST] /addresses
      * @return BaseResponse<PostAddressRes>
      */
     @ResponseBody
-    @PostMapping("")
+    @PostMapping("/addresses")
     public BaseResponse<PostAddressRes> postAddress(@RequestBody PostAddressReq postAddressReq) {
         if (postAddressReq.getAddress() == null) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ADDRESS);
@@ -70,12 +94,12 @@ public class AddressController {
     }
 
     /**
-     * 10. 유저의 배달 주소 조회 API
-     * [GET] /addresses/:addressIdx/users/:userIdx
+     * 10. 배달 주소 조회 API
+     * [GET] /users/:userIdx/addresses/:addressIdx
      * @return BaseResponse<GetAddressDetailRes>
      */
     @ResponseBody
-    @GetMapping("/{addressIdx}/users/{userIdx}")
+    @GetMapping("/users/{userIdx}/addresses/{addressIdx}")
     public BaseResponse<GetAddressDetailRes> getAddress(@PathVariable int userIdx, @PathVariable int addressIdx) {
         try {
             // jwt 확인
@@ -94,11 +118,11 @@ public class AddressController {
 
     /**
      * 11. 배달 주소 수정 API
-     * [PATCH] /addresses/:addressIdx/users/:userIdx
+     * [PATCH] /users/:userIdx/addresses/:addressIdx
      * @return BaseResponse<PatchAddressRes>
      */
     @ResponseBody
-    @PatchMapping("/{addressIdx}/users/{userIdx}")
+    @PatchMapping("/users/{userIdx}/addresses/{addressIdx}")
     public BaseResponse<PatchAddressRes> patchAddress(@RequestBody PatchAddressReq patchAddressReq, @PathVariable int addressIdx, @PathVariable int userIdx) {
         // request 검증
         if (patchAddressReq.getAliasType() == null) {
@@ -126,11 +150,11 @@ public class AddressController {
 
     /**
      * 12. 배달 주소 삭제 API
-     * [PATCH] /:addressIdx/status/users/:userIdx
+     * [PATCH] /users/:userIdx/addresses/:addressIdx/status
      * @return BaseResponse<PatchAddressRes>
      */
     @ResponseBody
-    @PatchMapping("/{addressIdx}/status/users/{userIdx}")
+    @PatchMapping("/users/{userIdx}/addresses/{addressIdx}/status")
     public BaseResponse<PatchAddressRes> patchAddress(@PathVariable int addressIdx, @PathVariable int userIdx) {
         try {
             // jwt 확인
@@ -145,6 +169,8 @@ public class AddressController {
             logger.warn("(" + addressIdx + ", " + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
-
     }
+
+
+
 }

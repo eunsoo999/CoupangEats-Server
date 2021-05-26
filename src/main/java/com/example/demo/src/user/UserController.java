@@ -41,60 +41,6 @@ public class UserController {
     }
 
     /**
-     * 로그인 유저 정보 조회 API
-     * [GET] /users/:userIdx
-     * @return BaseResponse<GetUserRes>
-     */
-    @ResponseBody
-    @GetMapping("/{userIdx}")
-    public BaseResponse<GetUserRes> getUser(@PathVariable int userIdx) {
-        try {
-            //jwt에서 idx 추출.
-            int userIdxByJwt = jwtService.getUserIdx();
-            //userIdx와 접근한 유저가 같은지 확인
-            if(userIdx != userIdxByJwt){
-                return new BaseResponse<>(INVALID_USER_JWT);
-            }
-
-            GetUserRes getUserRes = userProvider.retrieveUser(userIdx);
-            return new BaseResponse<>(getUserRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
-     * 휴대폰 인증번호 발송 API
-     * [POST] /users/auth/phone
-     */
-    @ResponseBody
-    @PostMapping("/auth/phone")
-    public BaseResponse<PostUserPhoneRes> sendMessage(@RequestBody PostUserPhoneReq postUserPhoneReq) throws BaseException {
-        if(postUserPhoneReq.getPhone() == null || postUserPhoneReq.getPhone().isEmpty()) {
-            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
-        }
-        if(!isRegexPhone(postUserPhoneReq.getPhone())) {
-            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
-        }
-        // 중복 체크
-        try {
-            if(userProvider.checkPhone(postUserPhoneReq.getPhone()) == 1) {
-                return new BaseResponse<>(DUPLICATED_PHONE);
-            }
-        } catch(BaseException exception){
-            return new BaseResponse<>(exception.getStatus());
-        }
-
-        try{
-            PostUserPhoneRes postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone());
-            return new BaseResponse<>(postUserPhoneRes);
-        } catch(BaseException exception){
-            logger.warn("");
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
      * 1. 회원가입 API
      * [POST] /users
      * @return BaseResponse<PostUserRes>
@@ -221,25 +167,55 @@ public class UserController {
     }
 
     /**
-     * 8. 유저의 배달 주소 목록 조회 API
-     * [GET] /users/:userIdx/addresses
-     * @return BaseResponse<GetAddressesRes>
+     * 5. 휴대폰 인증번호 발송 API
+     * [POST] /users/auth/phone
      */
     @ResponseBody
-    @GetMapping("/{userIdx}/addresses")
-    public BaseResponse<GetAddressesRes> getUserAddresses(@PathVariable int userIdx) {
+    @PostMapping("/auth/phone")
+    public BaseResponse<PostUserPhoneRes> sendMessage(@RequestBody PostUserPhoneReq postUserPhoneReq) throws BaseException {
+        if(postUserPhoneReq.getPhone() == null || postUserPhoneReq.getPhone().isEmpty()) {
+            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
+        }
+        if(!isRegexPhone(postUserPhoneReq.getPhone())) {
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+        }
+        // 중복 체크
+        try {
+            if(userProvider.checkPhone(postUserPhoneReq.getPhone()) == 1) {
+                return new BaseResponse<>(DUPLICATED_PHONE);
+            }
+        } catch(BaseException exception){
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+        try{
+            PostUserPhoneRes postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone());
+            return new BaseResponse<>(postUserPhoneRes);
+        } catch(BaseException exception){
+            logger.warn("");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 6. 로그인 유저 정보 조회 API
+     * [GET] /users/:userIdx
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}")
+    public BaseResponse<GetUserRes> getUser(@PathVariable int userIdx) {
         try {
             //jwt에서 idx 추출.
             int userIdxByJwt = jwtService.getUserIdx();
             //userIdx와 접근한 유저가 같은지 확인
-            if (userIdx != userIdxByJwt) {
+            if(userIdx != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
-            GetAddressesRes getAddressesRes = addressProvider.getAddreses(userIdx);
-            return new BaseResponse<>(getAddressesRes);
+
+            GetUserRes getUserRes = userProvider.retrieveUser(userIdx);
+            return new BaseResponse<>(getUserRes);
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
-            logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
