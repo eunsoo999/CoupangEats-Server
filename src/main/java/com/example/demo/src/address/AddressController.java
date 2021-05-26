@@ -43,12 +43,15 @@ public class AddressController {
             return new BaseResponse<>(ADDRESSES_EMPTY_ROADADDRESS);
         } else if (postAddressReq.getAliasType() == null) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ALIASTYPE);
-        }
-        else if (postAddressReq.getAliasType() != null && !(postAddressReq.getAliasType().equalsIgnoreCase("HOME")
+        } else if (postAddressReq.getAliasType() != null && !(postAddressReq.getAliasType().equalsIgnoreCase("HOME")
                 || postAddressReq.getAliasType().equalsIgnoreCase("COMPANY")
                 || postAddressReq.getAliasType().equalsIgnoreCase("ETC"))) {
             return new BaseResponse<>(ADDRESSES_INVALID_ALIASTYPE);
-        } // 별칭 타입 검증
+        } else if (postAddressReq.getLatitude().intValue() >= 100) {
+            return new BaseResponse<>(ADDRESSES_EMPTY_LATITUDE);
+        } else if (postAddressReq.getLongitude().intValue() >= 1000) {
+            return new BaseResponse<>(ADDRESSES_EMPTY_LONGITUDE);
+        }
 
         try {
             int userIdxByJwt = jwtService.getUserIdx();

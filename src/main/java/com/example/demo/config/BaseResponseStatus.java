@@ -35,12 +35,16 @@ public enum BaseResponseStatus {
     POST_USERS_INVALID_PASSWORD_SEQ(false, 2021, "비밀번호 3개 이상 연속되거나 동일한 문자/숫자는 불가능합니다."),
     POST_USERS_INVALID_PASSWORD_ID(false, 2022, "비밀번호는 아이디(이메일) 제외여야합니다."),
     POST_USERS_EMPTY_USERNAME(false, 2023, "이름을 입력해주세요."),
+    POST_USERS_LENGTH_USERNAME(false, 2024, "이름의 길이는 2자 이상 30자 이하여야합니다."),
+    POST_USERS_INVALID_USERNAME(false, 2025, "이름을 정확히 입력해주세요."),
 
     // Address
     ADDRESSES_EMPTY_ADDRESS(false, 2050, "주소를 입력해주세요."),
     ADDRESSES_EMPTY_ROADADDRESS(false, 2051, "도로명주소를 입력해주세요."),
     ADDRESSES_EMPTY_ALIASTYPE(false, 2052, "별칭 타입을 입력해주세요."),
     ADDRESSES_INVALID_ALIASTYPE(false, 2053, "별칭 타입 형태가 잘못되었습니다."),
+    ADDRESSES_EMPTY_LATITUDE(false, 2054, "위도 값을 확인해주세요."),
+    ADDRESSES_EMPTY_LONGITUDE(false, 2055, "경도 값을 확인해주세요."),
 
     /**
      * 3000 : Response 오류

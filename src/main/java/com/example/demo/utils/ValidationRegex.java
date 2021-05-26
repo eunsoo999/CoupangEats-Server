@@ -54,5 +54,12 @@ public class ValidationRegex {
         }
         return true;
     }
+
+    public static boolean isRegexName(String target) {
+        String regex = "^[가-힣]{2,30}$";
+        Pattern pattern = Pattern.compile(regex, Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(target);
+        return matcher.find();
+    }
 }
 

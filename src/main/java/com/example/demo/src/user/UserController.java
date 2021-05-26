@@ -104,30 +104,26 @@ public class UserController {
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
         if(postUserReq.getEmail() == null || postUserReq.getEmail().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
-        }
-        if(!isRegexEmail(postUserReq.getEmail())) {
+        } else if(!isRegexEmail(postUserReq.getEmail())) {
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
-        }
-        if(postUserReq.getPhone() == null || postUserReq.getPhone().isEmpty()) {
+        } else if(postUserReq.getPhone() == null || postUserReq.getPhone().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
-        }
-        if(!isRegexPhone(postUserReq.getPhone())) {
+        } else if(!isRegexPhone(postUserReq.getPhone())) {
             return new BaseResponse<>(POST_USERS_INVALID_PHONE);
-        }
-        if(postUserReq.getPassword() == null || postUserReq.getPassword().isEmpty()) {
+        } else if(postUserReq.getPassword() == null || postUserReq.getPassword().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PASSWORD);
-        }
-        if(!isRegexPassword(postUserReq.getPassword())) {
+        } else if(!isRegexPassword(postUserReq.getPassword())) {
             return new BaseResponse<>(POST_USERS_INVALID_PASSWORD);
-        }
-        if(postUserReq.getPassword().contains(postUserReq.getEmail().split("@")[0])) {
+        } else if(postUserReq.getPassword().contains(postUserReq.getEmail().split("@")[0])) {
             return new BaseResponse<>(POST_USERS_INVALID_PASSWORD_ID);
-        }
-        if(!isRegexPasswordSequence(postUserReq.getPassword())) {
+        } else if(!isRegexPasswordSequence(postUserReq.getPassword())) {
             return new BaseResponse<>(POST_USERS_INVALID_PASSWORD_SEQ);
-        }
-        if(postUserReq.getUserName() == null || postUserReq.getUserName().isEmpty()) {
+        } else if(postUserReq.getUserName() == null || postUserReq.getUserName().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_USERNAME);
+        } else if(postUserReq.getUserName().length() > 40 || postUserReq.getUserName().length() < 2) {
+            return new BaseResponse<>(POST_USERS_LENGTH_USERNAME);
+        } else if(!isRegexName(postUserReq.getUserName())) {
+            return new BaseResponse<>(POST_USERS_INVALID_USERNAME);
         }
 
         try{
