@@ -3,11 +3,14 @@ package com.example.demo.src.address;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.address.model.*;
+import com.example.demo.utils.GeoCoding;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -61,9 +64,10 @@ public class AddressController {
     @ResponseBody
     @PostMapping("/addresses")
     public BaseResponse<PostAddressRes> postAddress(@RequestBody PostAddressReq postAddressReq) {
-        if (postAddressReq.getAddress() == null) {
+        // request 검증
+        if (postAddressReq.getAddress() == null || postAddressReq.getAddress().isEmpty()) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ADDRESS);
-        } else if (postAddressReq.getRoadAddress() == null) {
+        } else if (postAddressReq.getRoadAddress() == null || postAddressReq.getRoadAddress().isEmpty()) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ROADADDRESS);
         } else if (postAddressReq.getAliasType() == null) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ALIASTYPE);
@@ -71,25 +75,31 @@ public class AddressController {
                 || postAddressReq.getAliasType().equalsIgnoreCase("COMPANY")
                 || postAddressReq.getAliasType().equalsIgnoreCase("ETC"))) {
             return new BaseResponse<>(ADDRESSES_INVALID_ALIASTYPE);
-        } else if (postAddressReq.getLatitude().intValue() >= 100) {
-            return new BaseResponse<>(ADDRESSES_EMPTY_LATITUDE);
-        } else if (postAddressReq.getLongitude().intValue() >= 1000) {
-            return new BaseResponse<>(ADDRESSES_EMPTY_LONGITUDE);
         }
 
         try {
-            int userIdxByJwt = jwtService.getUserIdx();
             //userIdx와 접근한 유저가 같은지 확인
+            int userIdxByJwt = jwtService.getUserIdx();
             if(postAddressReq.getUserIdx() != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
+
+            // 전달받은 도로명 주소로 위도, 경도 추출 후 저장
+            GetLocationRes getLocationRes = GeoCoding.getLocation(postAddressReq.getRoadAddress());
+            postAddressReq.setLatitude(getLocationRes.getLatitude());
+            postAddressReq.setLongitude(getLocationRes.getLongitude());
+
+            // 주소 추가
             int createdIdx = addressService.createAddress(postAddressReq);
             PostAddressRes postAddressRes = new PostAddressRes(createdIdx);
+
             return new BaseResponse<>(postAddressRes);
         } catch (BaseException exception) {
             logger.warn(exception.getStatus().getMessage());
             logger.warn(postAddressReq.toString());
             return new BaseResponse<>(exception.getStatus());
+        } catch (UnsupportedEncodingException e) {
+            return new BaseResponse<>(ADDRESSES_NOT_FOUND_LOCATION);
         }
     }
 

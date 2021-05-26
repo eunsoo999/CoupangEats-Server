@@ -43,9 +43,7 @@ public enum BaseResponseStatus {
     ADDRESSES_EMPTY_ROADADDRESS(false, 2051, "도로명주소를 입력해주세요."),
     ADDRESSES_EMPTY_ALIASTYPE(false, 2052, "별칭 타입을 입력해주세요."),
     ADDRESSES_INVALID_ALIASTYPE(false, 2053, "별칭 타입 형태가 잘못되었습니다."),
-    ADDRESSES_EMPTY_LATITUDE(false, 2054, "위도 값을 확인해주세요."),
-    ADDRESSES_EMPTY_LONGITUDE(false, 2055, "경도 값을 확인해주세요."),
-    ADDRESSES_INVALID_TYPE(false, 2056, "type이 잘못되었습니다. HOME or COMPANY만 가능합니다."),
+    ADDRESSES_INVALID_TYPE(false, 2054, "type이 잘못되었습니다. HOME or COMPANY만 가능합니다."),
 
     /**
      * 3000 : Response 오류
