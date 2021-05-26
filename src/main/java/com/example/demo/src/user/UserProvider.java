@@ -92,4 +92,28 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public GetExistAddressRes checkExistsBasicAddress(int userIdx, String type) throws BaseException {
+        GetExistAddressRes getExistAddressRes = new GetExistAddressRes();
+        try{
+            if(type.equalsIgnoreCase("HOME")) {
+                int result = userDao.checkUserHomeAddress(userIdx);
+                if (result == 1) {
+                    getExistAddressRes.setExistsStatus(true);
+                } else {
+                    getExistAddressRes.setExistsStatus(false);
+                }
+            } else if(type.equalsIgnoreCase("COMPANY")) {
+                int result = userDao.checkUserCompanyAddress(userIdx);
+                if (result == 1) {
+                    getExistAddressRes.setExistsStatus(true);
+                } else {
+                    getExistAddressRes.setExistsStatus(false);
+                }
+            }
+            return getExistAddressRes;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
