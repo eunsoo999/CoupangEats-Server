@@ -31,6 +31,14 @@ public class StoreProvider {
     public GetMainRes getMainStores(SearchOption searchOption) throws BaseException {
         GetMainRes getMainRes = new GetMainRes();
         try{
+            // 할인중인 맛집
+            List<GetStoreSmallBox> getStoreSmallBoxList = storeDao.selectOnsaleStoresUptoTen(searchOption.getLat(), searchOption.getLon());
+            if (getStoreSmallBoxList.isEmpty()) {
+                getMainRes.setOnSaleStores(null);
+            } else {
+                getMainRes.setOnSaleStores(getStoreSmallBoxList);
+            }
+
             // 주변맛집추천
             List<GetStoreMainBox> getStoreMainBoxList = storeDao.selectStoreMainBoxes(searchOption);
             if (getStoreMainBoxList.isEmpty()) {

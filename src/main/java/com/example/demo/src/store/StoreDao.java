@@ -104,4 +104,34 @@ public class StoreDao {
                 (rs,rowNum) -> new String(
                         rs.getString("imageUrl")), selectStoreImageUrlsParams);
     }
+
+    public List<GetStoreSmallBox> selectOnsaleStoresUptoTen(String lat, String lon) {
+        String selectOnsaleStoresUptoTenQuery = "select onSaleStore.idx as 'storeIdx', onSaleStore.storeName, " +
+                "(select StoreImage.imageUrl from StoreImage where StoreImage.storeIdx = onSaleStore.idx limit 1) as 'imageUrl', " +
+                "(select if (count(*) = 0, null, concat(truncate(avg(rating), 1), ' (', count(*), ')')) " +
+                "from Review " +
+                "where Review.storeIdx = onSaleStore.idx and Review.status != 'N') as 'totalReview', " +
+                "concat(if(truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1) < 0.1, '0.1', " +
+                "truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1)), 'km') as 'distance', " +
+                "concat(onSaleStore.discountPrice, '원 쿠폰') as 'coupon' " +
+                "from (select distinct Store.idx, Store.storeName, Store.latitude, Store.longitude, Store.status, Coupon.discountPrice " +
+                "from Store inner join Coupon on Store.idx = Coupon.storeIdx " +
+                "where Store.status != 'N' and Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
+                "group by Store.idx) onSaleStore limit 10";
+
+        Object[] selectOnsaleStoresParams = new Object[]{lat, lon, lat, lat, lon, lat};
+
+        return this.jdbcTemplate.query(selectOnsaleStoresUptoTenQuery,
+                (rs,rowNum) -> new GetStoreSmallBox(
+                        rs.getInt("storeIdx"),
+                        rs.getString("imageUrl"),
+                        rs.getString("storeName"),
+                        rs.getString("totalReview"),
+                        rs.getString("distance"),
+                        rs.getString("coupon")), selectOnsaleStoresParams);
+    }
 }
