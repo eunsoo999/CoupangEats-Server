@@ -1,6 +1,8 @@
 package com.example.demo.src.store;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.event.EventDao;
+import com.example.demo.src.event.model.GetEventBannerRes;
 import com.example.demo.src.store.model.*;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -15,19 +17,25 @@ import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
 @Service
 public class StoreProvider {
     private final StoreDao storeDao;
+    private final EventDao eventDao;
     private final JwtService jwtService;
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public StoreProvider(StoreDao storeDao, JwtService jwtService) {
+    public StoreProvider(StoreDao storeDao, EventDao eventDao, JwtService jwtService) {
         this.storeDao = storeDao;
+        this.eventDao = eventDao;
         this.jwtService = jwtService;
     }
 
     public GetMainRes getMainStores(SearchOption searchOption) throws BaseException {
         GetMainRes getMainRes = new GetMainRes();
         try{
+            // 이벤트 배너
+            List<GetEventBannerRes> getEventBannerList = eventDao.selectEventBanners();
+            getMainRes.setEvents(getEventBannerList);
+
             // 가게 카테고리
             List<GetStoreCategoryRes> getStoryCategoryList = storeDao.selectStoreCategories();
             getMainRes.setStoreCategories(getStoryCategoryList);
