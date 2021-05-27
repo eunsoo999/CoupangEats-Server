@@ -28,8 +28,7 @@ public enum BaseResponseStatus {
     // [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
-    POST_USERS_EMPTY_PHONE(false, 2017
-            , "전화번호를 입력해주세요."),
+    POST_USERS_EMPTY_PHONE(false, 2017, "전화번호를 입력해주세요."),
     POST_USERS_INVALID_PHONE(false, 2018, "전화번호 형식을 확인해주세요."),
     POST_USERS_EMPTY_PASSWORD(false, 2019, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_PASSWORD(false, 2020, "비밀번호는 영문/숫자/특수문자 2가지 이상 조합 8~20자로 입력해주세요."),

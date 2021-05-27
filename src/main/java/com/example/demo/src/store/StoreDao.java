@@ -35,7 +35,7 @@ public class StoreDao {
                 "else concat('배달비 ', FORMAT(Store.deliveryPrice , 0), '원') " +
                 "end as 'deliveryPrice', " +
                 "Store.deliveryTime, " +
-                "(select concat(Coupon.discountPrice, '원 쿠폰') " +
+                "(select concat(FORMAT(Coupon.discountPrice , 0), '원 쿠폰') " +
                 "from Coupon " +
                 "where Coupon.status != 'N' and now() < Coupon.ExpirationDate and Store.idx = Coupon.storeIdx limit 1) as 'coupon' " +
                 "from Store " +
@@ -115,7 +115,7 @@ public class StoreDao {
                 "truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
                 "*cos(radians(longitude)-radians(?)) " +
                 "+sin(radians(?))*sin(radians(latitude)))),1)), 'km') as 'distance', " +
-                "concat(onSaleStore.discountPrice, '원 쿠폰') as 'coupon' " +
+                "concat(FORMAT(onSaleStore.discountPrice , 0), '원 쿠폰') as 'coupon' " +
                 "from (select distinct Store.idx, Store.storeName, Store.latitude, Store.longitude, Store.status, Coupon.discountPrice " +
                 "from Store inner join Coupon on Store.idx = Coupon.storeIdx " +
                 "where Store.status != 'N' and Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
@@ -145,13 +145,14 @@ public class StoreDao {
                 "truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
                 "*cos(radians(longitude)-radians(?)) " +
                 "+sin(radians(?))*sin(radians(latitude)))),1)), 'km') as 'distance', " +
-                "if ((select concat(Coupon.discountPrice, '원 쿠폰') " +
+
+                "if ((select Coupon.discountPrice " +
                 "from Coupon " +
                 "where Coupon.status != 'N' and now() < Coupon.ExpirationDate and Store.idx = Coupon.storeIdx limit 1) is not null, null, " +
                 "case when Store.deliveryPrice = 0 then '무료배달'" +
                 "else concat('배달비 ', FORMAT(Store.deliveryPrice , 0), '원') " +
                 "end) as 'deliveryPrice', " +
-                "(select concat(Coupon.discountPrice, '원 쿠폰') " +
+                "(select concat(FORMAT(Coupon.discountPrice , 0), '원 쿠폰') " +
                 "from Coupon " +
                 "where Coupon.status != 'N' and now() < Coupon.ExpirationDate and Store.idx = Coupon.storeIdx limit 1) as 'coupon' " +
                 "from Store " +

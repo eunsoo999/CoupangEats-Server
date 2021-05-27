@@ -53,7 +53,7 @@ public class AddressProvider {
             //유저가 기본선택한 주소
             Integer seletedAddressIdx = userDao.selectUserAddressIdx(userIdx);
             if (seletedAddressIdx != null) {
-                getAddressesRes.setSeletedAddressIdx(seletedAddressIdx);
+                getAddressesRes.setSelectedAddressIdx(seletedAddressIdx);
             }
             return getAddressesRes;
         } catch (Exception exception){
