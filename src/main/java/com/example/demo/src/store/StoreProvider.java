@@ -1,10 +1,7 @@
 package com.example.demo.src.store;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.src.store.model.GetMainRes;
-import com.example.demo.src.store.model.GetStoreMainBox;
-import com.example.demo.src.store.model.GetStoreSmallBox;
-import com.example.demo.src.store.model.SearchOption;
+import com.example.demo.src.store.model.*;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +34,14 @@ public class StoreProvider {
                 getMainRes.setOnSaleStores(null);
             } else {
                 getMainRes.setOnSaleStores(getStoreSmallBoxList);
+            }
+
+            // 새로 들어온 가게 (최근 2주)
+            List<GetNewStoreBox> getNewStoreBoxList = storeDao.selectNewStoreBoxesUptoTen(searchOption.getLat(), searchOption.getLon());
+            if (getNewStoreBoxList.isEmpty()) {
+                getMainRes.setNewStores(null);
+            } else {
+                getMainRes.setNewStores(getNewStoreBoxList);
             }
 
             // 주변맛집추천

@@ -17,6 +17,7 @@ import java.util.List;
 public class GetMainRes {
     private List<GetStoreSmallBox> onSaleStores = new ArrayList<>();
     // 이벤트 추가
+    private List<GetNewStoreBox> newStores = new ArrayList<>();
     private List<GetStoreMainBox> recommendStores = new ArrayList<>();
     private int totalCount;
     private int cursor;

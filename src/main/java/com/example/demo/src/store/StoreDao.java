@@ -1,5 +1,6 @@
 package com.example.demo.src.store;
 
+import com.example.demo.src.store.model.GetNewStoreBox;
 import com.example.demo.src.store.model.GetStoreMainBox;
 import com.example.demo.src.store.model.GetStoreSmallBox;
 import com.example.demo.src.store.model.SearchOption;
@@ -133,5 +134,44 @@ public class StoreDao {
                         rs.getString("totalReview"),
                         rs.getString("distance"),
                         rs.getString("coupon")), selectOnsaleStoresParams);
+    }
+
+    public List<GetNewStoreBox> selectNewStoreBoxesUptoTen(String lat, String lon) {
+        String selectNewStoreBoxesUptoTenQuery = "select Store.idx as 'storeIdx', Store.storeName, " +
+                "(select StoreImage.imageUrl from StoreImage where StoreImage.storeIdx = Store.idx limit 1) as 'imageUrl', " +
+                "(select if (count(*) = 0, null, concat(truncate(avg(rating), 1), ' (', count(*), ')')) " +
+                "from Review " +
+                "where Review.storeIdx = Store.idx and Review.status != 'N') as 'totalReview', " +
+                "concat(if(truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1) < 0.1, '0.1', " +
+                "truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1)), 'km') as 'distance', " +
+                "if ((select concat(Coupon.discountPrice, '원 쿠폰') " +
+                "from Coupon " +
+                "where Coupon.status != 'N' and now() < Coupon.ExpirationDate and Store.idx = Coupon.storeIdx limit 1) is not null, null, " +
+                "case when Store.deliveryPrice = 0 then '무료배달'" +
+                "else concat('배달비 ', FORMAT(Store.deliveryPrice , 0), '원') " +
+                "end) as 'deliveryPrice', " +
+                "(select concat(Coupon.discountPrice, '원 쿠폰') " +
+                "from Coupon " +
+                "where Coupon.status != 'N' and now() < Coupon.ExpirationDate and Store.idx = Coupon.storeIdx limit 1) as 'coupon' " +
+                "from Store " +
+                "where Store.status != 'N' and TIMESTAMPDIFF(WEEK, Store.createdAt, CURRENT_TIMESTAMP()) <= 2 " +
+                "having distance < 4 order by Store.createdAt DESC " +
+                "limit 10";
+
+        Object[] selectNewStoreBoxesParams = new Object[]{lat, lon, lat, lat, lon, lat};
+
+        return this.jdbcTemplate.query(selectNewStoreBoxesUptoTenQuery,
+                (rs,rowNum) -> new GetNewStoreBox(
+                        rs.getInt("storeIdx"),
+                        rs.getString("imageUrl"),
+                        rs.getString("storeName"),
+                        rs.getString("totalReview"),
+                        rs.getString("distance"),
+                        rs.getString("coupon"),
+                        rs.getString("deliveryPrice") ), selectNewStoreBoxesParams);
     }
 }
