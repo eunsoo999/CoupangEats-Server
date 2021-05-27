@@ -28,7 +28,8 @@ public enum BaseResponseStatus {
     // [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
     POST_USERS_INVALID_EMAIL(false, 2016, "이메일 형식을 확인해주세요."),
-    POST_USERS_EMPTY_PHONE(false, 2017, "전화번호를 입력해주세요."),
+    POST_USERS_EMPTY_PHONE(false, 2017
+            , "전화번호를 입력해주세요."),
     POST_USERS_INVALID_PHONE(false, 2018, "전화번호 형식을 확인해주세요."),
     POST_USERS_EMPTY_PASSWORD(false, 2019, "비밀번호를 입력해주세요."),
     POST_USERS_INVALID_PASSWORD(false, 2020, "비밀번호는 영문/숫자/특수문자 2가지 이상 조합 8~20자로 입력해주세요."),
@@ -44,6 +45,14 @@ public enum BaseResponseStatus {
     ADDRESSES_EMPTY_ALIASTYPE(false, 2052, "별칭 타입을 입력해주세요."),
     ADDRESSES_INVALID_ALIASTYPE(false, 2053, "별칭 타입 형태가 잘못되었습니다."),
     ADDRESSES_INVALID_TYPE(false, 2054, "type이 잘못되었습니다. HOME or COMPANY만 가능합니다."),
+
+
+    // Store
+    STORES_EMPTY_LATITUDE(false, 2055, "잘못된 위도값입니다."),
+    STORES_EMPTY_LONGITUDE(false, 2056, "잘못된 경도값입니다."),
+    STORES_INVALID_SORT(false, 2057, "가능하지않은 정렬입니다."),
+    STORES_INVALID_CHEETAG(false, 2058, "잘못된 치타배달 가게보기 요청입니다."),
+    STORES_INVALID_COUPON(false,2059, "잘못된 할인쿠폰 가게보기 요청입니다."),
 
     /**
      * 3000 : Response 오류
