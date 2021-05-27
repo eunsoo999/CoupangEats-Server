@@ -28,6 +28,10 @@ public class StoreProvider {
     public GetMainRes getMainStores(SearchOption searchOption) throws BaseException {
         GetMainRes getMainRes = new GetMainRes();
         try{
+            // 가게 카테고리
+            List<GetStoreCategoryRes> getStoryCategoryList = storeDao.selectStoreCategories();
+            getMainRes.setStoreCategories(getStoryCategoryList);
+
             // 할인중인 맛집
             List<GetStoreSmallBox> getStoreSmallBoxList = storeDao.selectOnsaleStoresUptoTen(searchOption.getLat(), searchOption.getLon());
             if (getStoreSmallBoxList.isEmpty()) {

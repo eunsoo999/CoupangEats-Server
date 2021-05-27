@@ -15,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetMainRes {
+    private List<GetStoreCategoryRes> storeCategories = new ArrayList<>();
     private List<GetStoreSmallBox> onSaleStores = new ArrayList<>();
     // 이벤트 추가
     private List<GetNewStoreBox> newStores = new ArrayList<>();

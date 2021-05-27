@@ -1,9 +1,6 @@
 package com.example.demo.src.store;
 
-import com.example.demo.src.store.model.GetNewStoreBox;
-import com.example.demo.src.store.model.GetStoreMainBox;
-import com.example.demo.src.store.model.GetStoreSmallBox;
-import com.example.demo.src.store.model.SearchOption;
+import com.example.demo.src.store.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -173,5 +170,14 @@ public class StoreDao {
                         rs.getString("distance"),
                         rs.getString("coupon"),
                         rs.getString("deliveryPrice") ), selectNewStoreBoxesParams);
+    }
+
+    public List<GetStoreCategoryRes> selectStoreCategories() {
+        String selectStoreCategoriesQuery = "select categoryName, imageUrl from StoreCategory";
+
+        return this.jdbcTemplate.query(selectStoreCategoriesQuery,
+                (rs,rowNum) -> new GetStoreCategoryRes(
+                        rs.getString("categoryName"),
+                        rs.getString("imageUrl")));
     }
 }
