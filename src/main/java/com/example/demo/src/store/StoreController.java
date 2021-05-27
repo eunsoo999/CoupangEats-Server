@@ -3,6 +3,7 @@ package com.example.demo.src.store;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.store.model.GetMainRes;
+import com.example.demo.src.store.model.GetStoreCategoryRes;
 import com.example.demo.src.store.model.SearchOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.utils.ValidationRegex.isRegexLatitude;
@@ -61,10 +63,28 @@ public class StoreController {
             GetMainRes mainStores = storeProvider.getMainStores(searchOption);
             return new BaseResponse<>(mainStores);
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#15. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }
+    }
+
+    /**
+     * 16. 가게 카테고리 조회 API
+     * [GET] /stores/categories
+     * @return BaseResponse<GetStoreCategoryRes>
+     */
+    @ResponseBody
+    @GetMapping("/categories")
+    public BaseResponse<List<GetStoreCategoryRes>> getStoreCategories() {
+        try {
+            List<GetStoreCategoryRes> getStoreCategories = storeProvider.getStoreCategories();
+            return new BaseResponse<>(getStoreCategories);
+        } catch (BaseException exception) {
+            logger.warn("#16. " + exception.getStatus().getMessage());
+            return new BaseResponse<>(exception.getStatus());
+        }
+
     }
 
 }

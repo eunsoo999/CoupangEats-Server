@@ -77,4 +77,12 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public List<GetStoreCategoryRes> getStoreCategories() throws BaseException {
+        try{
+            return storeDao.selectStoreCategories();
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }
