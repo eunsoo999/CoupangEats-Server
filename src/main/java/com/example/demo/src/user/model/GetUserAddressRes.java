@@ -12,6 +12,7 @@ import lombok.Setter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetUserAddressRes {
     private int addressIdx;
+    private String mainAddress;
     private String latitude;
     private String longitude;
 }

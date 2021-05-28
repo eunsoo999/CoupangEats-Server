@@ -271,7 +271,7 @@ public class UserController {
     }
 
     /**
-     * 47. 유저의 기본 배달 주소 정보 조회 API
+     * 15. 유저의 기본 배달 주소 정보 조회 API
      * [GET] /users/:userIdx/pick/addresses
      * @return BaseResponse<GetUserAddressRes>
      */
@@ -287,7 +287,7 @@ public class UserController {
             GetUserAddressRes getUserAddressRes = userProvider.getUserAddress(userIdx);
             return new BaseResponse<>(getUserAddressRes);
         } catch (BaseException exception) {
-            logger.warn("#47. " + exception.getStatus().getMessage());
+            logger.warn("#15. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }

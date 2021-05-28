@@ -143,15 +143,20 @@ public class UserDao {
     }
 
     public GetUserAddressRes selectUserAddress(int userIdx) {
-        String selectUserAddressQuery = "select User.addressIdx, Address.latitude, Address.longitude " +
+        String selectUserAddressQuery = "select User.addressIdx, " +
+                "case when Address.status = 'COMPANY' then '회사' " +
+                "when Address.status = 'HOME' then '집' " +
+                "when alias is null || length(Address.alias) = 0 then address " +
+                "else alias end as 'mainAddress', " +
+                "Address.latitude, Address.longitude " +
                 "from User inner join Address on User.addressIdx = Address.idx " +
-                "where User.idx = ?";
+                "where User.idx = ? ";
 
         return this.jdbcTemplate.queryForObject(selectUserAddressQuery,
                 (rs,rowNum)-> new GetUserAddressRes(
                         rs.getInt("addressIdx"),
+                        rs.getString("mainAddress"),
                         rs.getString("latitude"),
-                        rs.getString("longitude")
-                ), userIdx);
+                        rs.getString("longitude")), userIdx);
     }
 }

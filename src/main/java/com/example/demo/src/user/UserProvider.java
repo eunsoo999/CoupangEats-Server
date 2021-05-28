@@ -125,7 +125,7 @@ public class UserProvider {
         // 유저가 기본 주소를 선택한 상태인지 확인
         Integer seletedAddressIdx = userDao.selectUserAddressIdx(userIdx);
         if (seletedAddressIdx == null) {
-            return new GetUserAddressRes(0, null, null);
+            return new GetUserAddressRes(0, null, null, null);
         }
         try {
             return userDao.selectUserAddress(userIdx);
