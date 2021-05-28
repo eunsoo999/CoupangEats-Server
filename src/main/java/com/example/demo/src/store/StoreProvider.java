@@ -104,4 +104,23 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public GetNewStoresRes getNewStores(SearchOption searchOption) throws BaseException {
+        try {
+            List<GetStoreMainBox> getStoreMainBoxList = storeDao.selectNewStores(searchOption);
+
+            if (getStoreMainBoxList.isEmpty()) {
+                return new GetNewStoresRes(0, null);
+            } else {
+                for (GetStoreMainBox storeMainBox : getStoreMainBoxList) {
+                    int storeIdx = storeMainBox.getStoreIdx();
+                    List<String> getImageUrls = storeDao.selectStoreImageUrls(storeIdx);
+                    storeMainBox.setImageUrls(getImageUrls);
+                }
+                return new GetNewStoresRes(getStoreMainBoxList.size(), getStoreMainBoxList);
+            }
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

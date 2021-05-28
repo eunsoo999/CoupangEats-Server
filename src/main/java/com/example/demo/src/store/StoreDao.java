@@ -218,16 +218,17 @@ public class StoreDao {
         if (searchOption.getMinDelivery() != null) {
             if(!whereFlag) {
                 selectAddressListQuery += "where onSaleStore.deliveryPrice <= "  + searchOption.getMinDelivery() + " ";
+                whereFlag = true;
             } else {
                 selectAddressListQuery += "and onSaleStore.deliveryPrice <= " + searchOption.getMinDelivery() + " ";
             }
-
         }
 
         // 검색조건처리 - 배달최소주문
         if (searchOption.getMinOrderPrice() != null) {
             if(!whereFlag) {
                 selectAddressListQuery += "where onSaleStore.minOrderPrice <= " + searchOption.getMinOrderPrice() + " ";
+                whereFlag = true;
             } else {
                 selectAddressListQuery += "and onSaleStore.minOrderPrice <= " + searchOption.getMinOrderPrice() + " ";
             }
@@ -252,6 +253,105 @@ public class StoreDao {
                 searchOption.getLat(), searchOption.getLon(), searchOption.getLat()};
 
         return this.jdbcTemplate.query(selectAddressListQuery,
+                (rs,rowNum) -> new GetStoreMainBox(
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName"),
+                        rs.getString("markIcon"),
+                        rs.getString("totalReview"),
+                        rs.getString("distance"),
+                        rs.getString("deliveryPrice"),
+                        rs.getString("deliveryTime"),
+                        rs.getString("coupon")), selectStoreMainBoxParams);
+    }
+
+    public List<GetStoreMainBox> selectNewStores(SearchOption searchOption) {
+        String selectNewStoresQuery = "select Store.idx as 'storeIdx', Store.storeName, " +
+                "case when Store.cheetahDelivery = 'Y' then '치타배달' " +
+                "when DATE_SUB(NOW(), INTERVAL 2 WEEK) <= Store.createdAt then '신규' " +
+                "end as 'markIcon', " +
+                "(select if (count(*) = 0, null, concat(truncate(avg(rating), 1), ' (', count(*), ')')) " +
+                "from Review where Review.storeIdx = Store.idx and Review.status != 'N') as 'totalReview', " +
+                "concat(if(truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1) < 0.1, '0.1', " +
+                "truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1)), 'km') as 'distance', " +
+                "case when Store.deliveryPrice = 0 then '무료배달'" +
+                "else concat('배달비 ', FORMAT(Store.deliveryPrice , 0), '원') " +
+                "end as 'deliveryPrice', " +
+                "Store.deliveryTime, " +
+                "(select concat(FORMAT(Coupon.discountPrice , 0), '원 쿠폰') " +
+                "from Coupon " +
+                "where Coupon.status != 'N' and now() < Coupon.ExpirationDate and Store.idx = Coupon.storeIdx limit 1) as 'coupon' " +
+                "from (select * from Store where Store.status != 'N' and DATE_SUB(NOW(), INTERVAL 2 WEEK) <= Store.createdAt order by Store.createdAt desc) Store ";
+
+        boolean whereFlag = false; // 조건절 "where" 포함되었는지 구분하는 flag
+
+        // 검색조건처리 - 치타배달(cheetah)보기
+        if (searchOption.getCheetah() != null && searchOption.getCheetah().equalsIgnoreCase("Y")) {
+            if(!whereFlag) {
+                selectNewStoresQuery += "where Store.cheetahDelivery = 'Y'" + " ";
+                whereFlag = true;
+            } else {
+                selectNewStoresQuery += "and Store.cheetahDelivery = 'Y'" + " ";
+            }
+        }
+
+        // 검색조건처리 - 배달비최소비용
+        if (searchOption.getMinDelivery() != null) {
+            if(!whereFlag) {
+                selectNewStoresQuery += "where Store.deliveryPrice <= " + searchOption.getMinDelivery() + " ";
+                whereFlag = true;
+            } else {
+                selectNewStoresQuery += "and Store.deliveryPrice <= " + searchOption.getMinDelivery() + " ";
+            }
+        }
+
+        // 검색조건처리 - 배달최소주문
+        if (searchOption.getMinOrderPrice() != null) {
+            if(!whereFlag) {
+                selectNewStoresQuery += "where Store.minOrderPrice <= " + searchOption.getMinOrderPrice() + " ";
+                whereFlag = true;
+            } else {
+                selectNewStoresQuery += "and Store.minOrderPrice <= " + searchOption.getMinOrderPrice() + " ";
+            }
+
+        }
+
+        // 검색조건처리 - 할인쿠폰유무
+        if (searchOption.getCoupon() != null && searchOption.getCoupon().equalsIgnoreCase("Y")) {
+            if(!whereFlag) {
+                selectNewStoresQuery += "where (select exists(select idx from Coupon " +
+                        "where Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
+                        "and Store.idx = Coupon.storeIdx limit 1))" + " ";
+                whereFlag = true;
+            } else {
+                selectNewStoresQuery += "and (select exists(select idx from Coupon " +
+                        "where Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
+                        "and Store.idx = Coupon.storeIdx limit 1))" + " ";
+            }
+        }
+
+        selectNewStoresQuery += "having distance < 4 ";
+
+        // 검색조건처리 - 정렬
+        if (searchOption.getSort() != null) {
+            if (searchOption.getSort().equalsIgnoreCase("orders")) { // 주문많은순
+                selectNewStoresQuery += "order by (select count(*) from Orders where Orders.status != 'N' and Orders.storeIdx = Store.idx) desc ";
+            } else if (searchOption.getSort().equalsIgnoreCase("nearby")) { // 가까운순
+                selectNewStoresQuery += "order by distance ";
+            } else if (searchOption.getSort().equalsIgnoreCase("rating")) { // 별점높은순
+                selectNewStoresQuery += "order by (select avg(rating) from Review where Review.storeIdx = Store.idx and Review.status != 'N') desc ";
+            }
+        }
+
+        System.out.println(selectNewStoresQuery);
+
+        Object[] selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
+                searchOption.getLat(), searchOption.getLon(), searchOption.getLat()};
+
+        return this.jdbcTemplate.query(selectNewStoresQuery,
                 (rs,rowNum) -> new GetStoreMainBox(
                         rs.getInt("storeIdx"),
                         rs.getString("storeName"),
