@@ -141,4 +141,17 @@ public class UserDao {
         String checkUserCompanyAddressQuery = "select exists(select idx from User where idx = ? and addressIdx = ?)";
         return this.jdbcTemplate.queryForObject(checkUserCompanyAddressQuery, int.class, userIdx, addressIdx);
     }
+
+    public GetUserAddressRes selectUserAddress(int userIdx) {
+        String selectUserAddressQuery = "select User.addressIdx, Address.latitude, Address.longitude " +
+                "from User inner join Address on User.addressIdx = Address.idx " +
+                "where User.idx = ?";
+
+        return this.jdbcTemplate.queryForObject(selectUserAddressQuery,
+                (rs,rowNum)-> new GetUserAddressRes(
+                        rs.getInt("addressIdx"),
+                        rs.getString("latitude"),
+                        rs.getString("longitude")
+                ), userIdx);
+    }
 }

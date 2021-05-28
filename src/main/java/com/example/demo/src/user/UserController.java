@@ -269,4 +269,28 @@ public class UserController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 47. 유저의 기본 배달 주소 정보 조회 API
+     * [GET] /users/:userIdx/pick/addresses
+     * @return BaseResponse<GetUserAddressRes>
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}/pick/addresses")
+    public BaseResponse<GetUserAddressRes> getUserAddress(@PathVariable int userIdx) {
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetUserAddressRes getUserAddressRes = userProvider.getUserAddress(userIdx);
+            return new BaseResponse<>(getUserAddressRes);
+        } catch (BaseException exception) {
+            logger.warn("#47. " + exception.getStatus().getMessage());
+            logger.warn("(" + userIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 }

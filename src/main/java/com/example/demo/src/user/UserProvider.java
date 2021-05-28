@@ -116,4 +116,22 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public GetUserAddressRes getUserAddress(int userIdx) throws BaseException {
+        // 유저 존재 확인
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND);
+        }
+        // 유저가 기본 주소를 선택한 상태인지 확인
+        Integer seletedAddressIdx = userDao.selectUserAddressIdx(userIdx);
+        if (seletedAddressIdx == null) {
+            return new GetUserAddressRes(0, null, null);
+        }
+        try {
+            return userDao.selectUserAddress(userIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+    }
 }
