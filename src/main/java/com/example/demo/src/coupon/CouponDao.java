@@ -1,2 +1,25 @@
-package com.example.demo.src.coupon;public class CouponDao {
+package com.example.demo.src.coupon;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import javax.sql.DataSource;
+
+@Repository
+public class CouponDao {
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    public void setDataSource(DataSource dataSource){
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+
+    public int checkCouponByStoreIdxAnduserIdx(int storeIdx, Integer userIdx) {
+        String checkCouponByStoreQuery = "select exists(select CouponUser.idx " +
+                "from Coupon inner join CouponUser on Coupon.idx = CouponUser.couponIdx " +
+                "where CouponUser.userIdx = ? and Coupon.storeIdx = ? and Coupon.ExpirationDate > now())";
+
+        return this.jdbcTemplate.queryForObject(checkCouponByStoreQuery, int.class, userIdx, storeIdx);
+    }
 }

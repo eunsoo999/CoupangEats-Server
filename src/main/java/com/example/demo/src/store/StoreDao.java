@@ -1,6 +1,7 @@
 package com.example.demo.src.store;
 
 import com.example.demo.src.store.model.*;
+import com.example.demo.src.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -119,7 +120,9 @@ public class StoreDao {
                 "from (select distinct Store.idx, Store.storeName, Store.latitude, Store.longitude, Store.status, Coupon.discountPrice " +
                 "from Store inner join Coupon on Store.idx = Coupon.storeIdx " +
                 "where Store.status != 'N' and Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
-                "group by Store.idx) onSaleStore limit 10";
+                "group by Store.idx) onSaleStore " +
+                "having distance < 4 " +
+                "limit 10";
 
         Object[] selectOnsaleStoresParams = new Object[]{lat, lon, lat, lat, lon, lat};
 
@@ -202,7 +205,7 @@ public class StoreDao {
                 "concat(format(onSaleStore.discountPrice, 0), '원 쿠폰') as 'coupon' " +
                 "from (select distinct Store.idx, Store.storeName, Store.latitude, Store.longitude, Store.status, Store.deliveryPrice, Store.deliveryTime, Store.minOrderPrice, Store.createdAt, Store.cheetahDelivery, Coupon.discountPrice " +
                 "from Store inner join Coupon on Store.idx = Coupon.storeIdx " +
-                "where Store.status != 'N' and DATE_SUB(NOW(), INTERVAL 2 WEEK) <= Store.createdAt and Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
+                "where Store.status != 'N' and Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
                 "group by Store.idx) onSaleStore ";
 
         boolean whereFlag = false; // 조건절 "where" 포함되었는지 구분하는 flag
@@ -361,5 +364,30 @@ public class StoreDao {
                         rs.getString("deliveryPrice"),
                         rs.getString("deliveryTime"),
                         rs.getString("coupon")), selectStoreMainBoxParams);
+    }
+
+    public GetStoreRes getStoreInfo(int storeIdx) {
+        String getStoreInfoQuery = "select storeName, (select if (count(*) = 0, null, avg(rating)) from Review " +
+                "where Review.status != 'N' and Review.storeIdx = Store.idx) as 'rating', " +
+                "(select FORMAT(count(*) , 0) from Review where Review.status != 'N' and Review.storeIdx = Store.idx) as 'reviewCount', " +
+                "deliveryTime, deliveryPrice, minOrderPrice, cheetahDelivery " +
+                "from Store where Store.idx = ?";
+
+        return this.jdbcTemplate.queryForObject(getStoreInfoQuery,
+                (rs,rowNum)-> new GetStoreRes(
+                        rs.getString("storeName"),
+                        rs.getString("rating"),
+                        rs.getString("reviewCount"),
+                        rs.getString("deliveryTime"),
+                        rs.getInt("deliveryPrice"),
+                        rs.getInt("minOrderPrice"),
+                        rs.getString("cheetahDelivery")), storeIdx);
+    }
+
+    public int checkStore(int storeIdx) {
+        String checkStoreQuery = "select exists(select idx from Store where idx = ? AND Store.status != 'N')";
+        int checkStoreParams = storeIdx;
+
+        return this.jdbcTemplate.queryForObject(checkStoreQuery, int.class, checkStoreParams);
     }
 }

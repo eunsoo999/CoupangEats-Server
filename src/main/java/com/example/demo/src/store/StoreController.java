@@ -3,6 +3,7 @@ package com.example.demo.src.store;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.store.model.*;
+import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,14 +25,17 @@ public class StoreController {
     private final StoreProvider storeProvider;
     @Autowired
     private final StoreService storeService;
+    @Autowired
+    private final JwtService jwtService;
 
-    public StoreController(StoreProvider storeProvider, StoreService storeService) {
+    public StoreController(StoreProvider storeProvider, StoreService storeService, JwtService jwtService) {
         this.storeProvider = storeProvider;
         this.storeService = storeService;
+        this.jwtService = jwtService;
     }
 
     /**
-     * 15. 메인 화면 API
+     * 16. 메인 화면 API
      * [GET] /stores?lat=&lon=&sort=&cheetah=&coupon=&minOrderPrice=&minDelivery=&   cursor=&limit=20
      * @return BaseResponse<GetMainRes>
      */
@@ -67,7 +71,7 @@ public class StoreController {
     }
 
     /**
-     * 16. 가게 카테고리 조회 API
+     * 17. 가게 카테고리 조회 API
      * [GET] /stores/categories
      * @return BaseResponse<GetStoreCategoryRes>
      */
@@ -84,7 +88,7 @@ public class StoreController {
     }
 
     /**
-     * 17. 할인 중인 가게 전체 조회 API
+     * 18. 할인 중인 가게 전체 조회 API
      * [GET] /stores/discount?lat=&lon=
      * @return BaseResponse<GetOnSaleStoresRes>
      */
@@ -120,7 +124,7 @@ public class StoreController {
     }
 
     /**
-     * 18. 새로 들어온 가게 전체 조회 API
+     * 19. 새로 들어온 가게 전체 조회 API
      * [GET] /stores/new?lat=&lon=
      * @return BaseResponse<GetNewStoresRes>
      */
@@ -139,6 +143,8 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_SORT);
         } else if(cheetah != null && !cheetah.equalsIgnoreCase("Y")) {
             return new BaseResponse<>(STORES_INVALID_CHEETAG);
+        } else if(coupon != null && !coupon.equalsIgnoreCase("Y")) {
+            return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
         SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon);
@@ -152,4 +158,35 @@ public class StoreController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 23. 가게 조회 API
+     * [GET] /stores/:storesIdx
+     * @return BaseResponse<GetStoreRes>
+     */
+    @ResponseBody
+    @GetMapping("/{storeIdx}")
+    public BaseResponse<GetStoreRes> getStore(@PathVariable int storeIdx) {
+        try {
+            try {
+                // 로그인 유저의 접근인지 확인
+                int userIdxByJwt = jwtService.getUserIdx();
+                GetStoreRes getStoreRes = storeProvider.getStore(storeIdx, userIdxByJwt);
+                return new BaseResponse<>(getStoreRes);
+            } catch (BaseException exception) {
+                // JWT 값이 비어있다는 에러일 경우 (비로그인유저의 접근)
+                if (exception.getStatus().equals(EMPTY_JWT)) {
+                    GetStoreRes getStoreRes = storeProvider.getStore(storeIdx, null);
+                    return new BaseResponse<>(getStoreRes);
+                }
+                // JWT 검증 에러일 경우
+                logger.warn("#23. " + exception.getStatus().getMessage());
+                logger.warn(String.valueOf(storeIdx));
+                return new BaseResponse<>(exception.getStatus());
+            }
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 }
