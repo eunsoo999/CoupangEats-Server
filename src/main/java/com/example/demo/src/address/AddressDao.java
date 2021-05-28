@@ -79,7 +79,7 @@ public class AddressDao {
         return this.jdbcTemplate.queryForObject(checkAddressQuery, int.class, checkAddressParams);
     }
 
-    public GetAddressDetailRes getAddress(int addressIdx) {
+    public GetAddressDetailRes selectAddress(int addressIdx) {
         String getAddressDetailQuery = "select address, roadAddress, detailAddress, status as 'aliasType', alias from Address where idx = ?";
         int getAddressParams = addressIdx;
 
@@ -120,7 +120,7 @@ public class AddressDao {
         return this.jdbcTemplate.update(updateStatusAddressQuery, updateStatusAddressParams);
     }
 
-    public GetLocationRes getLocation(int addressIdx) {
+    public GetLocationRes selectAddressLocation(int addressIdx) {
         String getLocationQuery = "select latitude, longitude from Address where idx = ?";
         int getLocationParams = addressIdx;
 

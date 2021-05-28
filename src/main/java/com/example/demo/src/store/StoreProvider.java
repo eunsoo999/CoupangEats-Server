@@ -133,18 +133,14 @@ public class StoreProvider {
     }
 
     public GetStoreRes getStore(int storeIdx, Integer userIdx) throws BaseException {
-        if(true) {
-            throw new BaseException(STORES_NOT_FOUND);
-        }
         // 가게 존재 확인
         if (storeDao.checkStore(storeIdx) == 0) {
             throw new BaseException(STORES_NOT_FOUND);
         }
 
         try {
-
             // 가게 정보
-            GetStoreRes getStoreRes = storeDao.getStoreInfo(storeIdx);
+            GetStoreRes getStoreRes = storeDao.selectStoreInfo(storeIdx);
             // 가게 이미지
             List<String> getImageUrls = storeDao.selectStoreImageUrls(storeIdx);
             getStoreRes.setImageUrls(getImageUrls);

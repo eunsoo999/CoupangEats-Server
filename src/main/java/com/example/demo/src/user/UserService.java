@@ -74,7 +74,7 @@ public class UserService {
 
         try {
             // 선택한 주소의 위도, 경도 값 조회
-            GetLocationRes location = addressDao.getLocation(addressIdx);
+            GetLocationRes location = addressDao.selectAddressLocation(addressIdx);
 
             // 유저 기본 주소 업데이트
             int updatedCount = userDao.updateUserAddressIdx(userIdx, addressIdx);

@@ -72,7 +72,7 @@ public class AddressProvider {
         }
 
         try {
-            return addressDao.getAddress(addressIdx);
+            return addressDao.selectAddress(addressIdx);
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }

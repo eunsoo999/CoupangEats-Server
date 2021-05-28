@@ -1,7 +1,6 @@
 package com.example.demo.src.store;
 
 import com.example.demo.src.store.model.*;
-import com.example.demo.src.user.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -366,7 +365,7 @@ public class StoreDao {
                         rs.getString("coupon")), selectStoreMainBoxParams);
     }
 
-    public GetStoreRes getStoreInfo(int storeIdx) {
+    public GetStoreRes selectStoreInfo(int storeIdx) {
         String getStoreInfoQuery = "select storeName, (select if (count(*) = 0, null, avg(rating)) from Review " +
                 "where Review.status != 'N' and Review.storeIdx = Store.idx) as 'rating', " +
                 "(select FORMAT(count(*) , 0) from Review where Review.status != 'N' and Review.storeIdx = Store.idx) as 'reviewCount', " +

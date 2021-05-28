@@ -64,7 +64,7 @@ public class StoreController {
             GetMainRes mainStores = storeProvider.getMainStores(searchOption);
             return new BaseResponse<>(mainStores);
         } catch (BaseException exception) {
-            logger.warn("#15. " + exception.getStatus().getMessage());
+            logger.warn("#16. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }
@@ -82,7 +82,7 @@ public class StoreController {
             List<GetStoreCategoryRes> getStoreCategories = storeProvider.getStoreCategories();
             return new BaseResponse<>(getStoreCategories);
         } catch (BaseException exception) {
-            logger.warn("#16. " + exception.getStatus().getMessage());
+            logger.warn("#17. " + exception.getStatus().getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -117,7 +117,7 @@ public class StoreController {
             GetOnSaleStoresRes getOnSaleStoresList = storeProvider.getOnsaleStores(searchOption);
             return new BaseResponse<>(getOnSaleStoresList);
         } catch (BaseException exception) {
-            logger.warn("#17. " + exception.getStatus().getMessage());
+            logger.warn("#18. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }
@@ -153,7 +153,7 @@ public class StoreController {
             GetNewStoresRes getNewStoresRes = storeProvider.getNewStores(searchOption);
             return new BaseResponse<>(getNewStoresRes);
         } catch (BaseException exception) {
-            logger.warn("#18. " + exception.getStatus().getMessage());
+            logger.warn("#19. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }
