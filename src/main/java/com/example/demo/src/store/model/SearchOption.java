@@ -12,7 +12,16 @@ public class SearchOption {
     private String lon;
     private String sort;
     private String cheetah;
-    private Integer midDelivery;
+    private Integer minDelivery;
     private Integer minOrderPrice;
     private String coupon;
+
+    public SearchOption(String lat, String lon, String sort, String cheetah, Integer minDelivery, Integer minOrderPrice) {
+        this.lat = lat;
+        this.lon = lon;
+        this.sort = sort;
+        this.cheetah = cheetah;
+        this.minDelivery = minDelivery;
+        this.minOrderPrice = minOrderPrice;
+    }
 }

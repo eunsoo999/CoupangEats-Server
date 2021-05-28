@@ -47,8 +47,8 @@ public class StoreDao {
         }
 
         // 검색조건처리 - 배달비최소비용
-        if (searchOption.getMidDelivery() != null) {
-            selectAddressListQuery += "and Store.deliveryPrice <= " + searchOption.getMidDelivery() + " ";
+        if (searchOption.getMinDelivery() != null) {
+            selectAddressListQuery += "and Store.deliveryPrice <= " + searchOption.getMinDelivery() + " ";
         }
 
         // 검색조건처리 - 배달최소주문
@@ -180,5 +180,86 @@ public class StoreDao {
                 (rs,rowNum) -> new GetStoreCategoryRes(
                         rs.getString("categoryName"),
                         rs.getString("imageUrl")));
+    }
+
+    public List<GetStoreMainBox> selectOnsaleStores(SearchOption searchOption) {
+        String selectAddressListQuery = "select onSaleStore.idx as 'storeIdx', onSaleStore.storeName, " +
+                "case when onSaleStore.cheetahDelivery = 'Y' then '치타배달' " +
+                "when DATE_SUB(NOW(), INTERVAL 2 WEEK) <= onSaleStore.createdAt then '신규' " +
+                "end as 'markIcon', " +
+                "(select if (count(*) = 0, null, concat(truncate(avg(rating), 1), ' (', count(*), ')')) " +
+                "from Review where Review.storeIdx = onSaleStore.idx and Review.status != 'N') as 'totalReview', " +
+                "concat(if(truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1) < 0.1, '0.1', " +
+                "truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))),1)), 'km') as 'distance', " +
+                "case when onSaleStore.deliveryPrice = 0 then '무료배달'" +
+                "else concat('배달비 ', FORMAT(onSaleStore.deliveryPrice , 0), '원') " +
+                "end as 'deliveryPrice', " +
+                "onSaleStore.deliveryTime, " +
+                "concat(format(onSaleStore.discountPrice, 0), '원 쿠폰') as 'coupon' " +
+                "from (select distinct Store.idx, Store.storeName, Store.latitude, Store.longitude, Store.status, Store.deliveryPrice, Store.deliveryTime, Store.minOrderPrice, Store.createdAt, Store.cheetahDelivery, Coupon.discountPrice " +
+                "from Store inner join Coupon on Store.idx = Coupon.storeIdx " +
+                "where Store.status != 'N' and DATE_SUB(NOW(), INTERVAL 2 WEEK) <= Store.createdAt and Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
+                "group by Store.idx) onSaleStore ";
+
+        boolean whereFlag = false; // 조건절 "where" 포함되었는지 구분하는 flag
+        // 검색조건처리 - 치타배달(cheetah)보기
+        if (searchOption.getCheetah() != null && searchOption.getCheetah().equalsIgnoreCase("Y")) {
+            if(!whereFlag) {
+                selectAddressListQuery += "where onSaleStore.cheetahDelivery = 'Y'";
+                whereFlag = true;
+            }
+        }
+
+        // 검색조건처리 - 배달비최소비용
+        if (searchOption.getMinDelivery() != null) {
+            if(!whereFlag) {
+                selectAddressListQuery += "where onSaleStore.deliveryPrice <= "  + searchOption.getMinDelivery() + " ";
+            } else {
+                selectAddressListQuery += "and onSaleStore.deliveryPrice <= " + searchOption.getMinDelivery() + " ";
+            }
+
+        }
+
+        // 검색조건처리 - 배달최소주문
+        if (searchOption.getMinOrderPrice() != null) {
+            if(!whereFlag) {
+                selectAddressListQuery += "where onSaleStore.minOrderPrice <= " + searchOption.getMinOrderPrice() + " ";
+            } else {
+                selectAddressListQuery += "and onSaleStore.minOrderPrice <= " + searchOption.getMinOrderPrice() + " ";
+            }
+        }
+
+        selectAddressListQuery += "having distance < 4 ";
+
+        // 검색조건처리 - 정렬
+        if (searchOption.getSort() != null) {
+            if (searchOption.getSort().equalsIgnoreCase("orders")) { // 주문많은순
+                selectAddressListQuery += "order by (select count(*) from Orders where Orders.status != 'N' and Orders.storeIdx = onSaleStore.idx) desc ";
+            } else if (searchOption.getSort().equalsIgnoreCase("nearby")) { // 가까운순
+                selectAddressListQuery += "order by distance ";
+            } else if (searchOption.getSort().equalsIgnoreCase("rating")) { // 별점높은순
+                selectAddressListQuery += "order by (select avg(rating) from Review where Review.storeIdx = onSaleStore.idx and Review.status != 'N') desc ";
+            } else if (searchOption.getSort().equalsIgnoreCase("new")) { // 신규매장순
+                selectAddressListQuery += "order by onSaleStore.createdAt desc ";
+            }
+        }
+
+        Object[] selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
+                searchOption.getLat(), searchOption.getLon(), searchOption.getLat()};
+
+        return this.jdbcTemplate.query(selectAddressListQuery,
+                (rs,rowNum) -> new GetStoreMainBox(
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName"),
+                        rs.getString("markIcon"),
+                        rs.getString("totalReview"),
+                        rs.getString("distance"),
+                        rs.getString("deliveryPrice"),
+                        rs.getString("deliveryTime"),
+                        rs.getString("coupon")), selectStoreMainBoxParams);
     }
 }

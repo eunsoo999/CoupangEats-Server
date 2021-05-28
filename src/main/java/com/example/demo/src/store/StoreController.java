@@ -3,6 +3,7 @@ package com.example.demo.src.store;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.store.model.GetMainRes;
+import com.example.demo.src.store.model.GetOnSaleStoresRes;
 import com.example.demo.src.store.model.GetStoreCategoryRes;
 import com.example.demo.src.store.model.SearchOption;
 import org.slf4j.Logger;
@@ -10,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
@@ -35,14 +35,14 @@ public class StoreController {
 
     /**
      * 15. 메인 화면 API
-     * [GET] /stores?lat=&lon=&sort=&cheetah=&coupon=&minOrderPrice=&midDelivery=&   cursor=&limit=20
+     * [GET] /stores?lat=&lon=&sort=&cheetah=&coupon=&minOrderPrice=&minDelivery=&   cursor=&limit=20
      * @return BaseResponse<GetMainRes>
      */
     @ResponseBody
     @GetMapping("")
     public BaseResponse<GetMainRes> getUserAddresses(@RequestParam String lat, @RequestParam String lon,
                                                      @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
-                                                     @RequestParam(required = false) Integer midDelivery, @RequestParam(required = false) Integer minOrderPrice,
+                                                     @RequestParam(required = false) Integer minDelivery, @RequestParam(required = false) Integer minOrderPrice,
                                                      @RequestParam(required = false) String coupon) {
         if(!isRegexLatitude(lat)) {
             return new BaseResponse<>(STORES_EMPTY_LATITUDE);
@@ -57,7 +57,7 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, midDelivery, minOrderPrice, coupon);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon);
 
         try {
             GetMainRes mainStores = storeProvider.getMainStores(searchOption);
@@ -84,7 +84,39 @@ public class StoreController {
             logger.warn("#16. " + exception.getStatus().getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
-
     }
 
+    /**
+     * 17. 할인 중인 가게 조회 API
+     * [GET] /stores/discount?lat=&lon=
+     * @return BaseResponse<GetStoreCategoryRes>
+     */
+    @ResponseBody
+    @GetMapping("/discount")
+    public BaseResponse<GetOnSaleStoresRes> getOnSaleStores(@RequestParam String lat, @RequestParam String lon,
+                                                                  @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
+                                                                  @RequestParam(required = false) Integer minDelivery, @RequestParam(required = false) Integer minOrderPrice) {
+        if(!isRegexLatitude(lat)) {
+            return new BaseResponse<>(STORES_EMPTY_LATITUDE);
+        } else if(!isRegexLongitude(lon)) {
+            return new BaseResponse<>(STORES_EMPTY_LONGITUDE);
+        } else if(sort != null && !(sort.equalsIgnoreCase("recomm") || sort.equalsIgnoreCase("orders")
+                || sort.equalsIgnoreCase("nearby") || sort.equalsIgnoreCase("rating") || sort.equalsIgnoreCase("new"))) {
+            return new BaseResponse<>(STORES_INVALID_SORT);
+        } else if(cheetah != null && !cheetah.equalsIgnoreCase("Y")) {
+            return new BaseResponse<>(STORES_INVALID_CHEETAG);
+        }
+
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery
+                , minOrderPrice);
+
+        try {
+            GetOnSaleStoresRes getOnSaleStoresList = storeProvider.getOnsaleStores(searchOption);
+            return new BaseResponse<>(getOnSaleStoresList);
+        } catch (BaseException exception) {
+            logger.warn("#17. " + exception.getStatus().getMessage());
+            logger.warn(searchOption.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
