@@ -53,6 +53,9 @@ public enum BaseResponseStatus {
     STORES_INVALID_CHEETAG(false, 2058, "잘못된 치타배달 가게보기 요청입니다."),
     STORES_INVALID_COUPON(false,2059, "잘못된 할인쿠폰 가게보기 요청입니다."),
 
+    COUPONS_EMPTY_NUMBER(false, 2060, "쿠폰 번호를 입력해주세요."),
+    COUPONS_LENGTH_NUMBER(false, 2061, "쿠폰번호는 8자리 혹은 16자리만 가능합니다."),
+
     /**
      * 3000 : Response 오류
      */
@@ -74,6 +77,9 @@ public enum BaseResponseStatus {
     STORES_NOT_FOUND(false, 3052, "존재하지않는 가게입니다."),
     MENUS_NOT_FOUND(false, 3053, "존재하지않는 메뉴입니다."),
     MENU_NOT_IN_STORES(false, 3054, "해당 가게의 메뉴가 아닙니다."),
+
+    COUPONS_NOT_FOUND(false, 3055, "잘못된 쿠폰번호입니다."),
+    COUPONS_USED(false, 3056, "이미 지급받은 쿠폰입니다."),
 
     /**
      * 4000 : Database, Server 오류

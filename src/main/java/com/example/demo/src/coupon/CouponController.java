@@ -3,6 +3,8 @@ package com.example.demo.src.coupon;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.coupon.model.GetCouponsRes;
+import com.example.demo.src.coupon.model.PostCouponReq;
+import com.example.demo.src.coupon.model.PostCouponRes;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.example.demo.config.BaseResponseStatus.INVALID_USER_JWT;
+import static com.example.demo.config.BaseResponseStatus.*;
 
 @RestController
 @RequestMapping("")
@@ -22,10 +24,41 @@ public class CouponController {
     private final CouponProvider couponProvider;
     @Autowired
     private final JwtService jwtService;
+    @Autowired
+    private final CouponService couponService;
 
-    public CouponController(CouponProvider couponProvider, JwtService jwtService) {
+    public CouponController(CouponProvider couponProvider, JwtService jwtService, CouponService couponService) {
         this.couponProvider = couponProvider;
         this.jwtService = jwtService;
+        this.couponService = couponService;
+    }
+
+    /**
+     * 30. 할인쿠폰 등록 API
+     * [POST] /coupons
+     * @return BaseResponse<PostCouponRes>
+     */
+    @ResponseBody
+    @PostMapping("/coupons")
+    public BaseResponse<PostCouponRes> postCouponByCouponNumber(@RequestBody PostCouponReq postCouponReq) {
+        if(postCouponReq.getCouponNumber() == null || postCouponReq.getCouponNumber().isEmpty()) {
+            return new BaseResponse<>(COUPONS_EMPTY_NUMBER);
+        } else if(!(postCouponReq.getCouponNumber().length() == 8 || postCouponReq.getCouponNumber().length() == 16)) {
+            return new BaseResponse<>(COUPONS_LENGTH_NUMBER);
+        }
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(postCouponReq.getUserIdx() != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            PostCouponRes createdCoupon = couponService.postCoupon(postCouponReq);
+            return new BaseResponse<>(createdCoupon);
+        } catch (BaseException exception) {
+            logger.warn("#30. " + exception.getStatus().getMessage());
+            logger.warn("(" + postCouponReq.toString() + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
     }
 
     /**

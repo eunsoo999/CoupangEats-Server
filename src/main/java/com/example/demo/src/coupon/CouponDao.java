@@ -2,6 +2,7 @@ package com.example.demo.src.coupon;
 
 import com.example.demo.src.coupon.model.GetCouponsRes;
 import com.example.demo.src.coupon.model.GetStoreCoupon;
+import com.example.demo.src.coupon.model.PostCouponReq;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -66,5 +67,36 @@ public class CouponDao {
                         rs.getString("minOrderPrice"),
                         rs.getString("expirationDate"),
                         rs.getString("status")), userIdx);
+    }
+
+
+    public int insertUserCoupon(int couponIdx, int userIdx) {
+        String insertUserCouponQuery = "insert into CouponUser (couponIdx, userIdx) values (?, ?);";
+        Object[] insertUserCouponParams = new Object[]{couponIdx, userIdx};
+        this.jdbcTemplate.update(insertUserCouponQuery, insertUserCouponParams);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class);
+    }
+
+    public int selectCouponByCouponNumber(String couponNumber) {
+        String selectCouponByCouponNumberQuery = "select idx from Coupon where Coupon.status != 'N' and Coupon.couponNumber = ?";
+
+        return this.jdbcTemplate.queryForObject(selectCouponByCouponNumberQuery, int.class, couponNumber);
+    }
+
+    public int checkCouponByCouponNumber(String couponNumber) {
+        String checkCouponByCouponNumberQuery = "select exists(select idx from Coupon where couponNumber = ? and Coupon.status != 'N' and Coupon.expirationDate >= date_format(now(), '%Y%m%d'))";
+        String checkCouponByCouponNumberParams = couponNumber;
+
+        return this.jdbcTemplate.queryForObject(checkCouponByCouponNumberQuery, int.class, checkCouponByCouponNumberParams);
+    }
+
+    public int checkCouponUserByCouponNumber(String couponNumber, int userIdx) {
+        String query = "select exists(select CouponUser.idx " +
+                "from Coupon inner join CouponUser on Coupon.idx = CouponUser.couponIdx " +
+                "where CouponUser.userIdx = ? and Coupon.couponNumber = ? and CouponUser.status != 'N' and Coupon.status != 'N')";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, userIdx, couponNumber);
     }
 }
