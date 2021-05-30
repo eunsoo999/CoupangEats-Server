@@ -17,12 +17,12 @@ public class CouponDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public int checkCouponByStoreIdxAnduserIdx(int storeIdx, Integer userIdx) {
+    public int checkCouponUser(int couponIdx, Integer userIdx) {
         String checkCouponByStoreQuery = "select exists(select CouponUser.idx " +
                 "from Coupon inner join CouponUser on Coupon.idx = CouponUser.couponIdx " +
-                "where CouponUser.userIdx = ? and Coupon.storeIdx = ? and Coupon.ExpirationDate > now())";
+                "where CouponUser.userIdx = ? and Coupon.idx = ? and CouponUser.status != 'N')";
 
-        return this.jdbcTemplate.queryForObject(checkCouponByStoreQuery, int.class, userIdx, storeIdx);
+        return this.jdbcTemplate.queryForObject(checkCouponByStoreQuery, int.class, userIdx, couponIdx);
     }
 
     public int checkCouponByStoreIdx(int storeIdx) {

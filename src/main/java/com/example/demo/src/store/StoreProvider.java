@@ -157,7 +157,7 @@ public class StoreProvider {
                 GetStoreCoupon storeCoupon = couponDao.selectStoreCoupon(storeIdx);
                 // 가게의 할인쿠폰을 소유하고 있는지 확인
                 if (userIdx != null) {
-                    if (couponDao.checkCouponByStoreIdxAnduserIdx(storeIdx, userIdx) == 1) {
+                    if (couponDao.checkCouponUser(storeCoupon.getCouponIdx(), userIdx) == 1) {
                         // 유저가 이미 가게의 쿠폰을 소유하고있음.
                         storeCoupon.setHasCoupon("Y");
                     } else {
