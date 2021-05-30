@@ -72,6 +72,7 @@ public enum BaseResponseStatus {
     ADDRESSES_NOT_FOUND_LOCATION(false, 3051, "해당 도로명 주소에 대한 정보를 찾을 수 없습니다."),
     // Store
     STORES_NOT_FOUND(false, 3052, "존재하지않는 가게입니다."),
+    MENU_NOT_IN_STORES(false, 3053, "해당 가게의 메뉴가 아닙니다."),
 
     /**
      * 4000 : Database, Server 오류
