@@ -38,7 +38,7 @@ public class MenuDao {
         String selectBestMenusQuery = "select Menu.idx as 'menuIdx', Menu.menuName, Menu.price, Menu.introduction, imageUrl " +
                 "from BestMenu inner join Menu on BestMenu.menuIdx = Menu.idx left join (select menuIdx, min(idx), imageUrl from MenuImage " +
                 "group by menuIdx) as FirstImage on Menu.idx = FirstImage.menuIdx " +
-                "where BestMenu.status != 'N' and BestMenu.storeIdx = ?";
+                "where BestMenu.status != 'N' and Menu.status != 'N' and BestMenu.storeIdx = ?";
 
         return this.jdbcTemplate.query(selectBestMenusQuery,
                 (rs,rowNum) -> new GetMenus(
@@ -61,7 +61,7 @@ public class MenuDao {
     }
 
     public GetMenuDetailRes selectMenu(int menuIdx) {
-        String selectMenuQuery = "select menuName, price, introduction from Menu where Menu.idx = ?";
+        String selectMenuQuery = "select menuName, price, introduction from Menu where Menu.idx = ? and Menu.status != 'N'";
         return this.jdbcTemplate.queryForObject(selectMenuQuery,
                 (rs,rowNum) -> new GetMenuDetailRes(
                         rs.getString("menuName"),
@@ -80,7 +80,7 @@ public class MenuDao {
     public List<GetMenuOptionCategorys> selectMenuOptionCategorys(int menuIdx) {
         String selectMenuImageUrlsQuery = "select title as 'optionCategoryName', requiredChoiceFlag, numberOfChoices " +
                 "from MenuOptionCategory " +
-                "where MenuOptionCategory.menuIdx = ?";
+                "where MenuOptionCategory.menuIdx = ? and MenuOptionCategory.status != 'N'";
 
         return this.jdbcTemplate.query(selectMenuImageUrlsQuery,
                 (rs,rowNum) -> new GetMenuOptionCategorys(
@@ -92,7 +92,7 @@ public class MenuDao {
     public List<GetMenuOptions> selectOptionsByMenuIdxAndCategoryName(int menuIdx, String optionCategoryName) {
         String selectOptionsQuery = "select MenuOption.title as 'optionName', MenuOption.extraPrice " +
                 "from MenuOption inner join MenuOptionCategory on MenuOption.optionCategoryIdx = MenuOptionCategory.idx " +
-                "where MenuOptionCategory.title = ? and MenuOptionCategory.menuIdx = ?";
+                "where MenuOptionCategory.title = ? and MenuOptionCategory.menuIdx = ? and MenuOption.status != 'N'";
 
         return this.jdbcTemplate.query(selectOptionsQuery,
                 (rs,rowNum) -> new GetMenuOptions(
@@ -104,5 +104,11 @@ public class MenuDao {
         String checkMenuInStoreQuery = "select exists(select idx from Menu where idx = ? and Menu.storeIdx = ? and Menu.status != 'N')";
 
         return this.jdbcTemplate.queryForObject(checkMenuInStoreQuery, int.class, menuIdx, storeIdx);
+    }
+
+    public int checkMenu(int menuIdx) {
+        String checkMenuInStoreQuery = "select exists(select idx from Menu where idx = ? and Menu.status != 'N')";
+
+        return this.jdbcTemplate.queryForObject(checkMenuInStoreQuery, int.class, menuIdx);
     }
 }
