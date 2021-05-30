@@ -186,7 +186,7 @@ public class StoreProvider {
             // 추천 메뉴 리스트
             List<GetMenus> recommendedMenus = menuDao.selectBestMenusByStoreIdx(storeIdx);
             bestMenu.setMenuList(recommendedMenus);
-            // 추천 메뉴가 없는 경우
+            // 추천 메뉴가 있는 경우에 list에 추가
             if (!recommendedMenus.isEmpty()) {
                 getStoreRes.getMenuCategories().add(bestMenu);
             }
