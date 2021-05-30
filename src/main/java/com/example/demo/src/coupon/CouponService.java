@@ -31,7 +31,7 @@ public class CouponService {
             throw new BaseException(USERS_NOT_FOUND); // 유저 존재 확인
         } else if (couponDao.checkCouponByCouponNumber(postCouponReq.getCouponNumber()) == 0) {
             throw new BaseException(COUPONS_NOT_FOUND); // 쿠폰 번호 확인
-        } else if (couponDao.checkCouponUserByCouponNumber(postCouponReq.getCouponNumber(), postCouponReq.getUserIdx()) == 1) {
+        } else if (couponDao.checkUserCouponByCouponNumber(postCouponReq.getCouponNumber(), postCouponReq.getUserIdx()) == 1) {
             throw new BaseException(COUPONS_USED); // 해당 쿠폰을 이미 유저가 가지고 있는지 확인
         }
 
@@ -43,6 +43,5 @@ public class CouponService {
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }
-
     }
 }
