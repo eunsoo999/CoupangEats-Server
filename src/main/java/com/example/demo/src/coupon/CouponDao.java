@@ -1,5 +1,7 @@
 package com.example.demo.src.coupon;
 
+import com.example.demo.src.coupon.model.GetStoreCoupon;
+import com.example.demo.src.menu.model.GetMenus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -21,5 +23,23 @@ public class CouponDao {
                 "where CouponUser.userIdx = ? and Coupon.storeIdx = ? and Coupon.ExpirationDate > now())";
 
         return this.jdbcTemplate.queryForObject(checkCouponByStoreQuery, int.class, userIdx, storeIdx);
+    }
+
+    public int checkCouponByStoreIdx(int storeIdx) {
+        String checkCouponByStoreQuery = "select exists(select Coupon.idx " +
+                "from Coupon " +
+                "where Coupon.storeIdx = ? and Coupon.ExpirationDate > now() and Coupon.status != 'N')";
+
+        return this.jdbcTemplate.queryForObject(checkCouponByStoreQuery, int.class, storeIdx);
+    }
+
+    public GetStoreCoupon selectStoreCoupon(int storeIdx) {
+        String selectStoreCoupon = "select idx as 'couponIdx', discountPrice from Coupon " +
+                "where Coupon.storeIdx = ? and Coupon.status != 'N' and Coupon.ExpirationDate > now()";
+
+        return this.jdbcTemplate.queryForObject(selectStoreCoupon,
+                (rs,rowNum) -> new GetStoreCoupon(
+                        rs.getInt("couponIdx"),
+                        rs.getInt("discountPrice")), storeIdx);
     }
 }

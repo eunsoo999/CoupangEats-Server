@@ -2,8 +2,12 @@ package com.example.demo.src.store;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.coupon.CouponDao;
+import com.example.demo.src.coupon.model.GetStoreCoupon;
 import com.example.demo.src.event.EventDao;
 import com.example.demo.src.event.model.GetEventBannerRes;
+import com.example.demo.src.menu.MenuDao;
+import com.example.demo.src.menu.model.GetMenuByCategory;
+import com.example.demo.src.menu.model.GetMenus;
 import com.example.demo.src.review.ReviewDao;
 import com.example.demo.src.review.model.GetPhotoReview;
 import com.example.demo.src.store.model.*;
@@ -24,16 +28,18 @@ public class StoreProvider {
     private final EventDao eventDao;
     private final ReviewDao reviewDao;
     private final CouponDao couponDao;
+    private final MenuDao menuDao;
     private final JwtService jwtService;
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public StoreProvider(StoreDao storeDao, EventDao eventDao, ReviewDao reviewDao, CouponDao couponDao, JwtService jwtService) {
+    public StoreProvider(StoreDao storeDao, EventDao eventDao, ReviewDao reviewDao, CouponDao couponDao, MenuDao menuDao, JwtService jwtService) {
         this.storeDao = storeDao;
         this.eventDao = eventDao;
         this.reviewDao = reviewDao;
         this.couponDao = couponDao;
+        this.menuDao = menuDao;
         this.jwtService = jwtService;
     }
 
@@ -141,22 +147,28 @@ public class StoreProvider {
         try {
             // 가게 정보
             GetStoreRes getStoreRes = storeDao.selectStoreInfo(storeIdx);
+
             // 가게 이미지
             List<String> getImageUrls = storeDao.selectStoreImageUrls(storeIdx);
             getStoreRes.setImageUrls(getImageUrls);
 
-            // 가게의 할인쿠폰을 소유하고 있는지 확인
-            if (userIdx != null) {
-                if (couponDao.checkCouponByStoreIdxAnduserIdx(storeIdx, userIdx) == 1) {
-                    // 유저가 이미 가게의 쿠폰을 소유하고있음.
-                    getStoreRes.setHasCoupon("Y");
+            // 가게 할인쿠폰 정보
+            if (couponDao.checkCouponByStoreIdx(storeIdx) == 1) {
+                GetStoreCoupon storeCoupon = couponDao.selectStoreCoupon(storeIdx);
+                // 가게의 할인쿠폰을 소유하고 있는지 확인
+                if (userIdx != null) {
+                    if (couponDao.checkCouponByStoreIdxAnduserIdx(storeIdx, userIdx) == 1) {
+                        // 유저가 이미 가게의 쿠폰을 소유하고있음.
+                        storeCoupon.setHasCoupon("Y");
+                    } else {
+                        // 유저가 가게의 쿠폰을 소유하고 있지않음.
+                        storeCoupon.setHasCoupon("N");
+                    }
                 } else {
-                    // 유저가 가게의 쿠폰을 소유하고 있지않음.
-                    getStoreRes.setHasCoupon("N");
+                    // 비로그인 유저는 쿠폰을 소유하고 있지않음.
+                    storeCoupon.setHasCoupon("N");
                 }
-            } else {
-                // 비로그인 유저는 쿠폰을 소유하고 있지않음.
-                getStoreRes.setHasCoupon("N");
+                getStoreRes.setCoupon(storeCoupon);
             }
 
             // 가게 포토리뷰 미리보기
@@ -168,6 +180,29 @@ public class StoreProvider {
                 getStoreRes.setPhotoReviews(photoReviews);
             }
 
+            // 가게 메뉴
+            // 추천메뉴 카테고리
+            GetMenuByCategory bestMenu = new GetMenuByCategory("추천메뉴", null);
+            // 추천 메뉴 리스트
+            List<GetMenus> recommendedMenus = menuDao.selectBestMenusByStoreIdx(storeIdx);
+            bestMenu.setMenuList(recommendedMenus);
+            // 추천 메뉴가 없는 경우
+            if (!recommendedMenus.isEmpty()) {
+                getStoreRes.getMenuCategories().add(bestMenu);
+            }
+
+            // 일반메뉴 카테고리
+            List<GetMenuByCategory> menuCategories = menuDao.selectStoreCategories(storeIdx);
+            for (GetMenuByCategory category : menuCategories) {
+                List<GetMenus> menus = menuDao.selectMenusBycategoryName(category.getMenuCategoryName());
+                category.setMenuList(menus);
+                getStoreRes.getMenuCategories().add(category);
+            }
+
+            // 해당 가게에 메뉴가 없는 경우
+            if (getStoreRes.getMenuCategories().isEmpty()) {
+                getStoreRes.setMenuCategories(null);
+            }
             return getStoreRes;
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);

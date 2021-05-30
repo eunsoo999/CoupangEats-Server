@@ -368,7 +368,7 @@ public class StoreDao {
     public GetStoreRes selectStoreInfo(int storeIdx) {
         String getStoreInfoQuery = "select storeName, (select if (count(*) = 0, null, avg(rating)) from Review " +
                 "where Review.status != 'N' and Review.storeIdx = Store.idx) as 'rating', " +
-                "(select FORMAT(count(*) , 0) from Review where Review.status != 'N' and Review.storeIdx = Store.idx) as 'reviewCount', " +
+                "(select if(count(*) = 0, null, FORMAT(count(*) , 0)) from Review where Review.status != 'N' and Review.storeIdx = Store.idx) as 'reviewCount', " +
                 "deliveryTime, deliveryPrice, minOrderPrice, cheetahDelivery " +
                 "from Store where Store.idx = ?";
 
