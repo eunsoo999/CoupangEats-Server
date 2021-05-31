@@ -35,11 +35,11 @@ public class CouponController {
 
     /**
      * 29. 가게에서 사용가능한 쿠폰 전체 조회 API
-     * [GET] /users/:userIdx/coupons/stores/:storeIdx
+     * [GET] /stores/:storeIdx/users/:userIdx/coupons
      * @return BaseResponse<List<GetCouponsRes>>
      */
     @ResponseBody
-    @GetMapping("/users/{userIdx}/coupons/stores/{storeIdx}")
+    @GetMapping("/stores/{storeIdx}/users/{userIdx}/coupons")
     public BaseResponse<List<GetCouponsRes>> postCouponByCouponNumber(@PathVariable int userIdx, @PathVariable int storeIdx) {
         try {
             //jwt 확인
