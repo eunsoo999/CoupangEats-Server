@@ -43,8 +43,6 @@ public class OrderController {
             return new BaseResponse<>(POST_ORDERS_EMPTY_ADDRESS);
         } else if(postOrderReq.getStoreIdx() == null || postOrderReq.getStoreIdx() == 0) {
             return new BaseResponse<>(POST_ORDERS_EMPTY_STOREIDX);
-        } else if(postOrderReq.getStoreName() == null || postOrderReq.getStoreName().isEmpty()) {
-            return new BaseResponse<>(POST_ORDERS_EMPTY_STORENAME);
         } else if(postOrderReq.getOrderMenus() == null || postOrderReq.getOrderMenus().isEmpty()) {
             return new BaseResponse<>(POST_ORDERS_EMPTY_ORDERMENUS);
         }  else if(postOrderReq.getOrderPrice() == null) {
@@ -67,7 +65,9 @@ public class OrderController {
         } else if(!postOrderReq.getOrderMenus().isEmpty()) {
             // 담은 메뉴가 있는지 검사
             for (PostOrderMenus menus : postOrderReq.getOrderMenus()) {
-                if(menus.getMenuName() == null || menus.getMenuName().isEmpty()) {
+                if (menus.getMenuIdx() == null) {
+                    return new BaseResponse<>(POST_ORDERMENUS_EMPTY_MENUIDX);
+                } else if(menus.getMenuName() == null || menus.getMenuName().isEmpty()) {
                     return new BaseResponse<>(POST_ORDERMENUS_EMPTY_NAME);
                 } else if(menus.getCount() == null || menus.getCount() == 0) {
                     return new BaseResponse<>(POST_ORDERMENUS_NOT_ZERO);

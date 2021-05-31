@@ -112,9 +112,9 @@ public class MenuDao {
         return this.jdbcTemplate.queryForObject(checkMenuInStoreQuery, int.class, menuIdx);
     }
 
-    public int checkMenuNameInStore(String menuName, Integer storeIdx) {
-        String checkMenuNameInStoreQuery = "select exists(select idx from Menu where menuName = ? and storeIdx = ? and Menu.status != 'N')";
+    public int checkMenuIdxInStore(int menuIdx, Integer storeIdx) {
+        String checkMenuIdxInStoreQuery = "select exists(select idx from Menu where idx = ? and storeIdx = ? and Menu.status != 'N')";
 
-        return this.jdbcTemplate.queryForObject(checkMenuNameInStoreQuery, int.class, menuName, storeIdx);
+        return this.jdbcTemplate.queryForObject(checkMenuIdxInStoreQuery, int.class, menuIdx, storeIdx);
     }
 }

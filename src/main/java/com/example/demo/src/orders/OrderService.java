@@ -44,7 +44,7 @@ public class OrderService {
         }
         // 해당 메뉴가 가게에 있는지 검사
         for (PostOrderMenus orderMenu : postOrderReq.getOrderMenus()) {
-            if (menuDao.checkMenuNameInStore(orderMenu.getMenuName(), postOrderReq.getStoreIdx()) == 0) {
+            if (menuDao.checkMenuIdxInStore(orderMenu.getMenuIdx(), postOrderReq.getStoreIdx()) == 0) {
                 throw new BaseException(MENU_NOT_IN_STORES);
             }
         }

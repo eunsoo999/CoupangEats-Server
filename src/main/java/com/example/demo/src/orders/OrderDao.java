@@ -19,10 +19,10 @@ public class OrderDao {
 
 
     public int insertOrder(PostOrderReq postOrderReq) {
-        String insertOrderQuery = "INSERT INTO Orders (address, storeIdx, storeName, orderPrice, deliveryPrice, discountPrice, totalPrice, " +
+        String insertOrderQuery = "INSERT INTO Orders (address, storeIdx, orderPrice, deliveryPrice, discountPrice, totalPrice, " +
                 "storeRequests, CheckEchoProduct, deliveryRequests, userIdx, payType) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        Object[] insertOrderParams = new Object[] {postOrderReq.getAddress(), postOrderReq.getStoreIdx(), postOrderReq.getStoreName(), postOrderReq.getOrderPrice(),
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        Object[] insertOrderParams = new Object[] {postOrderReq.getAddress(), postOrderReq.getStoreIdx(), postOrderReq.getOrderPrice(),
                                     postOrderReq.getDeliveryPrice(), postOrderReq.getDiscountPrice(), postOrderReq.getTotalPrice(),
                                     postOrderReq.getStoreRequests(), postOrderReq.getCheckEchoProduct(), postOrderReq.getDeliveryRequests(),
                                     postOrderReq.getUserIdx(), postOrderReq.getPayType()};
@@ -34,8 +34,9 @@ public class OrderDao {
     }
 
     public int insertOrderMenu(PostOrderMenus orderMenus) {
-        String insertOrderMenuQuery = "INSERT INTO OrderMenu (menuName, menuDetail, count, totalPrice) " + "VALUES (?, ?, ?, ?)";
-        Object[] insertOrderMenuParams = new Object[] {orderMenus.getMenuName(), orderMenus.getMenuDetail(), orderMenus.getCount(), orderMenus.getTotalPrice()};
+        String insertOrderMenuQuery = "INSERT INTO OrderMenu (menuName, menuDetail, count, totalPrice, menuIdx) " + "VALUES (?, ?, ?, ?, ?)";
+        Object[] insertOrderMenuParams = new Object[] {orderMenus.getMenuName(), orderMenus.getMenuDetail(),
+                orderMenus.getCount(), orderMenus.getTotalPrice(), orderMenus.getMenuIdx()};
 
         this.jdbcTemplate.update(insertOrderMenuQuery, insertOrderMenuParams);
 

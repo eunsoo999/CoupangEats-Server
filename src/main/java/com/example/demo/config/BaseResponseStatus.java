@@ -57,7 +57,7 @@ public enum BaseResponseStatus {
 
     POST_ORDERS_EMPTY_ADDRESS(false, 2062, "배달지 주소를 입력해주세요."),
     POST_ORDERS_EMPTY_STOREIDX(false, 2063, "가게 번호를 입력해주세요."),
-    POST_ORDERS_EMPTY_STORENAME(false, 2064, "가게 이름을 입력해주세요."),
+    POST_ORDERMENUS_EMPTY_MENUIDX(false, 2064, "주문 메뉴 번호를 입력해주세요."),
     POST_ORDERS_EMPTY_ORDERMENUS(false, 2065, "주문 메뉴가 비었습니다."),
     POST_ORDERMENUS_EMPTY_NAME(false, 2066, "주문 메뉴의 이름을 입력해주세요."),
     POST_ORDERMENUS_NOT_ZERO(false, 2067, "주문 수량을 확인해주세요. 1개 이상 주문 가능합니다."),

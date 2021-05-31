@@ -13,7 +13,6 @@ import java.util.List;
 public class PostOrderReq {
     private String address;
     private Integer storeIdx;
-    private String storeName;
     private List<PostOrderMenus> orderMenus = new ArrayList<>();
     private Integer couponIdx;
     private Integer orderPrice;

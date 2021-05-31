@@ -122,7 +122,6 @@ public class StoreProvider {
     public GetNewStoresRes getNewStores(SearchOption searchOption) throws BaseException {
         try {
             List<GetStoreMainBox> getStoreMainBoxList = storeDao.selectNewStores(searchOption);
-
             if (getStoreMainBoxList.isEmpty()) {
                 return new GetNewStoresRes(0, null);
             } else {

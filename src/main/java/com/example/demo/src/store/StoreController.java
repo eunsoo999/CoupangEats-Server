@@ -146,9 +146,7 @@ public class StoreController {
         } else if(coupon != null && !coupon.equalsIgnoreCase("Y")) {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
-
         SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon);
-
         try {
             GetNewStoresRes getNewStoresRes = storeProvider.getNewStores(searchOption);
             return new BaseResponse<>(getNewStoresRes);
@@ -188,5 +186,4 @@ public class StoreController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
 }

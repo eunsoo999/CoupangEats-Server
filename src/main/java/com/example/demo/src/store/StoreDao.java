@@ -348,8 +348,6 @@ public class StoreDao {
             }
         }
 
-        System.out.println(selectNewStoresQuery);
-
         Object[] selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
                 searchOption.getLat(), searchOption.getLon(), searchOption.getLat()};
 
