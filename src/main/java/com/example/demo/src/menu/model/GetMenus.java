@@ -12,6 +12,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetMenus {
+    private String bestOrderMenu;
+    private String bestReview;
     private int menuIdx;
     private String menuName;
     private String imageUrl;

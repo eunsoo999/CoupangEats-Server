@@ -193,7 +193,7 @@ public class StoreProvider {
             // 일반메뉴 카테고리
             List<GetMenuByCategory> menuCategories = menuDao.selectStoreCategories(storeIdx);
             for (GetMenuByCategory category : menuCategories) {
-                List<GetMenus> menus = menuDao.selectMenusBycategoryName(category.getMenuCategoryName());
+                List<GetMenus> menus = menuDao.selectMenusBycategoryName(category.getMenuCategoryName(), storeIdx);
                 category.setMenuList(menus);
                 getStoreRes.getMenuCategories().add(category);
             }

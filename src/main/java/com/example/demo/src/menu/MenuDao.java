@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.awt.*;
 import java.util.List;
 
 @Repository
@@ -17,31 +18,66 @@ public class MenuDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public List<GetMenus> selectMenusBycategoryName(String menuCategoryName) {
-        String selectMenuQuery = "select Menu.idx as 'menuIdx', Menu.menuName, " +
+    public List<GetMenus> selectMenusBycategoryName(String menuCategoryName, int storeIdx) {
+        String selectMenuQuery = "select if ((select count(*) " +
+                "from OrderMenu " +
+                "where menuIdx = Menu.idx and OrderMenu.status != 'N') = (select max(maxOrderCount.count) from " +
+                "(select count(*) as count " +
+                "from OrderMenu inner join Menu m on OrderMenu.menuIdx = m.idx " +
+                "where OrderMenu.status != 'N' and m.storeIdx = Menu.storeIdx " +
+                "group by OrderMenu.menuIdx) as maxOrderCount), '주문많음', null) as 'bestOrderMenu', " +
+                "if ((select count(*) " +
+                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx " +
+                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' and OrderMenu.menuIdx = Menu.idx) = " +
+                "(select max(maxReviewCount.count) from " +
+                "(select count(*) as count " +
+                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx " +
+                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' " +
+                "group by OrderMenu.menuIdx) as maxReviewCount), '리뷰많음', null) as 'bestReview', " +
+                "Menu.idx as 'menuIdx', Menu.menuName, " +
                 "Menu.price, Menu.introduction, FirstImage.imageUrl " +
                 "from Menu inner join MenuCategory on Menu.menuCategoryIdx = MenuCategory.idx " +
-                "left join (select menuIdx, min(idx), imageUrl from MenuImage " +
-                "group by menuIdx) as FirstImage on Menu.idx = FirstImage.menuIdx " +
-                "where menuCategoryName = ? and Menu.status != 'N'";
+                "left join (select menuIdx, min(idx), imageUrl " +
+                "from MenuImage " +
+                "group by menuIdx) as FirstImage " +
+                "on Menu.idx = FirstImage.menuIdx " +
+                "where menuCategoryName = ? and Menu.status != 'N' and Menu.storeIdx = ?";
 
         return this.jdbcTemplate.query(selectMenuQuery,
                 (rs,rowNum) -> new GetMenus(
+                        rs.getString("bestOrderMenu"),
+                        rs.getString("bestReview"),
                         rs.getInt("menuIdx"),
                         rs.getString("menuName"),
                         rs.getString("imageUrl"),
                         rs.getInt("price"),
-                        rs.getString("introduction")), menuCategoryName);
+                        rs.getString("introduction")), menuCategoryName, storeIdx);
     }
 
     public List<GetMenus> selectBestMenusByStoreIdx(int storeIdx) {
-        String selectBestMenusQuery = "select Menu.idx as 'menuIdx', Menu.menuName, Menu.price, Menu.introduction, imageUrl " +
+        String selectBestMenusQuery = "select if ((select count(*) " +
+                "from OrderMenu " +
+                "where menuIdx = Menu.idx and OrderMenu.status != 'N') = (select max(maxOrderCount.count) from " +
+                "(select count(*) as count " +
+                "from OrderMenu inner join Menu m on OrderMenu.menuIdx = m.idx " +
+                "where OrderMenu.status != 'N' and m.storeIdx = Menu.storeIdx " +
+                "group by OrderMenu.menuIdx) as maxOrderCount), '주문많음', null) as 'bestOrderMenu', " +
+                "if ((select count(*) " +
+                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx " +
+                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' and OrderMenu.menuIdx = Menu.idx) = " +
+                "(select max(maxReviewCount.count) from " +
+                "(select count(*) as count " +
+                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx " +
+                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' " +
+                "group by OrderMenu.menuIdx) as maxReviewCount), '리뷰많음', null) as 'bestReview',Menu.idx as 'menuIdx', Menu.menuName, Menu.price, Menu.introduction, imageUrl " +
                 "from BestMenu inner join Menu on BestMenu.menuIdx = Menu.idx left join (select menuIdx, min(idx), imageUrl from MenuImage " +
                 "group by menuIdx) as FirstImage on Menu.idx = FirstImage.menuIdx " +
                 "where BestMenu.status != 'N' and Menu.status != 'N' and BestMenu.storeIdx = ?";
 
         return this.jdbcTemplate.query(selectBestMenusQuery,
                 (rs,rowNum) -> new GetMenus(
+                        rs.getString("bestOrderMenu"),
+                        rs.getString("bestReview"),
                         rs.getInt("menuIdx"),
                         rs.getString("menuName"),
                         rs.getString("imageUrl"),
