@@ -2,9 +2,7 @@ package com.example.demo.src.coupon;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.coupon.model.GetCouponsRes;
-import com.example.demo.src.coupon.model.PostCouponReq;
-import com.example.demo.src.coupon.model.PostCouponRes;
+import com.example.demo.src.coupon.model.*;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +55,35 @@ public class CouponController {
     }
 
     /**
-     * 30. 할인쿠폰 등록 API
+     * 32. 가게 할인쿠폰 받기 API
+     * [POST] /stores/:storeIdx/coupons
+     * @return BaseResponse<PostCouponRes>
+     */
+    @ResponseBody
+    @PostMapping("/stores/{storeIdx}/coupons")
+    public BaseResponse<PostCouponRes> postUserCoupon(@RequestBody PostUserCouponReq postUserCouponReq, @PathVariable int storeIdx) {
+        if(postUserCouponReq.getUserIdx() == null) {
+            return new BaseResponse<>(POST_COUPONS_USERIDX);
+        } else if(postUserCouponReq.getCouponIdx() == null) {
+            return new BaseResponse<>(POST_COUPONS_COUPONIDX);
+        }
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(postUserCouponReq.getUserIdx() != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            PostCouponRes createdRes = couponService.createUserCouponByStore(postUserCouponReq, storeIdx);
+            return new BaseResponse<>(createdRes);
+        } catch (BaseException exception) {
+            logger.warn("#32. " + exception.getStatus().getMessage());
+            logger.warn(postUserCouponReq.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 33. 할인쿠폰 등록 API
      * [POST] /coupons
      * @return BaseResponse<PostCouponRes>
      */
@@ -75,17 +101,17 @@ public class CouponController {
             if(postCouponReq.getUserIdx() != userIdxByJwt){
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
-            PostCouponRes createdCoupon = couponService.postCoupon(postCouponReq);
+            PostCouponRes createdCoupon = couponService.createUserCouponByCouponNumber(postCouponReq);
             return new BaseResponse<>(createdCoupon);
         } catch (BaseException exception) {
-            logger.warn("#30. " + exception.getStatus().getMessage());
+            logger.warn("#33. " + exception.getStatus().getMessage());
             logger.warn("(" + postCouponReq.toString() + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 31. My이츠-할인쿠폰 조회 API
+     * 34. My이츠-할인쿠폰 조회 API
      * [GET] /users/:userIdx/coupons
      * @return BaseResponse<List<GetCouponsRes>>
      */
@@ -101,7 +127,7 @@ public class CouponController {
             List<GetCouponsRes> getUserRes = couponProvider.getCoupons(userIdx);
             return new BaseResponse<>(getUserRes);
         } catch (BaseException exception) {
-            logger.warn("#29. " + exception.getStatus().getMessage());
+            logger.warn("#34. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }

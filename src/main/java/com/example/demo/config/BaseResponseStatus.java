@@ -71,6 +71,9 @@ public enum BaseResponseStatus {
     POST_ORDERS_EMPTY_USERIDX(false, 2075, "유저 번호를 확인해주세요."),
     POST_ORDERMENUS_TOTALPRICE(false, 2076, "메뉴의 금액을 입력해주세요."),
 
+    POST_COUPONS_USERIDX(false, 2077, "쿠폰을 지급받을 유저 번호를 입력해주세요."),
+    POST_COUPONS_COUPONIDX(false, 2078, "지급받을 쿠폰 번호를 입력해주세요."),
+
     /**
      * 3000 : Response 오류
      */
@@ -93,13 +96,16 @@ public enum BaseResponseStatus {
     MENUS_NOT_FOUND(false, 3053, "존재하지않는 메뉴입니다."),
     MENU_NOT_IN_STORES(false, 3054, "해당 가게의 메뉴가 아닙니다."),
 
-    COUPONS_NOT_FOUND(false, 3055, "잘못된 쿠폰번호입니다."),
+    COUPON_NUMBER_NOT_FOUND(false, 3055, "잘못된 쿠폰번호입니다."),
     COUPONS_USED(false, 3056, "이미 지급받은 쿠폰입니다."),
     USERS_NOT_FOUND_COUPONS(false, 3057, "해당 쿠폰을 가지고 있지않은 유저입니다."),
     COUPONS_NOT_AVAILABLE(false, 3058, "사용가능한 쿠폰이 아닙니다."),
 
     CART_EMPTY_ADDRESS(false, 3058, "배달받을 주소를 설정해 주세요."),
     CART_IMPOSSIBLE_DISTANCE(false, 3059, "거리가 멀어 배달이 불가능합니다."),
+
+    COUPONS_NOT_FOUND(false, 3060, "존재하지않는 쿠폰입니다."),
+    COUPONS_NOT_IN_STORES(false, 3061, "가게의 쿠폰이 아니거나, 지급 만료된 쿠폰입니다."),
 
 
     /**

@@ -5,12 +5,9 @@ import com.example.demo.src.coupon.model.GetCouponsRes;
 import com.example.demo.src.coupon.model.GetStoreCoupon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -33,7 +30,7 @@ public class CouponDao {
     public int checkCouponByStoreIdx(int storeIdx) {
         String checkCouponByStoreQuery = "select exists(select Coupon.idx " +
                 "from Coupon " +
-                "where Coupon.storeIdx = ? and Coupon.ExpirationDate > now() and Coupon.status != 'N')";
+                "where Coupon.storeIdx = ? and Coupon.ExpirationDate >= date_format(now(), '%Y%m%d') and Coupon.status != 'N')";
 
         return this.jdbcTemplate.queryForObject(checkCouponByStoreQuery, int.class, storeIdx);
     }
@@ -168,5 +165,15 @@ public class CouponDao {
                         rs.getString("minOrderPrice"),
                         rs.getString("expirationDate"),
                         rs.getString("isAvailable")), storeIdx, userIdx, storeIdx);
+    }
+
+    public int checkCoupon(int couponIdx) {
+        String checkCouponQuery = "select exists(select Coupon.idx " +
+                "from Coupon " +
+                "where Coupon.ExpirationDate >= date_format(now(), '%Y%m%d') and Coupon.status != 'N' and " +
+                "idx = ?)";
+
+        return this.jdbcTemplate.queryForObject(checkCouponQuery, int.class, couponIdx);
+
     }
 }
