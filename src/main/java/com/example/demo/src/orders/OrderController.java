@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
-
 @RestController
 @RequestMapping("")
 public class OrderController {

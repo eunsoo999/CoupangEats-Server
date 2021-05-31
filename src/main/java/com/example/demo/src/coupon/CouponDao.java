@@ -5,9 +5,12 @@ import com.example.demo.src.coupon.model.GetCouponsRes;
 import com.example.demo.src.coupon.model.GetStoreCoupon;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
 
 @Repository
@@ -119,7 +122,9 @@ public class CouponDao {
 
     // 가게에서 사용가능한 쿠폰 limit 1개
     public GetCartCoupon getUserCouponInStore(int userIdx, int storeIdx) {
-        String query = "select UserCoupon.redeemStatus, UserCoupon.couponIdx, Coupon.discountPrice " +
+        String query = "select UserCoupon.redeemStatus, " +
+                "if(UserCoupon.redeemStatus = 'NONE', null, UserCoupon.couponIdx) as 'couponIdx', " +
+                "if(UserCoupon.redeemStatus = 'NONE', 0, Coupon.discountPrice) as 'discountPrice' " +
                 "from UserCoupon inner join Coupon on UserCoupon.couponIdx = Coupon.idx " +
                 "where UserCoupon.status != 'N' and userIdx = ? and (Coupon.storeIdx = ? or Coupon.storeIdx = 0) " +
                 "and Coupon.status != 'N' and UserCoupon.useDate is null and Coupon.expirationDate >= date_format(now(), '%Y%m%d') " +
@@ -129,7 +134,7 @@ public class CouponDao {
         return this.jdbcTemplate.queryForObject(query,
                 (rs,rowNum) -> new GetCartCoupon(
                         rs.getString("redeemStatus"),
-                        rs.getInt("couponIdx"),
+                        (Integer) rs.getObject("couponIdx"),
                         rs.getInt("discountPrice")), userIdx, storeIdx);
     }
 

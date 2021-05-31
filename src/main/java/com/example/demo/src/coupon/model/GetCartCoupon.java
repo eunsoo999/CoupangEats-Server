@@ -1,5 +1,6 @@
 package com.example.demo.src.coupon.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,6 +10,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetCartCoupon {
     private String redeemStatus; // 적용상태
     private int couponCount; // 사용 가능 쿠폰개수 ok
