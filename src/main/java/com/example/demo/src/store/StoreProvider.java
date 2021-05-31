@@ -156,11 +156,11 @@ public class StoreProvider {
                 GetStoreCoupon storeCoupon = couponDao.selectStoreCoupon(storeIdx);
                 // 가게의 할인쿠폰을 소유하고 있는지 확인
                 if (userIdx != null) {
-                    if (couponDao.checkUserCoupon(storeCoupon.getCouponIdx(), userIdx) == 1) {
-                        // 유저가 이미 가게의 쿠폰을 소유하고있음.
+                    if (couponDao.checkAvailableUserCouponInStore(storeCoupon.getCouponIdx(), userIdx) == 1) {
+                        // 유저가 사용가능한 가게의 쿠폰을 소유하고있음.
                         storeCoupon.setHasCoupon("Y");
                     } else {
-                        // 유저가 가게의 쿠폰을 소유하고 있지않음.
+                        // 유저가 가게의 쿠폰을 소유하고 있지않거나 이미 사용함.
                         storeCoupon.setHasCoupon("N");
                     }
                 } else {
