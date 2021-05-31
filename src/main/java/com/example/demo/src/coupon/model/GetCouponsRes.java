@@ -11,5 +11,5 @@ public class GetCouponsRes {
     private String discountPrice;
     private String minOrderPrice;
     private String expirationDate;
-    private String status; // 사용가능, 사용완료, 기간만료 상태
+    private String isAvailable; // 사용가능, 사용완료, 기간만료 상태
 }

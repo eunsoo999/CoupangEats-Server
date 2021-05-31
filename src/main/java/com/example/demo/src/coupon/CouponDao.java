@@ -49,7 +49,7 @@ public class CouponDao {
     }
 
     public List<GetCouponsRes> selectUserCoupons(int userIdx) {
-        String selectUserCouponsQuery = "select UserCoupon.couponIdx as 'userCouponIdx', couponName, " +
+        String selectUserCouponsQuery = "select UserCoupon.idx as 'userCouponIdx', couponName, " +
                 "concat(format(discountPrice, 0), '원 할인') as 'discountPrice', " +
                 "if (Coupon.minOrderPrice = 0, null, concat(format(Coupon.minOrderPrice, 0), '원 이상 주문 시')) as 'minOrderPrice', " +
                 "case when Coupon.expirationDate < date_format(now(), '%Y%m%d') then '기간만료' " +
@@ -145,5 +145,28 @@ public class CouponDao {
                 "and Coupon.status != 'N' and UserCoupon.useDate is null and Coupon.expirationDate >= date_format(now(), '%Y%m%d')";
 
         return this.jdbcTemplate.queryForObject(query, int.class, userIdx, storeIdx);
+    }
+
+    public List<GetCouponsRes> selectUserCouponsInStore(int userIdx, int storeIdx) {
+        String query = "select UserCoupon.idx as 'userCouponIdx', couponName, concat(format(Coupon.discountPrice, 0), '원 할인') as 'discountPrice', " +
+                "concat(format(Coupon.minOrderPrice, 0), '원 이상 주문 시') as 'minOrderPrice', " +
+                "case when Coupon.expirationDate < date_format(now(), '%Y%m%d') then '기간만료' " +
+                "when Coupon.expirationDate >= date_format(now(), '%Y%m%d') and UserCoupon.useDate is not null then '사용완료' " +
+                "when Coupon.expirationDate >= date_format(now(), '%Y%m%d') then DATE_FORMAT(Coupon.expirationDate, '%m/%d 까지') " +
+                "end as 'expirationDate', " +
+                "if((Coupon.storeIdx = ? or Coupon.storeIdx = 0) and UserCoupon.useDate is null and Coupon.expirationDate >= date_format(now(), '%Y%m%d'), 'Y', 'N') as 'isAvailable' " +
+                "from UserCoupon join Coupon on UserCoupon.couponIdx = Coupon.idx " +
+                "where UserCoupon.status != 'N' and userIdx = ? and Coupon.status != 'N' " +
+                "order by case when UserCoupon.useDate is null and Coupon.expirationDate >= date_format(now(), '%Y%m%d') and (Coupon.storeIdx = ? or Coupon.storeIdx = 0) then 1 " +
+                "else 3 end, Coupon.expirationDate desc";
+
+        return this.jdbcTemplate.query(query,
+                (rs,rowNum) -> new GetCouponsRes(
+                        rs.getInt("userCouponIdx"),
+                        rs.getString("couponName"),
+                        rs.getString("discountPrice"),
+                        rs.getString("minOrderPrice"),
+                        rs.getString("expirationDate"),
+                        rs.getString("isAvailable")), storeIdx, userIdx, storeIdx);
     }
 }

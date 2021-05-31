@@ -43,4 +43,26 @@ public class CouponProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public List<GetCouponsRes> getUserCouponsInStore(int userIdx, int storeIdx) throws BaseException {
+        // 유저 존재 확인
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND);
+        }
+        // 가게 존재 확인
+        if (storeDao.checkStore(storeIdx) == 0) {
+            throw new BaseException(STORES_NOT_FOUND);
+        }
+
+        try {
+            List<GetCouponsRes> getCouponsResList = couponDao.selectUserCouponsInStore(userIdx, storeIdx);
+            if (getCouponsResList.isEmpty()) {
+                return null;
+            } else {
+                return getCouponsResList;
+            }
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

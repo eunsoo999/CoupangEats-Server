@@ -34,6 +34,29 @@ public class CouponController {
     }
 
     /**
+     * 29. 가게에서 사용가능한 쿠폰 전체 조회 API
+     * [GET] /users/:userIdx/coupons/stores/:storeIdx
+     * @return BaseResponse<List<GetCouponsRes>>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/coupons/stores/{storeIdx}")
+    public BaseResponse<List<GetCouponsRes>> postCouponByCouponNumber(@PathVariable int userIdx, @PathVariable int storeIdx) {
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetCouponsRes> getCouponsRes = couponProvider.getUserCouponsInStore(userIdx, storeIdx);
+            return new BaseResponse<>(getCouponsRes);
+        } catch (BaseException exception) {
+            logger.warn("#29. " + exception.getStatus().getMessage());
+            logger.warn("(userIdx : " + userIdx + ", " + storeIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 30. 할인쿠폰 등록 API
      * [POST] /coupons
      * @return BaseResponse<PostCouponRes>
