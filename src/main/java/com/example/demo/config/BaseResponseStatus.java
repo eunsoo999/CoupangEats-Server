@@ -45,7 +45,6 @@ public enum BaseResponseStatus {
     ADDRESSES_INVALID_ALIASTYPE(false, 2053, "별칭 타입 형태가 잘못되었습니다."),
     ADDRESSES_INVALID_TYPE(false, 2054, "type이 잘못되었습니다. HOME or COMPANY만 가능합니다."),
 
-
     // Store
     STORES_EMPTY_LATITUDE(false, 2055, "잘못된 위도값입니다."),
     STORES_EMPTY_LONGITUDE(false, 2056, "잘못된 경도값입니다."),
@@ -55,6 +54,22 @@ public enum BaseResponseStatus {
 
     COUPONS_EMPTY_NUMBER(false, 2060, "쿠폰 번호를 입력해주세요."),
     COUPONS_LENGTH_NUMBER(false, 2061, "쿠폰번호는 8자리 혹은 16자리만 가능합니다."),
+
+    POST_ORDERS_EMPTY_ADDRESS(false, 2062, "배달지 주소를 입력해주세요."),
+    POST_ORDERS_EMPTY_STOREIDX(false, 2063, "가게 번호를 입력해주세요."),
+    POST_ORDERS_EMPTY_STORENAME(false, 2064, "가게 이름을 입력해주세요."),
+    POST_ORDERS_EMPTY_ORDERMENUS(false, 2065, "주문 메뉴가 비었습니다."),
+    POST_ORDERMENUS_EMPTY_NAME(false, 2066, "주문 메뉴의 이름을 입력해주세요."),
+    POST_ORDERMENUS_NOT_ZERO(false, 2067, "주문 수량을 확인해주세요. 1개 이상 주문 가능합니다."),
+    POST_ORDERS_EMPTY_ORDERPRICE(false, 2068, "주문 금액을 입력해주세요."),
+    POST_ORDERS_EMPTY_DELIVERYPRICE(false, 2069, "배달비를 입력해주세요."),
+    POST_ORDERS_EMPTY_DISCOUNTPRICE(false, 2070, "할인금액을 입력해주세요."),
+    POST_ORDERS_EMPTY_TOTALPRICE(false, 2071, "총 주문가격을 입력해주세요."),
+    POST_ORDERS_EMPTY_ECHOPRODUCT(false, 2072, "일회용품 수저 유무를 선택해주세요."),
+    POST_ORDERS_INVALID_ECHOPRODUCT(false, 2073, "일회용품 수저 유무 값이 잘못되었습니다."),
+    POST_ORDERS_EMPTY_PAYTYPE(false, 2074, "결제수단을 입력해주세요."),
+    POST_ORDERS_EMPTY_USERIDX(false, 2075, "유저 번호를 확인해주세요."),
+    POST_ORDERMENUS_TOTALPRICE(false, 2076, "메뉴의 금액을 입력해주세요."),
 
     /**
      * 3000 : Response 오류
@@ -80,6 +95,8 @@ public enum BaseResponseStatus {
 
     COUPONS_NOT_FOUND(false, 3055, "잘못된 쿠폰번호입니다."),
     COUPONS_USED(false, 3056, "이미 지급받은 쿠폰입니다."),
+    USERS_NOT_FOUND_COUPONS(false, 3057, "해당 쿠폰을 가지고 있지않은 유저입니다."),
+    COUPONS_NOT_AVAILABLE(false, 3058, "사용가능한 쿠폰이 아닙니다."),
 
     /**
      * 4000 : Database, Server 오류
@@ -95,11 +112,11 @@ public enum BaseResponseStatus {
 
     FAILED_TO_UPDATE_ADDRESSES(false,4020,"배달 주소 수정에 실패하였습니다."),
     FAILED_TO_UPDATE_STATUS_ADDRESSES(false, 4021, "배달 주소 삭제에 실패하였습니다."),
-    FAILED_TO_UPDATE_USER_ADDRESS(false, 4022, "주소 선택에 실패하였습니다.");
+    FAILED_TO_UPDATE_USER_ADDRESS(false, 4022, "주소 선택에 실패하였습니다."),
+    FAILED_TO_UPDATE_USER_COUPON(false, 4023, "쿠폰 사용에 실패하였습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요
-
 
     private final boolean isSuccess;
     private final int code;

@@ -98,4 +98,21 @@ public class CouponDao {
 
         return this.jdbcTemplate.queryForObject(query, int.class, userIdx, couponNumber);
     }
+
+    public int updateUserCoupon(int userIdx, int couponIdx) {
+        String updateUserCouponQuery = "update UserCoupon set useDate = NOW() where idx = ? and userIdx = ? and status != 'N'";
+        Object[] updateUserCouponParams = new Object[]{couponIdx, userIdx};
+
+        return this.jdbcTemplate.update(updateUserCouponQuery, updateUserCouponParams);
+    }
+
+    public int checkIsAvailableUserCouponInStore(int userCouponIdx, int storeIdx) {
+        String query = "select exists(select UserCoupon.idx " +
+                "from UserCoupon inner join Coupon on UserCoupon.couponIdx = Coupon.idx " +
+                "where UserCoupon.status != 'N' and Coupon.status != 'N' and UserCoupon.useDate is null and " +
+                "Coupon.expirationDate >= date_format(now(), '%Y%m%d') and " +
+                "UserCoupon.idx = ? and Coupon.storeIdx = ?)";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, userCouponIdx, storeIdx);
+    }
 }
