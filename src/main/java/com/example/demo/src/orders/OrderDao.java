@@ -1,5 +1,6 @@
 package com.example.demo.src.orders;
 
+import com.example.demo.src.orders.model.GetCartRes;
 import com.example.demo.src.orders.model.PostOrderMenus;
 import com.example.demo.src.orders.model.PostOrderReq;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,5 +43,22 @@ public class OrderDao {
 
         String lastInserIdQuery = "select last_insert_id()";
         return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class);
+    }
+
+    public GetCartRes getCartUserInfo(int userIdx) {
+        String query = "select case when Address.status = 'COMPANY' then '회사' " +
+                "when Address.status = 'HOME' then '집' " +
+                "when alias is null || length(Address.alias) = 0 then address " +
+                "else alias end as 'mainAddress', " +
+                "concat(Address.roadAddress, ' ',Address.detailAddress) as 'address', " +
+                "User.payType " +
+                "from User inner join Address on User.addressIdx = Address.idx " +
+                "where User.idx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs,rowNum)-> new GetCartRes(
+                        rs.getString("mainAddress"),
+                        rs.getString("address"),
+                        rs.getString("payType")), userIdx);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.demo.src.coupon;
 
+import com.example.demo.src.coupon.model.GetCartCoupon;
 import com.example.demo.src.coupon.model.GetCouponsRes;
 import com.example.demo.src.coupon.model.GetStoreCoupon;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,5 +115,30 @@ public class CouponDao {
                 "UserCoupon.idx = ? and Coupon.storeIdx = ?)";
 
         return this.jdbcTemplate.queryForObject(query, int.class, userCouponIdx, storeIdx);
+    }
+
+    // 가게에서 사용가능한 쿠폰 limit 1개
+    public GetCartCoupon getUserCouponInStore(int userIdx, int storeIdx) {
+        String query = "select UserCoupon.redeemStatus, UserCoupon.couponIdx, Coupon.discountPrice " +
+                "from UserCoupon inner join Coupon on UserCoupon.couponIdx = Coupon.idx " +
+                "where UserCoupon.status != 'N' and userIdx = ? and (Coupon.storeIdx = ? or Coupon.storeIdx = 0) " +
+                "and Coupon.status != 'N' and UserCoupon.useDate is null and Coupon.expirationDate >= date_format(now(), '%Y%m%d') " +
+                "order by UserCoupon.updatedAt desc " +
+                "limit 1";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs,rowNum) -> new GetCartCoupon(
+                        rs.getString("redeemStatus"),
+                        rs.getInt("couponIdx"),
+                        rs.getInt("discountPrice")), userIdx, storeIdx);
+    }
+
+    public int getUserCouponCountInStore(int userIdx, int storeIdx) {
+        String query = "select count(*) " +
+                "from UserCoupon inner join Coupon on UserCoupon.couponIdx = Coupon.idx " +
+                "where UserCoupon.status != 'N' and userIdx = ? and (Coupon.storeIdx = ? or Coupon.storeIdx = 0) " +
+                "and Coupon.status != 'N' and UserCoupon.useDate is null and Coupon.expirationDate >= date_format(now(), '%Y%m%d')";
+
+        return this.jdbcTemplate.queryForObject(query, int.class, userIdx, storeIdx);
     }
 }

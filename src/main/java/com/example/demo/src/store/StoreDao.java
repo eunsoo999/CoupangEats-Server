@@ -387,4 +387,15 @@ public class StoreDao {
 
         return this.jdbcTemplate.queryForObject(checkStoreQuery, int.class, checkStoreParams);
     }
+
+    public double getDistanceToStore(String latitude, String longitude, int storeIdx) {
+        String getDistanceQuery = "select (6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))) " +
+                "from Store where Store.idx = ?";
+        Object[] params = new Object[] {latitude, longitude, latitude, storeIdx};
+
+        return this.jdbcTemplate.queryForObject(getDistanceQuery, int.class, params);
+
+    }
 }

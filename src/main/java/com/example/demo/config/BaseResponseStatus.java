@@ -98,6 +98,10 @@ public enum BaseResponseStatus {
     USERS_NOT_FOUND_COUPONS(false, 3057, "해당 쿠폰을 가지고 있지않은 유저입니다."),
     COUPONS_NOT_AVAILABLE(false, 3058, "사용가능한 쿠폰이 아닙니다."),
 
+    CART_EMPTY_ADDRESS(false, 3058, "배달받을 주소를 설정해 주세요."),
+    CART_IMPOSSIBLE_DISTANCE(false, 3059, "거리가 멀어 배달이 불가능합니다."),
+
+
     /**
      * 4000 : Database, Server 오류
      */

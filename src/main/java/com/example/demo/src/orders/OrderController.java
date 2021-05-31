@@ -2,11 +2,10 @@ package com.example.demo.src.orders;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
+import com.example.demo.src.orders.model.GetCartRes;
 import com.example.demo.src.orders.model.PostOrderMenus;
 import com.example.demo.src.orders.model.PostOrderReq;
 import com.example.demo.src.orders.model.PostOrderRes;
-import com.example.demo.src.store.model.GetStoreRes;
-import com.example.demo.src.user.model.PostLoginReq;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +24,36 @@ public class OrderController {
     private final JwtService jwtService;
     @Autowired
     private final OrderService orderService;
+    @Autowired
+    private final OrderProvider orderProvider;
 
-    public OrderController(JwtService jwtService, OrderService orderService) {
+    public OrderController(JwtService jwtService, OrderService orderService, OrderProvider orderProvider) {
         this.jwtService = jwtService;
         this.orderService = orderService;
+        this.orderProvider = orderProvider;
+    }
+
+    /**
+     * 26. 카트보기 API
+     * [GET] /users/:userIdx/stores/:storeIdx/cart
+     * @return BaseResponse<GetCartRes>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/stores/{storeIdx}/cart")
+    public BaseResponse<GetCartRes> getCart(@PathVariable int userIdx, @PathVariable int storeIdx) {
+        try{
+            // 유저 JWT 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdxByJwt != userIdx) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetCartRes getCartRes = orderProvider.getCart(userIdx, storeIdx);
+            return new BaseResponse<>(getCartRes);
+        } catch (BaseException exception){
+            logger.warn("#26 " + exception.getStatus().getMessage());
+            logger.warn("(userIdx : " + userIdx + ", storeIdx : " + storeIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
     }
 
     /**
@@ -91,4 +116,6 @@ public class OrderController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+
 }
