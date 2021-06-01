@@ -52,10 +52,8 @@ public enum BaseResponseStatus {
     STORES_INVALID_SORT(false, 2057, "가능하지않은 정렬입니다."),
     STORES_INVALID_CHEETAG(false, 2058, "잘못된 치타배달 가게보기 요청입니다."),
     STORES_INVALID_COUPON(false,2059, "잘못된 할인쿠폰 가게보기 요청입니다."),
-
     COUPONS_EMPTY_NUMBER(false, 2060, "쿠폰 번호를 입력해주세요."),
     COUPONS_LENGTH_NUMBER(false, 2061, "쿠폰번호는 8자리 혹은 16자리만 가능합니다."),
-
     POST_ORDERS_EMPTY_ADDRESS(false, 2062, "배달지 주소를 입력해주세요."),
     POST_ORDERS_LENGTH_ADDRESS(false, 2063, "배달지 주소는 100자 이하만 가능합니다."),
     POST_ORDERS_EMPTY_STOREIDX(false, 2064, "가게 번호를 입력해주세요."),
@@ -71,19 +69,17 @@ public enum BaseResponseStatus {
     POST_ORDERS_EMPTY_TOTALPRICE(false, 2074, "총 주문가격을 입력해주세요."),
     POST_ORDERS_EMPTY_ECHOPRODUCT(false, 2075, "일회용품 수저 유무를 선택해주세요."),
     POST_ORDERS_INVALID_ECHOPRODUCT(false, 2076, "일회용품 수저 유무 값이 잘못되었습니다."),
-
-
     POST_COUPONS_USERIDX(false, 2077, "쿠폰을 지급받을 유저 번호를 입력해주세요."),
     POST_COUPONS_COUPONIDX(false, 2078, "지급받을 쿠폰 번호를 입력해주세요."),
-
     STORE_REVIEWS_INVALID_TYPE(false, 2079, "type이 잘못되었습니다."),
     STORE_REVIEWS_INVALID_SORT(false, 2080, "가능하지않은 정렬입니다."),
-
     POST_ORDERS_EMPTY_PAYTYPE(false, 2081, "결제수단을 입력해주세요."),
     POST_ORDERS_EMPTY_USERIDX(false, 2082, "유저 번호를 확인해주세요."),
     POST_ORDERMENUS_TOTALPRICE(false, 2083, "메뉴의 금액을 입력해주세요."),
     POST_ORDERS_LENGTH_STOREREQUEST(false, 2084, "가게 요청사항은 50자 이하만 가능합니다."),
     POST_ORDERS_LENGTH_DELIVERYREQUEST(false, 2085, "배달 요청사항은 50자 이하만 가능합니다."),
+    STORES_EMPTY_CATEGORY(false, 2086, "조회할 카테고리를 입력해주세요."),
+    STORES_INVALID_CATEGORY(false, 2087, "유효한 가게 카테고리가 아닙니다."),
 
 
     /**

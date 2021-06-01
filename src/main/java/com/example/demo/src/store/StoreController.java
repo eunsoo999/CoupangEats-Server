@@ -58,7 +58,7 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, null);
 
         try {
             GetMainRes mainStores = storeProvider.getMainStores(searchOption);
@@ -111,7 +111,7 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, null);
 
         try {
             GetOnSaleStoresRes getOnSaleStoresList = storeProvider.getOnsaleStores(searchOption);
@@ -146,12 +146,56 @@ public class StoreController {
         } else if(coupon != null && !coupon.equalsIgnoreCase("Y")) {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, null);
         try {
             GetNewStoresRes getNewStoresRes = storeProvider.getNewStores(searchOption);
             return new BaseResponse<>(getNewStoresRes);
         } catch (BaseException exception) {
             logger.warn("#19. " + exception.getStatus().getMessage());
+            logger.warn(searchOption.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 20. 카테고리별 주변 가게 조회 및 검색 옵션 API
+     * [GET] /stores/category?lat=&lon= &category= &cheetah=y &coupon=& minOrderPrice= &sort=& minDelivery==
+     * @return BaseResponse<GetMainRes>
+     */
+    @ResponseBody
+    @GetMapping("/category")
+    public BaseResponse<GetStoresByCategoryRes> getStoresByCategory(@RequestParam String lat, @RequestParam String lon,
+                                                        @RequestParam(required = false) String category,
+                                                        @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
+                                                        @RequestParam(required = false) Integer minDelivery, @RequestParam(required = false) Integer minOrderPrice,
+                                                        @RequestParam(required = false) String coupon) {
+        if(!isRegexLatitude(lat)) {
+            return new BaseResponse<>(STORES_EMPTY_LATITUDE);
+        } else if(!isRegexLongitude(lon)) {
+            return new BaseResponse<>(STORES_EMPTY_LONGITUDE);
+        } else if(sort != null && !(sort.equalsIgnoreCase("recomm") || sort.equalsIgnoreCase("orders")
+                || sort.equalsIgnoreCase("nearby") || sort.equalsIgnoreCase("rating") || sort.equalsIgnoreCase("new"))) {
+            return new BaseResponse<>(STORES_INVALID_SORT);
+        } else if(cheetah != null && !cheetah.equalsIgnoreCase("Y")) {
+            return new BaseResponse<>(STORES_INVALID_CHEETAG);
+        } else if(coupon != null && !coupon.equalsIgnoreCase("Y")) {
+            return new BaseResponse<>(STORES_INVALID_COUPON);
+        } else if(category == null) {
+            return new BaseResponse<>(STORES_EMPTY_CATEGORY);
+        } else if(!(category.equals("신규 맛집") || category.equals("1인분") || category.equals("한식") || category.equals("치킨")
+                || category.equals("분식") || category.equals("돈까스") || category.equals("족발/보쌈") || category.equals("찜/탕")
+                || category.equals("구이") || category.equals("피자") || category.equals("중식") || category.equals("일식")
+                || category.equals("회/해물") || category.equals("양식") || category.equals("커피/차") || category.equals("디저트")
+                || category.equals("간식") || category.equals("아시안") || category.equals("샌드위치") || category.equals("샐러드")
+                || category.equals("버거") || category.equals("멕시칸") || category.equals("도시락") || category.equals("죽") || category.equals("프랜차이즈"))) {
+             return new BaseResponse<>(STORES_INVALID_CATEGORY);
+        }
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, category);
+        try {
+            GetStoresByCategoryRes mainStores = storeProvider.getStoreByCategory(searchOption);
+            return new BaseResponse<>(mainStores);
+        } catch (BaseException exception) {
+            logger.warn("#20. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }

@@ -26,7 +26,7 @@ public class StoreDao {
                 "from Review " +
                 "where Review.storeIdx = Store.idx and Review.status != 'N') as 'totalReview', " +
                 "concat(if(truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
-                "*cos(radians(longitude)-radians(?)) " + " + " +
+                "*cos(radians(longitude)-radians(?)) " +
                 "+sin(radians(?))*sin(radians(latitude)))),1) < 0.1, '0.1', " +
                 "truncate((6371*acos(cos(radians(?))*cos(radians(latitude)) " +
                 "*cos(radians(longitude)-radians(?)) " +
@@ -38,8 +38,24 @@ public class StoreDao {
                 "(select concat(FORMAT(Coupon.discountPrice , 0), '원 쿠폰') " +
                 "from Coupon " +
                 "where Coupon.status != 'N' and now() < Coupon.ExpirationDate and Store.idx = Coupon.storeIdx limit 1) as 'coupon' " +
-                "from Store " +
-                "where Store.status != 'N' ";
+                "from Store ";
+
+        // 카테고리가 있는 경우 조건절 쿼리 추가 (신규맛집은 전체 카테고리 중 신규 맛집(2주) 목록 조회이다)
+        if (searchOption.getCategory() != null && !searchOption.getCategory().equals("신규 맛집")) {
+            selectAddressListQuery += "join StoreCategory on Store.storeCategoryIdx = StoreCategory.idx ";
+        }
+
+        selectAddressListQuery += "where Store.status != 'N' ";
+
+        // 카테고리 : 신규인 경우, 최근 2주안에 등록된 가게 목록 조회
+        if (searchOption.getCategory() != null && searchOption.getCategory().equals("신규 맛집")) {
+            selectAddressListQuery += "and TIMESTAMPDIFF(WEEK, Store.createdAt, CURRENT_TIMESTAMP()) <= 2 ";
+        }
+
+        // 카테고리가 있는 경우 조건절 쿼리 추가 - ? : categoryName
+        if (searchOption.getCategory() != null && !searchOption.getCategory().equals("신규 맛집")) {
+            selectAddressListQuery += "and StoreCategory.categoryName = ? ";
+        }
 
         // 검색조건처리 - 치타배달(cheetah)보기
         if (searchOption.getCheetah() != null && searchOption.getCheetah().equalsIgnoreCase("Y")) {
@@ -56,15 +72,12 @@ public class StoreDao {
             selectAddressListQuery += "and Store.minOrderPrice <= " + searchOption.getMinOrderPrice() + " ";
         }
 
-        // 검색조건처리 - 할인쿠폰유무
-        if (searchOption.getCoupon() != null && searchOption.getCoupon().equalsIgnoreCase("Y")) {
-            selectAddressListQuery += "and (select exists(select idx from Coupon " +
-                    "where Coupon.status != 'N' and now() < Coupon.ExpirationDate " +
-                    "and Store.idx = Coupon.storeIdx limit 1))" + " ";
-        }
-
         selectAddressListQuery += "having distance < 4 ";
 
+        // 검색조건처리 - 할인쿠폰 유무
+        if (searchOption.getCoupon() != null && searchOption.getCoupon().equalsIgnoreCase("Y")) {
+            selectAddressListQuery += "and coupon is not null ";
+        }
         // 검색조건처리 - 정렬
         if (searchOption.getSort() != null) {
             if (searchOption.getSort().equalsIgnoreCase("orders")) { // 주문많은순
@@ -78,8 +91,14 @@ public class StoreDao {
             }
         }
 
-        Object[] selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
-                searchOption.getLat(), searchOption.getLon(), searchOption.getLat()};
+        Object[] selectStoreMainBoxParams;
+        if (searchOption.getCategory() == null || searchOption.getCategory().equals("신규 맛집")) {
+            selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
+                    searchOption.getLat(), searchOption.getLon(), searchOption.getLat()};
+        } else {
+            selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
+                    searchOption.getLat(), searchOption.getLon(), searchOption.getLat(), searchOption.getCategory()};
+        }
 
         return this.jdbcTemplate.query(selectAddressListQuery,
                 (rs,rowNum) -> new GetStoreMainBox(
