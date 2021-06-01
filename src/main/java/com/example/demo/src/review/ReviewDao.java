@@ -65,7 +65,6 @@ public class ReviewDao {
 
         // 로그인상태일 경우 유저의 리뷰 도움이돼요/안돼요 표시
         if(userIdx != null) {
-            System.out.println("로그인유저");
             selectStoreReviewsQuery += ", case when (select exists(select ReviewLike.idx from ReviewLike " +
                     "where ReviewLike.reviewIdx = Result.reviewIdx and ReviewLike.status != 'N' and ReviewLike.likeFlag = 'Y' and ReviewLike.userIdx = ?)) " +
                     "then 'YES' " +

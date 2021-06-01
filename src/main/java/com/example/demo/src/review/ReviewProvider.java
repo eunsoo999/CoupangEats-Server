@@ -32,7 +32,7 @@ public class ReviewProvider {
             throw new BaseException(STORES_NOT_FOUND);
         }
         try {
-            // 가게명, 별점, 리뷰 개수 
+            // 가게명, 별점, 리뷰 개수
             GetReviewsRes getReviewsRes = reviewDao.selectStoreReviewInfo(storeIdx);
             // 리뷰 목록
             List<GetReview> reviews = reviewDao.selectStoreReviews(userIdx, storeIdx, type, sort);

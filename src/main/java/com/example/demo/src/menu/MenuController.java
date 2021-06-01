@@ -25,7 +25,7 @@ public class MenuController {
     }
 
     /**
-     * 24. 메뉴 상세 조회 API
+     * 25. 메뉴 상세 조회 API
      * [GET] /stores/:storesIdx/menus/:menuIdx
      * @return BaseResponse<GetMenuDetailRes>
      */
@@ -36,6 +36,8 @@ public class MenuController {
             GetMenuDetailRes menuDetail = menuProvider.selectMenu(storeIdx, menuIdx);
             return new BaseResponse<>(menuDetail);
         } catch (BaseException exception) {
+            logger.warn("#25. " + exception.getStatus().getMessage());
+            logger.warn(String.valueOf(storeIdx));
             return new BaseResponse<>(exception.getStatus());
         }
     }

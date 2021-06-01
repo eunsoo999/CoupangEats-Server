@@ -3,7 +3,6 @@ package com.example.demo.src.review;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.review.model.GetReviewsRes;
-import com.example.demo.src.store.model.GetStoreRes;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,8 +27,8 @@ public class ReviewController {
     }
 
     /**
-     * 35. 가게 리뷰 조회 및 포토 리뷰 보기, 정렬 API
-     * [GET] /stores/:storeIdx/reviews?type=***&sort=**&cursor=&limit=20
+     * 36. 가게 리뷰 조회 및 포토 리뷰 보기, 정렬 API
+     * [GET] /stores/:storeIdx/reviews?type=&sort=
      * @return BaseResponse<GetReviewsRes>
      */
     @ResponseBody
@@ -57,13 +56,12 @@ public class ReviewController {
                     return new BaseResponse<>(getReviewsRes);
                 }
                 // JWT 검증 에러일 경우
-                logger.warn("#35. " + exception.getStatus().getMessage());
+                logger.warn("#36. " + exception.getStatus().getMessage());
                 logger.warn("(" + storeIdx + ", " + type + ", " + sort + ")");
                 return new BaseResponse<>(exception.getStatus());
             }
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
-
     }
 }

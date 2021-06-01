@@ -40,7 +40,7 @@ public class UserController {
     }
 
     /**
-     * 자동로그인 API
+     * 1. 자동로그인 API
      * [GET] /users/:userIdx/auto-login
      * @return BaseResponse<>
      */
@@ -61,7 +61,7 @@ public class UserController {
     }
 
     /**
-     * 1. 회원가입 API
+     * 2. 회원가입 API
      * [POST] /users
      * @return BaseResponse<PostUserRes>
      */
@@ -70,6 +70,8 @@ public class UserController {
     public BaseResponse<PostUserRes> createUser(@RequestBody PostUserReq postUserReq) {
         if(postUserReq.getEmail() == null || postUserReq.getEmail().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_EMAIL);
+        } else if(postUserReq.getEmail().length() > 45) {
+            return new BaseResponse<>(POST_USERS_LENGTH_EMAIL);
         } else if(!isRegexEmail(postUserReq.getEmail())) {
             return new BaseResponse<>(POST_USERS_INVALID_EMAIL);
         } else if(postUserReq.getPhone() == null || postUserReq.getPhone().isEmpty()) {
@@ -96,14 +98,14 @@ public class UserController {
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
         } catch(BaseException exception){
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#2. " +exception.getStatus().getMessage());
             logger.warn(postUserReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 2. 로그인 API
+     * 3. 로그인 API
      * [POST] /users/login
      * @return BaseResponse<PostLoginRes>
      */
@@ -124,14 +126,14 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception){
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#3. " +exception.getStatus().getMessage());
             logger.warn(postLoginReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 3. 이메일 중복 확인 API
+     * 4. 이메일 중복 확인 API
      * [GET] /users/email/check?email=silver@naver.com
      * @return BaseResponse<GetDuplicatedRes>
      */
@@ -152,14 +154,14 @@ public class UserController {
             }
             return new BaseResponse<>(getDuplicatedRes);
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#4. " +exception.getStatus().getMessage());
             logger.warn("(" + email + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 4. 전화번호 중복 확인 API
+     * 5. 전화번호 중복 확인 API
      * [GET] /users/phone/check?phone=01029292929
      * @return BaseResponse<GetDuplicatedRes>
      */
@@ -180,14 +182,14 @@ public class UserController {
             }
             return new BaseResponse<>(getDuplicatedPhoneRes);
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#5. " +exception.getStatus().getMessage());
             logger.warn("(" + phone + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 5. 휴대폰 인증번호 발송 API
+     * 6. 휴대폰 인증번호 발송 API
      * [POST] /users/auth/phone
      */
     @ResponseBody
@@ -218,7 +220,13 @@ public class UserController {
     }
 
     /**
-     * 6. 로그인 유저 정보 조회 API
+     * 7. 휴대폰 인증번호 확인 API
+     * [GET] /users/auth/phone/confirm
+     * @return BaseResponse<GetUserRes>
+     */
+
+    /**
+     * 8. 로그인 유저 정보 조회 API
      * [GET] /users/:userIdx
      * @return BaseResponse<GetUserRes>
      */
@@ -236,14 +244,14 @@ public class UserController {
             GetUserRes getUserRes = userProvider.retrieveUser(userIdx);
             return new BaseResponse<>(getUserRes);
         } catch (BaseException exception) {
-            logger.warn("#6. " + exception.getStatus().getMessage());
+            logger.warn("#8. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 13. 유저의 집 / 회사 주소 존재 확인 API (home, company)
+     * 14. 유저의 집 / 회사 주소 존재 확인 API (home, company)
      * [GET] /users/:userIdx/addresses/check?type=
      * @return BaseResponse<GetExistAddressRes>
      */
@@ -262,14 +270,14 @@ public class UserController {
             GetExistAddressRes getExistAddressRes = userProvider.checkExistsBasicAddress(userIdx, type);
             return new BaseResponse<>(getExistAddressRes);
         } catch (BaseException exception) {
-            logger.warn("#13. " + exception.getStatus().getMessage());
+            logger.warn("#14. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ", "+ type + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 14. 기본 배달 주소 선택 API 추가
+     * 15. 기본 배달 주소 선택 API 추가
      * [PATCH] /users/:userIdx/pick/addresses/:addressIdx
      * @return BaseResponse<PatchUserRes>
      */
@@ -285,14 +293,14 @@ public class UserController {
             GetLocationRes result = userService.updateUserAddressIdx(userIdx, addressIdx);
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
-            logger.warn("#14. " + exception.getStatus().getMessage());
+            logger.warn("#15. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ", "+ addressIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 15. 유저의 기본 배달 주소 정보 조회 API
+     * 16. 유저의 기본 배달 주소 정보 조회 API
      * [GET] /users/:userIdx/pick/addresses
      * @return BaseResponse<GetUserAddressRes>
      */
@@ -308,10 +316,9 @@ public class UserController {
             GetUserAddressRes getUserAddressRes = userProvider.getUserAddress(userIdx);
             return new BaseResponse<>(getUserAddressRes);
         } catch (BaseException exception) {
-            logger.warn("#15. " + exception.getStatus().getMessage());
+            logger.warn("#16. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
 }

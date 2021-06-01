@@ -38,8 +38,11 @@ public enum BaseResponseStatus {
     POST_USERS_EMPTY_USERNAME(false, 2023, "이름을 입력해주세요."),
     POST_USERS_LENGTH_USERNAME(false, 2024, "이름의 길이는 2자 이상 30자 이하여야합니다."),
     POST_USERS_INVALID_USERNAME(false, 2025, "이름을 정확히 입력해주세요."),
+    POST_USERS_LENGTH_EMAIL(false, 2026, "이메일 길이는 45자이하여야합니다."),
 
     // Address
+    ADDRESSES_LENGTH_DETAILADDRESS(false, 2048, "상세 주소는 50자 이하여야합니다."),
+    ADDRESSES_LENGTH_ADDRESS(false, 2049, "주소는 50자 이하여야합니다."),
     ADDRESSES_EMPTY_ADDRESS(false, 2050, "주소를 입력해주세요."),
     ADDRESSES_EMPTY_ROADADDRESS(false, 2051, "도로명주소를 입력해주세요."),
     ADDRESSES_EMPTY_ALIASTYPE(false, 2052, "별칭 타입을 입력해주세요."),

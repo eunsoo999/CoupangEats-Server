@@ -35,15 +35,15 @@ public class StoreController {
     }
 
     /**
-     * 16. 메인 화면 API
-     * [GET] /stores?lat=&lon=&sort=&cheetah=&coupon=&minOrderPrice=&minDelivery=&   cursor=&limit=20
+     * 17. 메인 화면 API
+     * [GET] /stores?lat=&lon=&sort=&cheetah=Y&coupon=Y&ordermin=&deliverymin=&cursor=&numOfRows=20
      * @return BaseResponse<GetMainRes>
      */
     @ResponseBody
     @GetMapping("")
     public BaseResponse<GetMainRes> getUserAddresses(@RequestParam String lat, @RequestParam String lon,
                                                      @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
-                                                     @RequestParam(required = false) Integer minDelivery, @RequestParam(required = false) Integer minOrderPrice,
+                                                     @RequestParam(required = false) Integer deliverymin, @RequestParam(required = false) Integer ordermin,
                                                      @RequestParam(required = false) String coupon) {
         if(!isRegexLatitude(lat)) {
             return new BaseResponse<>(STORES_EMPTY_LATITUDE);
@@ -58,20 +58,20 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, null);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null);
 
         try {
             GetMainRes mainStores = storeProvider.getMainStores(searchOption);
             return new BaseResponse<>(mainStores);
         } catch (BaseException exception) {
-            logger.warn("#16. " + exception.getStatus().getMessage());
+            logger.warn("#17. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 17. 가게 카테고리 조회 API
+     * 18. 가게 카테고리 조회 API
      * [GET] /stores/categories
      * @return BaseResponse<GetStoreCategoryRes>
      */
@@ -82,21 +82,21 @@ public class StoreController {
             List<GetStoreCategoryRes> getStoreCategories = storeProvider.getStoreCategories();
             return new BaseResponse<>(getStoreCategories);
         } catch (BaseException exception) {
-            logger.warn("#17. " + exception.getStatus().getMessage());
+            logger.warn("#18. " + exception.getStatus().getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 18. 할인 중인 가게 전체 조회 API
-     * [GET] /stores/discount?lat=&lon=
+     * 19. 할인 중인 가게 전체 조회 API
+     * [GET] /stores/discount?lat=&lon=&sort=&cheetah=&ordermin=&deliverymin=&coupon=Y
      * @return BaseResponse<GetOnSaleStoresRes>
      */
     @ResponseBody
     @GetMapping("/discount")
     public BaseResponse<GetOnSaleStoresRes> getOnSaleStores(@RequestParam String lat, @RequestParam String lon,
                                                             @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
-                                                            @RequestParam(required = false) Integer minDelivery, @RequestParam(required = false) Integer minOrderPrice,
+                                                            @RequestParam(required = false) Integer deliverymin, @RequestParam(required = false) Integer ordermin,
                                                             @RequestParam(required = false) String coupon) {
         if(!isRegexLatitude(lat)) {
             return new BaseResponse<>(STORES_EMPTY_LATITUDE);
@@ -111,13 +111,13 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, null);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null);
 
         try {
             GetOnSaleStoresRes getOnSaleStoresList = storeProvider.getOnsaleStores(searchOption);
             return new BaseResponse<>(getOnSaleStoresList);
         } catch (BaseException exception) {
-            logger.warn("#18. " + exception.getStatus().getMessage());
+            logger.warn("#19. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }
@@ -125,14 +125,14 @@ public class StoreController {
 
     /**
      * 19. 새로 들어온 가게 전체 조회 API
-     * [GET] /stores/new?lat=&lon=
+     * [GET] /stores/new?lat=&lon=&sort=&cheetah=&ordermin=&deliverymin=&coupon=&cursor=&numOfRows=
      * @return BaseResponse<GetNewStoresRes>
      */
     @ResponseBody
     @GetMapping("/new")
     public BaseResponse<GetNewStoresRes> getNewStores(@RequestParam String lat, @RequestParam String lon,
                                                       @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
-                                                      @RequestParam(required = false) Integer minDelivery, @RequestParam(required = false) Integer minOrderPrice,
+                                                      @RequestParam(required = false) Integer deliverymin, @RequestParam(required = false) Integer ordermin,
                                                       @RequestParam(required = false) String coupon) {
         if(!isRegexLatitude(lat)) {
             return new BaseResponse<>(STORES_EMPTY_LATITUDE);
@@ -146,7 +146,7 @@ public class StoreController {
         } else if(coupon != null && !coupon.equalsIgnoreCase("Y")) {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, null);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null);
         try {
             GetNewStoresRes getNewStoresRes = storeProvider.getNewStores(searchOption);
             return new BaseResponse<>(getNewStoresRes);
@@ -158,17 +158,17 @@ public class StoreController {
     }
 
     /**
-     * 20. 카테고리별 주변 가게 조회 및 검색 옵션 API
-     * [GET] /stores/category?lat=&lon= &category= &cheetah=y &coupon=& minOrderPrice= &sort=& minDelivery==
+     * 21. 카테고리별 주변 가게 조회 및 검색 옵션 API
+     * [GET] /stores/category?lat=&lon=&category=&cheetah=y&coupon=&ordermin=&sort=&deliverymin=
      * @return BaseResponse<GetMainRes>
      */
     @ResponseBody
     @GetMapping("/category")
     public BaseResponse<GetStoresByCategoryRes> getStoresByCategory(@RequestParam String lat, @RequestParam String lon,
-                                                        @RequestParam(required = false) String category,
-                                                        @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
-                                                        @RequestParam(required = false) Integer minDelivery, @RequestParam(required = false) Integer minOrderPrice,
-                                                        @RequestParam(required = false) String coupon) {
+                                                                    @RequestParam(required = false) String category,
+                                                                    @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
+                                                                    @RequestParam(required = false) Integer deliverymin, @RequestParam(required = false) Integer ordermin,
+                                                                    @RequestParam(required = false) String coupon) {
         if(!isRegexLatitude(lat)) {
             return new BaseResponse<>(STORES_EMPTY_LATITUDE);
         } else if(!isRegexLongitude(lon)) {
@@ -190,19 +190,19 @@ public class StoreController {
                 || category.equals("버거") || category.equals("멕시칸") || category.equals("도시락") || category.equals("죽") || category.equals("프랜차이즈"))) {
              return new BaseResponse<>(STORES_INVALID_CATEGORY);
         }
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, minDelivery, minOrderPrice, coupon, category);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, category);
         try {
             GetStoresByCategoryRes mainStores = storeProvider.getStoreByCategory(searchOption);
             return new BaseResponse<>(mainStores);
         } catch (BaseException exception) {
-            logger.warn("#20. " + exception.getStatus().getMessage());
+            logger.warn("#21. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 23. 가게 조회 API
+     * 24. 가게 조회 API
      * [GET] /stores/:storesIdx
      * @return BaseResponse<GetStoreRes>
      */
@@ -222,7 +222,7 @@ public class StoreController {
                     return new BaseResponse<>(getStoreRes);
                 }
                 // JWT 검증 에러일 경우
-                logger.warn("#23. " + exception.getStatus().getMessage());
+                logger.warn("#24. " + exception.getStatus().getMessage());
                 logger.warn(String.valueOf(storeIdx));
                 return new BaseResponse<>(exception.getStatus());
             }

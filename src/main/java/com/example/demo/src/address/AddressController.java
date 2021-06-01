@@ -33,7 +33,7 @@ public class AddressController {
     }
 
     /**
-     * 8. 유저의 배달 주소 목록 조회 API
+     * 9. 유저의 배달 주소 목록 조회 API
      * [GET] /users/:userIdx/addresses
      * @return BaseResponse<GetAddressesRes>
      */
@@ -50,14 +50,14 @@ public class AddressController {
             GetAddressesRes getAddressesRes = addressProvider.getAddreses(userIdx);
             return new BaseResponse<>(getAddressesRes);
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#9. " +exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 9. 배달 주소 추가 API
+     * 10. 배달 주소 추가 API
      * [POST] /addresses
      * @return BaseResponse<PostAddressRes>
      */
@@ -67,8 +67,13 @@ public class AddressController {
         // request 검증
         if (postAddressReq.getAddress() == null || postAddressReq.getAddress().isEmpty()) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ADDRESS);
+        } else if (postAddressReq.getAddress().length() > 50) {
+            return new BaseResponse<>(ADDRESSES_LENGTH_ADDRESS);
         } else if (postAddressReq.getRoadAddress() == null || postAddressReq.getRoadAddress().isEmpty()) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ROADADDRESS);
+        } else if (postAddressReq.getDetailAddress() != null &&
+                postAddressReq.getDetailAddress().length() > 50) {
+            return new BaseResponse<>(ADDRESSES_LENGTH_DETAILADDRESS);
         } else if (postAddressReq.getAliasType() == null) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ALIASTYPE);
         } else if (postAddressReq.getAliasType() != null && !(postAddressReq.getAliasType().equalsIgnoreCase("HOME")
@@ -95,7 +100,7 @@ public class AddressController {
 
             return new BaseResponse<>(postAddressRes);
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#10. " +exception.getStatus().getMessage());
             logger.warn(postAddressReq.toString());
             return new BaseResponse<>(exception.getStatus());
         } catch (UnsupportedEncodingException e) {
@@ -104,7 +109,7 @@ public class AddressController {
     }
 
     /**
-     * 10. 배달 주소 조회 API
+     * 11. 배달 주소 조회 API
      * [GET] /users/:userIdx/addresses/:addressIdx
      * @return BaseResponse<GetAddressDetailRes>
      */
@@ -120,14 +125,14 @@ public class AddressController {
             GetAddressDetailRes addressDetailRes = addressProvider.getAddress(addressIdx, userIdx);
             return new BaseResponse<>(addressDetailRes);
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#11. " +exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ", " + addressIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 11. 배달 주소 수정 API
+     * 12. 배달 주소 수정 API
      * [PATCH] /users/:userIdx/addresses/:addressIdx
      * @return BaseResponse<PatchAddressRes>
      */
@@ -152,14 +157,14 @@ public class AddressController {
             int updatedCount = addressService.updateAddress(patchAddressReq, addressIdx, userIdx);
             return new BaseResponse<>(new PatchAddressRes(updatedCount));
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#12. " +exception.getStatus().getMessage());
             logger.warn(patchAddressReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 12. 배달 주소 삭제 API
+     * 13. 배달 주소 삭제 API
      * [PATCH] /users/:userIdx/addresses/:addressIdx/status
      * @return BaseResponse<PatchAddressRes>
      */
@@ -175,7 +180,7 @@ public class AddressController {
             int updatedCount = addressService.updateStatusAddress(addressIdx, userIdx);
             return new BaseResponse<>(new PatchAddressRes(updatedCount));
         } catch (BaseException exception) {
-            logger.warn(exception.getStatus().getMessage());
+            logger.warn("#13. " +exception.getStatus().getMessage());
             logger.warn("(" + addressIdx + ", " + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }

@@ -32,7 +32,7 @@ public class CouponController {
     }
 
     /**
-     * 29. 가게에서 사용가능한 쿠폰 전체 조회 API
+     * 30. 가게에서 사용가능한 쿠폰 전체 조회 API
      * [GET] /stores/:storeIdx/users/:userIdx/coupons
      * @return BaseResponse<List<GetCouponsRes>>
      */
@@ -48,14 +48,14 @@ public class CouponController {
             List<GetCouponsRes> getCouponsRes = couponProvider.getUserCouponsInStore(userIdx, storeIdx);
             return new BaseResponse<>(getCouponsRes);
         } catch (BaseException exception) {
-            logger.warn("#29. " + exception.getStatus().getMessage());
+            logger.warn("#30. " + exception.getStatus().getMessage());
             logger.warn("(userIdx : " + userIdx + ", " + storeIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 32. 가게 할인쿠폰 받기 API
+     * 33. 가게 할인쿠폰 받기 API
      * [POST] /stores/:storeIdx/coupons
      * @return BaseResponse<PostCouponRes>
      */
@@ -76,14 +76,14 @@ public class CouponController {
             PostCouponRes createdRes = couponService.createUserCouponByStore(postUserCouponReq, storeIdx);
             return new BaseResponse<>(createdRes);
         } catch (BaseException exception) {
-            logger.warn("#32. " + exception.getStatus().getMessage());
+            logger.warn("#33. " + exception.getStatus().getMessage());
             logger.warn(postUserCouponReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 33. 할인쿠폰 등록 API
+     * 34. 할인쿠폰 등록 API
      * [POST] /coupons
      * @return BaseResponse<PostCouponRes>
      */
@@ -104,14 +104,14 @@ public class CouponController {
             PostCouponRes createdCoupon = couponService.createUserCouponByCouponNumber(postCouponReq);
             return new BaseResponse<>(createdCoupon);
         } catch (BaseException exception) {
-            logger.warn("#33. " + exception.getStatus().getMessage());
+            logger.warn("#34. " + exception.getStatus().getMessage());
             logger.warn("(" + postCouponReq.toString() + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 34. My이츠-할인쿠폰 조회 API
+     * 35. My이츠-할인쿠폰 조회 API
      * [GET] /users/:userIdx/coupons
      * @return BaseResponse<List<GetCouponsRes>>
      */
@@ -127,7 +127,7 @@ public class CouponController {
             List<GetCouponsRes> getUserRes = couponProvider.getCoupons(userIdx);
             return new BaseResponse<>(getUserRes);
         } catch (BaseException exception) {
-            logger.warn("#34. " + exception.getStatus().getMessage());
+            logger.warn("#35. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }

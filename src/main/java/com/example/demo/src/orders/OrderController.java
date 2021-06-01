@@ -33,9 +33,8 @@ public class OrderController {
     }
 
     /**
-     * 26. 카트보기 API
+     * 27. 카트보기 API
      * [GET] /users/:userIdx/stores/:storeIdx/cart
-     *
      * @return BaseResponse<GetCartRes>
      */
     @ResponseBody
@@ -50,16 +49,15 @@ public class OrderController {
             GetCartRes getCartRes = orderProvider.getCart(userIdx, storeIdx);
             return new BaseResponse<>(getCartRes);
         } catch (BaseException exception) {
-            logger.warn("#26 " + exception.getStatus().getMessage());
+            logger.warn("#27 " + exception.getStatus().getMessage());
             logger.warn("(userIdx : " + userIdx + ", storeIdx : " + storeIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 27. 주문하기 API
+     * 28. 주문하기 API
      * [POST] /orders
-     *
      * @return BaseResponse<PostOrderRes>
      */
     @ResponseBody
@@ -122,7 +120,7 @@ public class OrderController {
             PostOrderRes postOrderRes = orderService.postOrder(postOrderReq);
             return new BaseResponse<>(postOrderRes);
         } catch (BaseException exception) {
-            logger.warn("#27 " + exception.getStatus().getMessage());
+            logger.warn("#28 " + exception.getStatus().getMessage());
             logger.warn(postOrderReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
