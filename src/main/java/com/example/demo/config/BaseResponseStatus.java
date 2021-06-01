@@ -74,6 +74,9 @@ public enum BaseResponseStatus {
     POST_COUPONS_USERIDX(false, 2077, "쿠폰을 지급받을 유저 번호를 입력해주세요."),
     POST_COUPONS_COUPONIDX(false, 2078, "지급받을 쿠폰 번호를 입력해주세요."),
 
+    STORE_REVIEWS_INVALID_TYPE(false, 2079, "type이 잘못되었습니다."),
+    STORE_REVIEWS_INVALID_SORT(false, 2080, "가능하지않은 정렬입니다."),
+
     /**
      * 3000 : Response 오류
      */

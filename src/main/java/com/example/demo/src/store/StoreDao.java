@@ -68,7 +68,7 @@ public class StoreDao {
         // 검색조건처리 - 정렬
         if (searchOption.getSort() != null) {
             if (searchOption.getSort().equalsIgnoreCase("orders")) { // 주문많은순
-                selectAddressListQuery += "order by (select count(*) from Orders where Orders.status != 'N' and Orders.storeIdx = Store.idx) desc ";
+                selectAddressListQuery += "order by (select count(*) from Orders where Orders.status != 'CANCEL' and Orders.storeIdx = Store.idx) desc ";
             } else if (searchOption.getSort().equalsIgnoreCase("nearby")) { // 가까운순
                 selectAddressListQuery += "order by distance ";
             } else if (searchOption.getSort().equalsIgnoreCase("rating")) { // 별점높은순
@@ -241,7 +241,7 @@ public class StoreDao {
         // 검색조건처리 - 정렬
         if (searchOption.getSort() != null) {
             if (searchOption.getSort().equalsIgnoreCase("orders")) { // 주문많은순
-                selectAddressListQuery += "order by (select count(*) from Orders where Orders.status != 'N' and Orders.storeIdx = onSaleStore.idx) desc ";
+                selectAddressListQuery += "order by (select count(*) from Orders where Orders.status != 'CANCEL' and Orders.storeIdx = onSaleStore.idx) desc ";
             } else if (searchOption.getSort().equalsIgnoreCase("nearby")) { // 가까운순
                 selectAddressListQuery += "order by distance ";
             } else if (searchOption.getSort().equalsIgnoreCase("rating")) { // 별점높은순
@@ -340,7 +340,7 @@ public class StoreDao {
         // 검색조건처리 - 정렬
         if (searchOption.getSort() != null) {
             if (searchOption.getSort().equalsIgnoreCase("orders")) { // 주문많은순
-                selectNewStoresQuery += "order by (select count(*) from Orders where Orders.status != 'N' and Orders.storeIdx = Store.idx) desc ";
+                selectNewStoresQuery += "order by (select count(*) from Orders where Orders.status != 'CANCEL' and Orders.storeIdx = Store.idx) desc ";
             } else if (searchOption.getSort().equalsIgnoreCase("nearby")) { // 가까운순
                 selectNewStoresQuery += "order by distance ";
             } else if (searchOption.getSort().equalsIgnoreCase("rating")) { // 별점높은순
@@ -364,7 +364,7 @@ public class StoreDao {
     }
 
     public GetStoreRes selectStoreInfo(int storeIdx) {
-        String getStoreInfoQuery = "select storeName, (select if (count(*) = 0, null, avg(rating)) from Review " +
+        String getStoreInfoQuery = "select storeName, (select if (count(*) = 0, null, truncate(avg(rating), 1)) from Review " +
                 "where Review.status != 'N' and Review.storeIdx = Store.idx) as 'rating', " +
                 "(select if(count(*) = 0, null, FORMAT(count(*) , 0)) from Review where Review.status != 'N' and Review.storeIdx = Store.idx) as 'reviewCount', " +
                 "deliveryTime, deliveryPrice, minOrderPrice, cheetahDelivery " +
