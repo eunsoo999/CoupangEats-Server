@@ -48,6 +48,7 @@ public class OrderService {
                 throw new BaseException(MENU_NOT_IN_STORES);
             }
         }
+        
         try {
             // update UserCoupon (쿠폰사용처리)
             if (postOrderReq.getCouponIdx() != null) {
@@ -57,13 +58,13 @@ public class OrderService {
                 }
             }
             // insert Order
-            int createdIdx = orderDao.insertOrder(postOrderReq);
+            int createdOrderIdx = orderDao.insertOrder(postOrderReq);
 
             // insert orderMenus
             for (PostOrderMenus orderMenus : postOrderReq.getOrderMenus()) {
-                orderDao.insertOrderMenu(orderMenus);
+                orderDao.insertOrderMenu(orderMenus, createdOrderIdx);
             }
-            PostOrderRes postOrderRes = new PostOrderRes(createdIdx);
+            PostOrderRes postOrderRes = new PostOrderRes(createdOrderIdx);
             return postOrderRes;
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);

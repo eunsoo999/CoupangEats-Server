@@ -34,9 +34,10 @@ public class OrderDao {
         return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class);
     }
 
-    public int insertOrderMenu(PostOrderMenus orderMenus) {
-        String insertOrderMenuQuery = "INSERT INTO OrderMenu (menuName, menuDetail, count, totalPrice, menuIdx) " + "VALUES (?, ?, ?, ?, ?)";
-        Object[] insertOrderMenuParams = new Object[] {orderMenus.getMenuName(), orderMenus.getMenuDetail(),
+    public int insertOrderMenu(PostOrderMenus orderMenus, int orderIdx) {
+        String insertOrderMenuQuery = "INSERT INTO OrderMenu (orderIdx, menuName, menuDetail, count, totalPrice, menuIdx) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
+        Object[] insertOrderMenuParams = new Object[] {orderIdx, orderMenus.getMenuName(), orderMenus.getMenuDetail(),
                 orderMenus.getCount(), orderMenus.getTotalPrice(), orderMenus.getMenuIdx()};
 
         this.jdbcTemplate.update(insertOrderMenuQuery, insertOrderMenuParams);

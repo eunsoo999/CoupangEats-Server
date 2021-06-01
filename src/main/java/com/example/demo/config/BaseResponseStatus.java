@@ -21,8 +21,7 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
     INVALID_USER_JWT(false,2003,"권한이 없는 유저의 접근입니다."),
-    NOT_LOGIN_STATUS(false, 2004, "로그인 상태가 아닙니다." +
-            ""),
+    NOT_LOGIN_STATUS(false, 2004, "로그인 상태가 아닙니다."),
 
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
@@ -58,26 +57,34 @@ public enum BaseResponseStatus {
     COUPONS_LENGTH_NUMBER(false, 2061, "쿠폰번호는 8자리 혹은 16자리만 가능합니다."),
 
     POST_ORDERS_EMPTY_ADDRESS(false, 2062, "배달지 주소를 입력해주세요."),
-    POST_ORDERS_EMPTY_STOREIDX(false, 2063, "가게 번호를 입력해주세요."),
-    POST_ORDERMENUS_EMPTY_MENUIDX(false, 2064, "주문 메뉴 번호를 입력해주세요."),
-    POST_ORDERS_EMPTY_ORDERMENUS(false, 2065, "주문 메뉴가 비었습니다."),
-    POST_ORDERMENUS_EMPTY_NAME(false, 2066, "주문 메뉴의 이름을 입력해주세요."),
-    POST_ORDERMENUS_NOT_ZERO(false, 2067, "주문 수량을 확인해주세요. 1개 이상 주문 가능합니다."),
-    POST_ORDERS_EMPTY_ORDERPRICE(false, 2068, "주문 금액을 입력해주세요."),
-    POST_ORDERS_EMPTY_DELIVERYPRICE(false, 2069, "배달비를 입력해주세요."),
-    POST_ORDERS_EMPTY_DISCOUNTPRICE(false, 2070, "할인금액을 입력해주세요."),
-    POST_ORDERS_EMPTY_TOTALPRICE(false, 2071, "총 주문가격을 입력해주세요."),
-    POST_ORDERS_EMPTY_ECHOPRODUCT(false, 2072, "일회용품 수저 유무를 선택해주세요."),
-    POST_ORDERS_INVALID_ECHOPRODUCT(false, 2073, "일회용품 수저 유무 값이 잘못되었습니다."),
-    POST_ORDERS_EMPTY_PAYTYPE(false, 2074, "결제수단을 입력해주세요."),
-    POST_ORDERS_EMPTY_USERIDX(false, 2075, "유저 번호를 확인해주세요."),
-    POST_ORDERMENUS_TOTALPRICE(false, 2076, "메뉴의 금액을 입력해주세요."),
+    POST_ORDERS_LENGTH_ADDRESS(false, 2063, "배달지 주소는 100자 이하만 가능합니다."),
+    POST_ORDERS_EMPTY_STOREIDX(false, 2064, "가게 번호를 입력해주세요."),
+    POST_ORDERMENUS_EMPTY_MENUIDX(false, 2065, "주문 메뉴 번호를 입력해주세요."),
+    POST_ORDERS_EMPTY_ORDERMENUS(false, 2066, "주문 메뉴가 비었습니다."),
+    POST_ORDERMENUS_EMPTY_NAME(false, 2067, "주문 메뉴의 이름을 입력해주세요."),
+    POST_ORDERMENUS_LENGTH_NAME(false, 2068, "주문 메뉴의 이름은 45자 이하만 가능합니다."),
+    POST_ORDERMENUS_LENGTH_DETAIL(false, 2069, "주문 메뉴 상세는 150자 이하만 가능합니다."),
+    POST_ORDERMENUS_NOT_ZERO(false, 2070, "주문 수량을 확인해주세요. 1개 이상 주문 가능합니다."),
+    POST_ORDERS_EMPTY_ORDERPRICE(false, 2071, "주문 금액을 입력해주세요."),
+    POST_ORDERS_EMPTY_DELIVERYPRICE(false, 2072, "배달비를 입력해주세요."),
+    POST_ORDERS_EMPTY_DISCOUNTPRICE(false, 2073, "할인금액을 입력해주세요."),
+    POST_ORDERS_EMPTY_TOTALPRICE(false, 2074, "총 주문가격을 입력해주세요."),
+    POST_ORDERS_EMPTY_ECHOPRODUCT(false, 2075, "일회용품 수저 유무를 선택해주세요."),
+    POST_ORDERS_INVALID_ECHOPRODUCT(false, 2076, "일회용품 수저 유무 값이 잘못되었습니다."),
+
 
     POST_COUPONS_USERIDX(false, 2077, "쿠폰을 지급받을 유저 번호를 입력해주세요."),
     POST_COUPONS_COUPONIDX(false, 2078, "지급받을 쿠폰 번호를 입력해주세요."),
 
     STORE_REVIEWS_INVALID_TYPE(false, 2079, "type이 잘못되었습니다."),
     STORE_REVIEWS_INVALID_SORT(false, 2080, "가능하지않은 정렬입니다."),
+
+    POST_ORDERS_EMPTY_PAYTYPE(false, 2081, "결제수단을 입력해주세요."),
+    POST_ORDERS_EMPTY_USERIDX(false, 2082, "유저 번호를 확인해주세요."),
+    POST_ORDERMENUS_TOTALPRICE(false, 2083, "메뉴의 금액을 입력해주세요."),
+    POST_ORDERS_LENGTH_STOREREQUEST(false, 2084, "가게 요청사항은 50자 이하만 가능합니다."),
+    POST_ORDERS_LENGTH_DELIVERYREQUEST(false, 2085, "배달 요청사항은 50자 이하만 가능합니다."),
+
 
     /**
      * 3000 : Response 오류
