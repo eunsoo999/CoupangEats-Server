@@ -40,6 +40,27 @@ public class UserController {
     }
 
     /**
+     * 자동로그인 API
+     * [GET] /users/:userIdx/auto-login
+     * @return BaseResponse<>
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}/auto-login")
+    public BaseResponse<CheckAutoLoginRes> checkAutoLogin(@PathVariable int userIdx) {
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse(NOT_LOGIN_STATUS);
+            }
+            return new BaseResponse<>(new CheckAutoLoginRes("Y"));
+        } catch (BaseException exception) {
+            logger.warn("#1. " + exception.getStatus().getMessage());
+            return new BaseResponse<>(NOT_LOGIN_STATUS);
+        }
+    }
+
+    /**
      * 1. 회원가입 API
      * [POST] /users
      * @return BaseResponse<PostUserRes>
