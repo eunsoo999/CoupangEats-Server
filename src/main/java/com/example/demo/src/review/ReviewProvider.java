@@ -26,16 +26,16 @@ public class ReviewProvider {
         this.storeDao = storeDao;
     }
 
-    public GetReviewsRes getStoreReviews(int storeIdx, String type, String sort) throws BaseException {
+    public GetReviewsRes getStoreReviews(Integer userIdx, int storeIdx, String type, String sort) throws BaseException {
         // 가게 존재 확인
         if (storeDao.checkStore(storeIdx) == 0) {
             throw new BaseException(STORES_NOT_FOUND);
         }
         try {
-            // 가게명, 별점, 리뷰 개수
+            // 가게명, 별점, 리뷰 개수 
             GetReviewsRes getReviewsRes = reviewDao.selectStoreReviewInfo(storeIdx);
             // 리뷰 목록
-            List<GetReview> reviews = reviewDao.selectStoreReviews(storeIdx, type, sort);
+            List<GetReview> reviews = reviewDao.selectStoreReviews(userIdx, storeIdx, type, sort);
 
             // 각 리뷰의 이미지 배열
             for (GetReview review: reviews) {

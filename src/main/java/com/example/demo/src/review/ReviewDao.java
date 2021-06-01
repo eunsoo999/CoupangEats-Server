@@ -48,8 +48,8 @@ public class ReviewDao {
                         rs.getString("reviewCount")), storeIdx);
     }
 
-    public List<GetReview> selectStoreReviews(int storeIdx, String type, String sort) {
-        String selectStoreReviewsQuery = "select Result.reviewIdx, userName, rating, contents, orderMenus, likeCount, " +
+    public List<GetReview> selectStoreReviews(Integer userIdx, int storeIdx, String type, String sort) {
+        String selectStoreReviewsQuery = "select Result.reviewIdx, RPAD(left(userName, 1), char_length(userName), '*') as 'userName', rating, contents, orderMenus, likeCount, " +
                 "CASE WHEN timestampdiff(SECOND, Result.createdAt, current_timestamp) < 60 " +
                 "THEN concat(TIMESTAMPDIFF(SECOND, Result.createdAt, CURRENT_TIMESTAMP()), '초 전') " +
                 "WHEN timestampdiff(MINUTE, Result.createdAt, current_timestamp) < 60 " +
@@ -61,13 +61,28 @@ public class ReviewDao {
                 "WHEN timestampdiff(WEEK, Result.createdAt, current_timestamp) <= 1 THEN '지난 주' " +
                 "WHEN timestampdiff(MONTH , Result.createdAt, current_timestamp) <= 1 THEN '지난 달' " +
                 "ELSE date_format(Result.createdAt, '%Y-%m-%d') " +
-                "END AS writingTimeStamp " +
-                "from (select ReviewTable.reviewIdx, userName, rating, contents, orderMenus, ReviewTable.createdAt, " +
+                "END AS writingTimeStamp ";
+
+        // 로그인상태일 경우 유저의 리뷰 도움이돼요/안돼요 표시
+        if(userIdx != null) {
+            System.out.println("로그인유저");
+            selectStoreReviewsQuery += ", case when (select exists(select ReviewLike.idx from ReviewLike " +
+                    "where ReviewLike.reviewIdx = Result.reviewIdx and ReviewLike.status != 'N' and ReviewLike.likeFlag = 'Y' and ReviewLike.userIdx = ?)) " +
+                    "then 'YES' " +
+                    "when (select exists(select ReviewLike.idx from ReviewLike " +
+                    "where ReviewLike.reviewIdx = Result.reviewIdx and ReviewLike.status != 'N' and ReviewLike.likeFlag = 'N' and ReviewLike.userIdx = ?)) " +
+                    "then 'NO' else null end as isLiked ";
+        } else {
+            selectStoreReviewsQuery += ", null as 'isLiked' "; // 비로그인
+        }
+
+        selectStoreReviewsQuery += "from (select ReviewTable.reviewIdx, userName, rating, contents, orderMenus, ReviewTable.createdAt, " +
                 "count(case when ReviewLike.likeFlag = 'Y' then 1 end) as likeCount " +
                 "from (select Review.idx as 'reviewIdx', User.userName, truncate(avg(Review.rating), 1) as 'rating' ,Review.contents, group_concat(distinct OrderMenu.menuName separator '·') as 'orderMenus', Review.createdAt " +
                 "from Review inner join User on Review.userIdx = User.idx inner join Orders on Review.orderIdx = Orders.idx join OrderMenu on OrderMenu.orderIdx = Orders.idx " +
                 "where Review.status != 'N' and User.status != 'N' and Orders.status != 'N' and OrderMenu.status != 'N' and Review.storeIdx = ? ";
 
+        // 포토리뷰만 보기
         if(type != null && type.equalsIgnoreCase("photo")) {
             selectStoreReviewsQuery += "and (select count(*) from ReviewImage where Review.status != 'N' and Review.idx = ReviewImage.reviewIdx) > 0 ";
         }
@@ -75,6 +90,7 @@ public class ReviewDao {
         selectStoreReviewsQuery += "group by Review.idx) ReviewTable left join ReviewLike on ReviewTable.reviewIdx = ReviewLike.reviewIdx " +
                 "group by ReviewTable.reviewIdx) Result ";
 
+        // 정렬 옵션
         if((sort != null && sort.equalsIgnoreCase("new")) || sort == null) {
             selectStoreReviewsQuery += "order by Result.createdAt desc";
         } else if(sort.equalsIgnoreCase("reviewliked")) {
@@ -85,6 +101,13 @@ public class ReviewDao {
             selectStoreReviewsQuery += "order by rating asc";
         }
 
+        Object[] params;
+        if (userIdx == null) {
+            params = new Object[] {storeIdx}; // 비로그인 유저
+        } else {
+            params = new Object[] {userIdx, userIdx, storeIdx}; // 로그인 유저
+        }
+
         return this.jdbcTemplate.query(selectStoreReviewsQuery,
                 (rs,rowNum) -> new GetReview(
                         rs.getInt("reviewIdx"),
@@ -93,7 +116,8 @@ public class ReviewDao {
                         rs.getString("writingTimeStamp"),
                         rs.getString("contents"),
                         rs.getString("orderMenus"),
-                        rs.getInt("likeCount")), storeIdx);
+                        rs.getInt("likeCount"),
+                        rs.getString("isLiked")), params);
     }
 
     public List<String> selectReviewImages(int reviewIdx) {
