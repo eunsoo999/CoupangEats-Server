@@ -415,6 +415,16 @@ public class StoreDao {
         Object[] params = new Object[] {latitude, longitude, latitude, storeIdx};
 
         return this.jdbcTemplate.queryForObject(getDistanceQuery, int.class, params);
+    }
 
+    public int selectCheetahStoreCount(String lat, String lon) {
+        String selectCheetahStoreCountQuery = "select count(*) as 'cheetahCount' " +
+                "from (select (6371*acos(cos(radians(?))*cos(radians(latitude)) " +
+                "*cos(radians(longitude)-radians(?)) " +
+                "+sin(radians(?))*sin(radians(latitude)))) as 'distance' " +
+                "from Store where Store.status != 'N' and Store.cheetahDelivery = 'Y' " +
+                "having distance < 4) cheetahStore";
+
+        return this.jdbcTemplate.queryForObject(selectCheetahStoreCountQuery, int.class, lat, lon, lat);
     }
 }

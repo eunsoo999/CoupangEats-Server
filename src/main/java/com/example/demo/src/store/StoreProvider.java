@@ -232,4 +232,12 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public int getCheetahStoreCount(String lat, String lon) throws BaseException {
+        try{
+            return storeDao.selectCheetahStoreCount(lat, lon);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

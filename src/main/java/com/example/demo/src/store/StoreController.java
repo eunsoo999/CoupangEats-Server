@@ -9,7 +9,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.utils.ValidationRegex.isRegexLatitude;
@@ -197,6 +199,32 @@ public class StoreController {
         } catch (BaseException exception) {
             logger.warn("#21. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 23. 치타배달 가게 개수 조회 API
+     * [GET] /stores/cheetah/count?lat=&lon=
+     * @return BaseResponse<GetStoreRes>
+     */
+    @ResponseBody
+    @GetMapping("/cheetah/count")
+    public BaseResponse<Map> getCheetahStoreCount(@RequestParam(required = false) String lat, @RequestParam(required = false) String lon) {
+        // Validation
+        if(lat == null || !isRegexLatitude(lat)) {
+            return new BaseResponse<>(STORES_EMPTY_LATITUDE);
+        } else if(lon == null || !isRegexLongitude(lon)) {
+            return new BaseResponse<>(STORES_EMPTY_LONGITUDE);
+        }
+
+        try {
+            Map<String, Integer> result = new HashMap<>();
+            int cheetahCount = storeProvider.getCheetahStoreCount(lat, lon);
+            result.put("cheetahCount", cheetahCount);
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            logger.warn("#23. " + exception.getStatus().getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }
