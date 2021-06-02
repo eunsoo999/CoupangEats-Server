@@ -2,16 +2,15 @@ package com.example.demo.src.review;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.address.model.PatchAddressRes;
 import com.example.demo.src.review.model.GetReviewRes;
 import com.example.demo.src.review.model.GetReviewsRes;
-import com.example.demo.src.review.model.PostReviewReq;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.demo.config.BaseResponseStatus.*;
@@ -25,10 +24,13 @@ public class ReviewController {
     private final JwtService jwtService;
     @Autowired
     private final ReviewProvider reviewProvider;
+    @Autowired
+    private final ReviewService reviewService;
 
-    public ReviewController(JwtService jwtService, ReviewProvider reviewProvider) {
+    public ReviewController(JwtService jwtService, ReviewProvider reviewProvider, ReviewService reviewService) {
         this.jwtService = jwtService;
         this.reviewProvider = reviewProvider;
+        this.reviewService = reviewService;
     }
 
     /**
@@ -71,9 +73,34 @@ public class ReviewController {
     }
 
     /**
+     * 39. 리뷰 삭제 API
+     * [PATCH] /users/:userIdx/reviews/:reviewIdx/status
+     * @return BaseResponse<Map>
+     */
+    @ResponseBody
+    @PatchMapping("/users/{userIdx}/reviews/{reviewIdx}/status")
+    public BaseResponse<Map> patchReviewStatus(@PathVariable int userIdx, @PathVariable int reviewIdx) {
+        try {
+            // jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            int updatedCount = reviewService.updateStatusReview(userIdx, reviewIdx);
+            Map<String, Integer> result = new HashMap<>();
+            result.put("updatedCount", updatedCount);
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            logger.warn("#39. " +exception.getStatus().getMessage());
+            logger.warn("(" + userIdx + ", " + reviewIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
      * 40. 리뷰 조회 API
      * [GET] /users/:userIdx/reviews/:reviewIdx
-     * @return BaseResponse<Map>
+     * @return BaseResponse<GetReviewRes>
      */
     @ResponseBody
     @GetMapping("/users/{userIdx}/reviews/{reviewIdx}")

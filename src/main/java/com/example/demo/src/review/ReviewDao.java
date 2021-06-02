@@ -166,4 +166,19 @@ public class ReviewDao {
                         rs.getString("menuLiked"),
                         rs.getString("comment")), reviewIdx);
     }
+
+    public int updateStatusReview(int reviewIdx) {
+        String updateStatusReviewQuery = "update Review set status = 'N' where idx = ?";
+        return this.jdbcTemplate.update(updateStatusReviewQuery, reviewIdx);
+    }
+
+    public int updateStatusMenuReviews(int reviewIdx) {
+        String updateStatusMenuReviewsQuery = "update MenuReview set status = 'N' where reviewIdx = ?";
+        return this.jdbcTemplate.update(updateStatusMenuReviewsQuery, reviewIdx);
+    }
+
+    public int updateStatusReviewImages(int reviewIdx) {
+        String query = "update ReviewImage set status = 'N' where reviewIdx = ?";
+        return this.jdbcTemplate.update(query, reviewIdx);
+    }
 }
