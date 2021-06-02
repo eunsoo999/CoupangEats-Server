@@ -43,52 +43,7 @@ public class UserController {
     }
 
     /**
-     * 0. 카카오 로그인 API
-     * [POST] /users/login/kakao
-     */
-    @ResponseBody
-    @PostMapping("/login/kakao")
-    public BaseResponse<PostLoginRes> kakaoLogin(@RequestBody PostKakaoLoginReq postKakaoLogin) {
-        if (postKakaoLogin.getAccessToken() == null || postKakaoLogin.getAccessToken().isEmpty()) {
-            return new BaseResponse<>(AUTH_KAKAO_EMPTY_TOKEN);
-        }
-
-        try {
-            // 액세스 토큰으로 사용자 정보 받아온다.
-            KaKaoUserInfo kaKaoUserInfo = KakaoApiService.getKakaoUserInfo(postKakaoLogin.getAccessToken());
-
-            // 로그인 처리 or 회원가입 진행 후 jwt, userIdx 반환
-            PostLoginRes postLoginRes = userProvider.kakaoLogin(kaKaoUserInfo);
-            return new BaseResponse<>(postLoginRes);
-        } catch (BaseException exception) {
-            logger.warn("#0. " + exception.getStatus().getMessage());
-            return new BaseResponse<>(exception.getStatus());
-        }
-    }
-
-    /**
-     * 1. 자동로그인 API
-     * [GET] /users/:userIdx/auto-login
-     * @return BaseResponse<>
-     */
-    @ResponseBody
-    @GetMapping("/{userIdx}/auto-login")
-    public BaseResponse<CheckAutoLoginRes> checkAutoLogin(@PathVariable int userIdx) {
-        try {
-            //jwt 확인
-            int userIdxByJwt = jwtService.getUserIdx();
-            if (userIdx != userIdxByJwt) {
-                return new BaseResponse(NOT_LOGIN_STATUS);
-            }
-            return new BaseResponse<>(new CheckAutoLoginRes("Y"));
-        } catch (BaseException exception) {
-            logger.warn("#1. " + exception.getStatus().getMessage());
-            return new BaseResponse<>(NOT_LOGIN_STATUS);
-        }
-    }
-
-    /**
-     * 2. 회원가입 API
+     * 0. 회원가입 API
      * [POST] /users
      * @return BaseResponse<PostUserRes>
      */
@@ -125,8 +80,53 @@ public class UserController {
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
         } catch(BaseException exception){
-            logger.warn("#2. " +exception.getStatus().getMessage());
+            logger.warn("#0. " +exception.getStatus().getMessage());
             logger.warn(postUserReq.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 1. 자동로그인 API
+     * [GET] /users/:userIdx/auto-login
+     * @return BaseResponse<>
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}/auto-login")
+    public BaseResponse<CheckAutoLoginRes> checkAutoLogin(@PathVariable int userIdx) {
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse(NOT_LOGIN_STATUS);
+            }
+            return new BaseResponse<>(new CheckAutoLoginRes("Y"));
+        } catch (BaseException exception) {
+            logger.warn("#1. " + exception.getStatus().getMessage());
+            return new BaseResponse<>(NOT_LOGIN_STATUS);
+        }
+    }
+
+    /**
+     * 2. 카카오 로그인 API
+     * [POST] /users/login/kakao
+     */
+    @ResponseBody
+    @PostMapping("/login/kakao")
+    public BaseResponse<PostLoginRes> kakaoLogin(@RequestBody PostKakaoLoginReq postKakaoLogin) {
+        if (postKakaoLogin.getAccessToken() == null || postKakaoLogin.getAccessToken().isEmpty()) {
+            return new BaseResponse<>(AUTH_KAKAO_EMPTY_TOKEN);
+        }
+
+        try {
+            // 액세스 토큰으로 사용자 정보 받아온다.
+            KaKaoUserInfo kaKaoUserInfo = KakaoApiService.getKakaoUserInfo(postKakaoLogin.getAccessToken());
+
+            // 로그인 처리 or 회원가입 진행 후 jwt, userIdx 반환
+            PostLoginRes postLoginRes = userProvider.kakaoLogin(kaKaoUserInfo);
+            return new BaseResponse<>(postLoginRes);
+        } catch (BaseException exception) {
+            logger.warn("#2. " + exception.getStatus().getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }
