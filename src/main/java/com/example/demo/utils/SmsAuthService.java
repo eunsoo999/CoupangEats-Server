@@ -1,7 +1,7 @@
 package com.example.demo.utils;
 
 import com.example.demo.config.BaseException;
-import com.example.demo.src.user.model.PostUserPhoneRes;
+import com.example.demo.src.user.model.PhoneAuthInfo;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.springframework.stereotype.Service;
@@ -20,9 +20,8 @@ import static com.example.demo.config.secret.Secret.*;
 
 @Service
 public class SmsAuthService {
-
-    public PostUserPhoneRes sendPhoneAuth(String toPhone) throws BaseException {
-        int authNumber = (int) (Math.random() * (99999 - 10000 + 1)) + 10000;
+    public PhoneAuthInfo sendPhoneAuth(String toPhone) throws BaseException {
+        int authNumber = (int) (Math.random() * (99999 - 10000 + 1)) + 10000; // 인증번호 난수 생성
         String accessKey = SENS_ACCESS_KEY;
         String serviceId = SENS_SERVICE_ID;
         String method = "POST";
@@ -43,11 +42,11 @@ public class SmsAuthService {
         bodyJson.put("contentType", "comm");
         bodyJson.put("countryCode", "82");
         bodyJson.put("from", "01099686284");
-        bodyJson.put("content", "[쿠팡이츠] 인증번호\n" + authNumber);
+        bodyJson.put("content", "[13th-쿠팡이츠] 인증번호\n" + authNumber);
         bodyJson.put("messages", toArr);
 
         String body = bodyJson.toJSONString();
-        System.out.println("body: : " + body);
+        //System.out.println("body: : " + body);
 
         try {
             URL url = new URL(requestURL);
@@ -70,7 +69,7 @@ public class SmsAuthService {
 
             int responseCode = con.getResponseCode();
             BufferedReader br;
-            System.out.println("responseCode : " + responseCode);
+            //System.out.println("responseCode : " + responseCode);
 
             if (responseCode == 202) { //정상
                 br = new BufferedReader(new InputStreamReader(con.getInputStream()));
@@ -83,8 +82,13 @@ public class SmsAuthService {
             while ((inputLine = br.readLine()) != null) {
                 response.append(inputLine);
             }
+
             br.close();
-            return new PostUserPhoneRes(tophone, authNumber);
+            con.disconnect();
+            if (responseCode != 202) { // 정상이 아니라면
+                throw new BaseException(FAILED_TO_SEND_PHONE_AUTH);
+            }
+            return new PhoneAuthInfo(tophone, String.valueOf(authNumber));
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_SEND_PHONE_AUTH);
         }
@@ -111,5 +115,4 @@ public class SmsAuthService {
             throw new BaseException(FAILED_TO_SEND_PHONE_AUTH);
         }
     }
-
 }

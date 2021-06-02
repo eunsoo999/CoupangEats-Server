@@ -7,6 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PostUserPhoneRes {
+public class PostAuthNumberReq {
     private String phone;
+    private String authNumber;
 }

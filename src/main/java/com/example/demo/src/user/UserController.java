@@ -12,6 +12,8 @@ import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
+
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.utils.ValidationRegex.*;
 
@@ -194,27 +196,27 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/auth/phone")
-    public BaseResponse<PostUserPhoneRes> sendMessage(@RequestBody PostUserPhoneReq postUserPhoneReq) throws BaseException {
+    public BaseResponse<PostUserPhoneRes> sendMessage(@RequestBody PostUserPhoneReq postUserPhoneReq, HttpSession session) {
         if(postUserPhoneReq.getPhone() == null || postUserPhoneReq.getPhone().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
         }
         if(!isRegexPhone(postUserPhoneReq.getPhone())) {
             return new BaseResponse<>(POST_USERS_INVALID_PHONE);
         }
-        // 중복 체크
-        try {
+
+        try{
+            // 휴대폰 번호 중복 체크
             if(userProvider.checkPhone(postUserPhoneReq.getPhone()) == 1) {
                 return new BaseResponse<>(DUPLICATED_PHONE);
             }
-        } catch(BaseException exception){
-            return new BaseResponse<>(exception.getStatus());
-        }
 
-        try{
-            PostUserPhoneRes postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone());
-            return new BaseResponse<>(postUserPhoneRes);
+            PhoneAuthInfo postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone()); // 문자 발송
+            // 인증번호 세션 저장
+            session.setMaxInactiveInterval(30*5); // 세션유지시간 = 5분
+            session.setAttribute(postUserPhoneRes.getPhone(), postUserPhoneRes.getAuthNumber()); // key-value 휴대폰번호-인증번호로 세션에 저장
+            return new BaseResponse<>(new PostUserPhoneRes(postUserPhoneRes.getPhone()));
         } catch(BaseException exception){
-            logger.warn("");
+            logger.warn(exception.getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }
@@ -224,6 +226,16 @@ public class UserController {
      * [GET] /users/auth/phone/confirm
      * @return BaseResponse<GetUserRes>
      */
+    @ResponseBody
+    @PostMapping("/auth/phone/confirm")
+    public BaseResponse<PostUserPhoneReq> checkAuthNumber(@RequestBody PostAuthNumberReq postAuthNumberReq, HttpSession session) {
+        if (postAuthNumberReq.getAuthNumber().equals(String.valueOf(session.getAttribute(postAuthNumberReq.getPhone())))) {
+            session.removeAttribute(postAuthNumberReq.getPhone()); // 인증번호가 맞다면 세션삭제
+            return new BaseResponse<>(new PostUserPhoneReq(postAuthNumberReq.getPhone()));
+        } else {
+            return new BaseResponse<>(WRONG_AUTH_NUMBER);
+        }
+    }
 
     /**
      * 8. 로그인 유저 정보 조회 API
