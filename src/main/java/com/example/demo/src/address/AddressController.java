@@ -89,11 +89,6 @@ public class AddressController {
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
 
-            // 전달받은 도로명 주소로 위도, 경도 추출 후 저장
-            GetLocationRes getLocationRes = GeoCoding.getLocation(postAddressReq.getRoadAddress());
-            postAddressReq.setLatitude(getLocationRes.getLatitude());
-            postAddressReq.setLongitude(getLocationRes.getLongitude());
-
             // 주소 추가
             int createdIdx = addressService.createAddress(postAddressReq);
             PostAddressRes postAddressRes = new PostAddressRes(createdIdx);
@@ -103,8 +98,6 @@ public class AddressController {
             logger.warn("#10. " +exception.getStatus().getMessage());
             logger.warn(postAddressReq.toString());
             return new BaseResponse<>(exception.getStatus());
-        } catch (UnsupportedEncodingException e) {
-            return new BaseResponse<>(ADDRESSES_NOT_FOUND_LOCATION);
         }
     }
 

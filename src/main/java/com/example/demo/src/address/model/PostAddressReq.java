@@ -5,8 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.math.BigDecimal;
-
 @Getter
 @Setter
 @AllArgsConstructor
@@ -17,7 +15,5 @@ public class PostAddressReq {
     private String detailAddress;
     private String aliasType;
     private String alias;
-    private String latitude;
-    private String longitude;
     private int userIdx;
 }

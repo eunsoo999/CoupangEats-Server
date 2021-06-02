@@ -1,9 +1,11 @@
 package com.example.demo.src.address;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.address.model.GetLocationRes;
 import com.example.demo.src.address.model.PatchAddressReq;
 import com.example.demo.src.address.model.PostAddressReq;
 import com.example.demo.src.user.UserDao;
+import com.example.demo.utils.GeoCoding;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,6 +40,13 @@ public class AddressService {
         if (postAddressReq.getAlias() != null && postAddressReq.getAlias().replace(" ", "").length() == 0) {
             postAddressReq.setAlias(null);
         }
+        GetLocationRes getLocationRes;
+        try {
+            // 전달받은 도로명 주소로 위도, 경도 추출 후 저장
+            getLocationRes = GeoCoding.getLocation(postAddressReq.getRoadAddress());
+        } catch (Exception exception) {
+            throw new BaseException(ADDRESSES_NOT_FOUND_LOCATION);
+        }
 
         try {
             // 집 주소를 등록할 때, 기존 집을 대체하는 경우
@@ -49,8 +58,8 @@ public class AddressService {
             if (postAddressReq.getAliasType().equalsIgnoreCase("COMPANY") && userDao.checkUserCompanyAddress(postAddressReq.getUserIdx()) == 1) {
                 int beforeCompanyIdx = userDao.getUserCompanyIdx(postAddressReq.getUserIdx());
                 addressDao.updateAddressTypeAndInitAlias(beforeCompanyIdx,"ETC"); // 기존 회사 "ETC" 변경, alias 제거
-                }
-            return addressDao.insertAddress(postAddressReq);
+            }
+            return addressDao.insertAddress(postAddressReq, getLocationRes.getLatitude(), getLocationRes.getLongitude());
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }
@@ -70,8 +79,16 @@ public class AddressService {
             patchAddressReq.setAlias(null);
         }
 
+        // 전달받은 도로명 주소로 위도, 경도 추출 후 저장
+        GetLocationRes getLocationRes;
         try {
-            // 집 주소 대체일 경우 기존 집 주소 "ETC"으로 변경, , alias 제거
+            getLocationRes = GeoCoding.getLocation(patchAddressReq.getRoadAddress());
+        } catch (Exception exception) {
+            throw new BaseException(ADDRESSES_NOT_FOUND_LOCATION);
+        }
+
+        try {
+            // 집 주소 대체일 경우 기존 집 주소 "ETC"으로 변경, alias 제거
             if (patchAddressReq.getAliasType().equalsIgnoreCase("HOME") && userDao.checkUserHomeAddress(userIdx) == 1) {
                 int beforeHomeIdx = userDao.getUserHomeIdx(userIdx);
                 addressDao.updateAddressTypeAndInitAlias(beforeHomeIdx, "ETC");
@@ -81,7 +98,7 @@ public class AddressService {
                 addressDao.updateAddressTypeAndInitAlias(beforeCompanyIdx, "ETC");
             }
 
-            int updatedCount = addressDao.updateAddress(addressIdx, patchAddressReq);
+            int updatedCount = addressDao.updateAddress(addressIdx, patchAddressReq, getLocationRes.getLatitude(), getLocationRes.getLongitude());
             if (updatedCount != 1) {
                 throw new BaseException(FAILED_TO_UPDATE_ADDRESSES);
             }
@@ -89,7 +106,6 @@ public class AddressService {
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }
-
     }
 
     public int updateStatusAddress(int addressIdx, int userIdx) throws BaseException {

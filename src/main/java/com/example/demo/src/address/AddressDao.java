@@ -33,10 +33,10 @@ public class AddressDao {
                         rs.getString("subAddress")), selectAddressListParams);
     }
 
-    public int insertAddress(PostAddressReq postAddressReq) {
+    public int insertAddress(PostAddressReq postAddressReq, String latitude, String longitude) {
         String insertAddressQuery = "INSERT INTO Address (address, roadAddress, detailAddress, alias, latitude, longitude, userIdx, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         Object[] insertAddressParams = new Object[]{postAddressReq.getAddress(), postAddressReq.getRoadAddress(), postAddressReq.getDetailAddress(),
-                postAddressReq.getAlias(), postAddressReq.getLatitude(), postAddressReq.getLongitude(), postAddressReq.getUserIdx(), postAddressReq.getAliasType().toUpperCase()};
+                postAddressReq.getAlias(), latitude, longitude, postAddressReq.getUserIdx(), postAddressReq.getAliasType().toUpperCase()};
         this.jdbcTemplate.update(insertAddressQuery, insertAddressParams);
 
         String lastInsertIdQuery = "select last_insert_id()";
@@ -101,9 +101,10 @@ public class AddressDao {
         return this.jdbcTemplate.queryForObject(checkAddressQuery, int.class, checkAddressParams);
     }
 
-    public int updateAddress(int addressIdx, PatchAddressReq patchAddressReq) {
-        String updateAddressQuery = "update Address set detailAddress = ?, alias = ?, status = ? where idx = ?";
-        Object[] updateAddressParams = new Object[]{patchAddressReq.getDetailAddress(), patchAddressReq.getAlias(), patchAddressReq.getAliasType(), addressIdx};
+    public int updateAddress(int addressIdx, PatchAddressReq patchAddressReq, String latitude, String longtitude) {
+        String updateAddressQuery = "update Address set address = ?, roadAddress = ?, detailAddress = ?, alias = ?, status = ?, latitude = ?, longitude = ? where idx = ?";
+        Object[] updateAddressParams = new Object[]{patchAddressReq.getAddress(), patchAddressReq.getRoadAddress(),
+                patchAddressReq.getDetailAddress(), patchAddressReq.getAlias(), patchAddressReq.getAliasType(), latitude, longtitude, addressIdx};
 
         return this.jdbcTemplate.update(updateAddressQuery, updateAddressParams); // 개수 반환
     }
