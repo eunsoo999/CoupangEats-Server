@@ -11,8 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 import static com.example.demo.config.BaseResponseStatus.*;
 
 @Service
@@ -133,5 +131,26 @@ public class UserProvider {
             throw new BaseException(DATABASE_ERROR);
         }
 
+    }
+
+    public PostLoginRes kakaoLogin(KaKaoUserInfo kaKaoUserInfo) throws BaseException {
+        int userIdx;
+        String jwt;
+        // 카카오에서 받아온 사용자 정보의 이메일을 가지고 User테이블에 있는지 확인한다.
+        if (userDao.checkEmail(kaKaoUserInfo.getEmail()) == 1) {
+            // 해당 이메일이 카카오 가입으로 가입된 계정이 맞는지 확인한다.
+            if (userDao.checkKakaoUserEmail(kaKaoUserInfo.getEmail()) == 1) {
+                //카카오 가입 이메일이 맞다면 로그인 처리
+                userIdx = userDao.getUserIdxByEmail(kaKaoUserInfo.getEmail());
+                jwt = jwtService.createJwt(userIdx);
+            } else {
+                throw new BaseException(USERS_INAPP_EXISTS); // 해당 이메일로 자체 이메일가입한 상태라면 카카오로그인, 가입 X, 자체로그인으로.
+            }
+        } else { // 가입이 되어 있지 않다면 가입 진행
+            PostUserReq kakaoSignUp = new PostUserReq(kaKaoUserInfo.getEmail(), null, kaKaoUserInfo.getUserName(), null);
+            userIdx = userDao.createUser(kakaoSignUp, "KAKAO");
+            jwt = jwtService.createJwt(userIdx);
+        }
+        return new PostLoginRes(userIdx, jwt);
     }
 }

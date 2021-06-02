@@ -55,7 +55,7 @@ public class UserService {
             throw new BaseException(PASSWORD_ENCRYPTION_ERROR);
         }
         try{
-            int userIdx = userDao.createUser(postUserReq);
+            int userIdx = userDao.createUser(postUserReq, "INAPP");
             return new PostUserRes(userIdx);
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);

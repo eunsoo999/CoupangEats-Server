@@ -27,6 +27,7 @@ public enum BaseResponseStatus {
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
     WRONG_AUTH_NUMBER(false, 2011, "인증번호가 일치하지 않습니다."),
     AUTH_PHONE_EMPTY_NUMBER(false, 2012, "인증번호를 입력해주세요."),
+    AUTH_KAKAO_EMPTY_TOKEN(false, 2013, "액세스토큰을 입력해주세요."),
 
     // [POST] /users
     POST_USERS_EMPTY_EMAIL(false, 2015, "이메일을 입력해주세요."),
@@ -100,6 +101,9 @@ public enum BaseResponseStatus {
     USERS_NOT_FOUND(false, 3016, "존재하지않는 회원입니다."),
     FAILED_TO_LOGIN(false,3017,"없는 아이디거나 비밀번호가 틀렸습니다."),
     FAILED_TO_SEND_PHONE_AUTH(false, 3018, "인증번호 발송 실패하였습니다."),
+    FAILED_TO_KAKAO_AUTH(false, 3019, "카카오 유저 정보 조회에 실패하였습니다."),
+    FAILED_TO_KAKAO_EMAIL(false, 3020, "카카오 정보에 등록된 이메일이 없습니다. 이메일을 추가 입력해주세요."),
+    USERS_INAPP_EXISTS(false, 3021, "이미 서비스에 가입이 되어 있는 이메일입니다. 이메일 로그인을 통해 로그인을 진행해주세요."),
 
     // Address
     ADDRESSES_NOT_FOUND(false, 3050, "존재하지않는 배달주소입니다."),

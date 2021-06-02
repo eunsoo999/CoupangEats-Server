@@ -2,6 +2,7 @@ package com.example.demo.src.user;
 
 import com.example.demo.src.address.AddressProvider;
 import com.example.demo.src.address.model.GetLocationRes;
+import com.example.demo.utils.KakaoApiService;
 import com.example.demo.utils.SmsAuthService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +40,30 @@ public class UserController {
         this.jwtService = jwtService;
         this.smsAuthService = smsAuthService;
         this.addressProvider = addressProvider;
+    }
+
+    /**
+     * 0. 카카오 로그인 API
+     * [POST] /users/login/kakao
+     */
+    @ResponseBody
+    @PostMapping("/login/kakao")
+    public BaseResponse<PostLoginRes> kakaoLogin(@RequestBody PostKakaoLoginReq postKakaoLogin) {
+        if (postKakaoLogin.getAccessToken() == null || postKakaoLogin.getAccessToken().isEmpty()) {
+            return new BaseResponse<>(AUTH_KAKAO_EMPTY_TOKEN);
+        }
+
+        try {
+            // 액세스 토큰으로 사용자 정보 받아온다.
+            KaKaoUserInfo kaKaoUserInfo = KakaoApiService.getKakaoUserInfo(postKakaoLogin.getAccessToken());
+
+            // 로그인 처리 or 회원가입 진행 후 jwt, userIdx 반환
+            PostLoginRes postLoginRes = userProvider.kakaoLogin(kaKaoUserInfo);
+            return new BaseResponse<>(postLoginRes);
+        } catch (BaseException exception) {
+            logger.warn("#0. " + exception.getStatus().getMessage());
+            return new BaseResponse<>(exception.getStatus());
+        }
     }
 
     /**

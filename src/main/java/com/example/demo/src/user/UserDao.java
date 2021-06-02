@@ -18,9 +18,9 @@ public class UserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
 
-    public int createUser(PostUserReq postUserReq){
-        String createUserQuery = "insert into User (email, password, userName, phone) values (?, ?, ?, ?)";
-        Object[] createUserParams = new Object[]{postUserReq.getEmail(), postUserReq.getPassword(), postUserReq.getUserName(), postUserReq.getPhone()};
+    public int createUser(PostUserReq postUserReq, String joinType){
+        String createUserQuery = "insert into User (email, password, userName, phone, joinType) values (?, ?, ?, ?, ?)";
+        Object[] createUserParams = new Object[]{postUserReq.getEmail(), postUserReq.getPassword(), postUserReq.getUserName(), postUserReq.getPhone(), joinType};
         this.jdbcTemplate.update(createUserQuery, createUserParams);
 
         String lastInserIdQuery = "select last_insert_id()";
@@ -42,7 +42,7 @@ public class UserDao {
     }
 
     public GetUserRes getUser(int userIdx) {
-        String getUserQuery = "select userName, concat(left(phone, 3), '-****-', right(phone, 4)) as 'phone' from User where status != 'N' and idx = ?";
+        String getUserQuery = "select userName, if(phone is not null, concat(left(phone, 3), '-****-', right(phone, 4)), 'Kakao User') as 'phone' from User where status != 'N' and idx = ?";
         int getUserParams = userIdx;
 
         return this.jdbcTemplate.queryForObject(getUserQuery,
@@ -158,5 +158,15 @@ public class UserDao {
                         rs.getString("mainAddress"),
                         rs.getString("latitude"),
                         rs.getString("longitude")), userIdx);
+    }
+
+    public int getUserIdxByEmail(String email) {
+        String getUserIdxByEmailQuery = "select idx from User where email = ? and status != 'N'";
+        return this.jdbcTemplate.queryForObject(getUserIdxByEmailQuery, int.class, email);
+    }
+
+    public int checkKakaoUserEmail(String email) {
+        String checkKakaoUserEmailQuery = "select(select idx from User where email = ? and status != 'N' and joinType = 'KAKAO')";
+        return this.jdbcTemplate.queryForObject(checkKakaoUserEmailQuery, int.class, email);
     }
 }
