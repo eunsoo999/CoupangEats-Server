@@ -9,4 +9,5 @@ import lombok.Setter;
 @AllArgsConstructor
 public class PostUserPhoneRes {
     private String phone;
+    private String message;
 }
