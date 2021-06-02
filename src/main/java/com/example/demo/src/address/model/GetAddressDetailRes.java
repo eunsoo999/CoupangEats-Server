@@ -15,4 +15,6 @@ public class GetAddressDetailRes {
     private String detailAddress;
     private String aliasType;
     private String alias;
+    private String latitude;
+    private String longitude;
 }

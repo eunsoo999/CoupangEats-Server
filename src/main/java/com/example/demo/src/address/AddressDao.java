@@ -80,7 +80,7 @@ public class AddressDao {
     }
 
     public GetAddressDetailRes selectAddress(int addressIdx) {
-        String getAddressDetailQuery = "select address, roadAddress, detailAddress, status as 'aliasType', alias from Address where idx = ?";
+        String getAddressDetailQuery = "select address, roadAddress, detailAddress, status as 'aliasType', alias, latitude, longitude from Address where idx = ?";
         int getAddressParams = addressIdx;
 
         return this.jdbcTemplate.queryForObject(getAddressDetailQuery,
@@ -89,7 +89,9 @@ public class AddressDao {
                         rs.getString("roadAddress"),
                         rs.getString("detailAddress"),
                         rs.getString("aliasType"),
-                        rs.getString("alias")), getAddressParams);
+                        rs.getString("alias"),
+                        rs.getString("latitude"),
+                        rs.getString("longitude")), getAddressParams);
     }
 
     public int checkAddressByOwner(int addressIdx, int userIdx) {
