@@ -62,4 +62,32 @@ public class OrderDao {
                         rs.getString("address"),
                         rs.getString("payType")), userIdx);
     }
+
+    public int checkOrderIdx(int orderIdx) {
+        String checkOrderIdxQuery = "select exists(select idx from Orders where idx = ? and status != 'N')";
+        int checkOrderIdxParams = orderIdx;
+
+        return this.jdbcTemplate.queryForObject(checkOrderIdxQuery, int.class, checkOrderIdxParams);
+    }
+
+    public int checkOrderInStore(int orderIdx, int storeIdx) {
+        String checkOrderIdxQuery = "select exists(select idx from Orders where idx = ? and storeIdx = ? and status != 'N')";
+
+        return this.jdbcTemplate.queryForObject(checkOrderIdxQuery, int.class, orderIdx, storeIdx);
+    }
+
+    // 해당 주문내역에 주문메뉴가 있는지 검증
+    public int checkOrderMenuInOrder(int orderIdx, int orderMenuIdx) {
+        String checkOrderMenuInOrder = "select exists(select idx from OrderMenu " +
+                "where OrderMenu.status != 'N' and OrderMenu.orderIdx = ? and OrderMenu.idx = ?)";
+
+        return this.jdbcTemplate.queryForObject(checkOrderMenuInOrder, int.class, orderIdx, orderMenuIdx);
+    }
+
+    // 유저가 주문한 주문번호가 맞는지 검증
+    public int checkOrderByUserIdx(Integer orderIdx, Integer userIdx) {
+        String checkOrderByUserIdxQuery = "select exists(select idx from Orders " +
+                "where Orders.status != 'N' and Orders.idx = ? and Orders.userIdx = ?)";
+        return this.jdbcTemplate.queryForObject(checkOrderByUserIdxQuery, int.class, orderIdx, userIdx);
+    }
 }

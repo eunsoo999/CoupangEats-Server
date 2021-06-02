@@ -138,13 +138,14 @@ public class ReviewDao {
     }
 
     public GetReviewRes selectReview(int reviewIdx) {
-        String selectReviewQuery = "select Store.storeName, truncate(Review.rating, 1) as 'rating', " +
+        String selectReviewQuery = "select Store.idx as 'storeIdx', Store.storeName, truncate(Review.rating, 1) as 'rating', " +
                 "Review.contents, Review.deliveryLiked, Review.deliveryComment " +
                 "from Review inner join Store on Review.storeIdx = Store.idx " +
                 "where Review.status != 'N' and Review.idx = ?";
 
         return this.jdbcTemplate.queryForObject(selectReviewQuery,
                 (rs,rowNum) -> new GetReviewRes(
+                        rs.getInt("storeIdx"),
                         rs.getString("storeName"),
                         rs.getDouble("rating"),
                         rs.getString("contents"),
@@ -180,5 +181,37 @@ public class ReviewDao {
     public int updateStatusReviewImages(int reviewIdx) {
         String query = "update ReviewImage set status = 'N' where reviewIdx = ?";
         return this.jdbcTemplate.update(query, reviewIdx);
+    }
+
+    public int insertReview(PostReviewReq postReviewReq) {
+        String insertReviewQuery = "INSERT INTO Review (contents, rating, userIdx, orderIdx, "
+                                    + "storeIdx, deliveryLiked, deliveryComment) "
+                                    + "VALUES (?,?,?,?,?,?,?)";
+        Object[] params = new Object[]{postReviewReq.getContents(), postReviewReq.getRating(), postReviewReq.getUserIdx(),
+                                        postReviewReq.getOrderIdx(), postReviewReq.getStoreIdx(), postReviewReq.getDeliveryLiked(), postReviewReq.getDeliveryComment()};
+        this.jdbcTemplate.update(insertReviewQuery, params);
+
+        String lastInserIdQuery = "select last_insert_id()";
+        return this.jdbcTemplate.queryForObject(lastInserIdQuery, int.class);
+    }
+
+    public void insertReviewImage(int reviewIdx, String imageUrl) {
+        String insertImageQuery = "INSERT INTO ReviewImage (imageUrl, reviewIdx) VALUES (?, ?)";
+        this.jdbcTemplate.update(insertImageQuery, imageUrl, reviewIdx);
+    }
+
+    public void insertMenuReview(int reviewIdx, PostMenuReviewReq menuReview) {
+        String insertMenuReviewQuery = "INSERT INTO MenuReview (OrderMenuIdx, reviewIdx, menuLiked, comment) " +
+                                        "VALUES (?, ?, ?, ?)";
+        Object[] params = new Object[]{menuReview.getOrderMenuIdx(), reviewIdx, menuReview.getMenuLiked(), menuReview.getMenuComment()};
+
+        this.jdbcTemplate.update(insertMenuReviewQuery, params);
+    }
+
+    public int checkReviewByOrderIdx(int orderIdx) {
+        String checkReviewByOrderIdxQuery = "select exists(select idx from Review " +
+                "where Review.status != 'N' and Review.orderIdx = ?)";
+
+        return this.jdbcTemplate.queryForObject(checkReviewByOrderIdxQuery, int.class, orderIdx);
     }
 }

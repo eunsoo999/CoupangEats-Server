@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class GetReviewRes {
+    private int storeIdx;
     private String storeName;
     private double rating;
     private String contents;
@@ -19,7 +20,8 @@ public class GetReviewRes {
     private String deliveryLiked;
     private String deliveryComment;
 
-    public GetReviewRes(String storeName, double rating, String contents, String deliveryLiked, String deliveryComment) {
+    public GetReviewRes(int storeIdx, String storeName, double rating, String contents, String deliveryLiked, String deliveryComment) {
+        this.storeIdx = storeIdx;
         this.storeName = storeName;
         this.rating = rating;
         this.contents = contents;

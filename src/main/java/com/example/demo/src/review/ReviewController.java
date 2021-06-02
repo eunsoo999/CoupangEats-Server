@@ -2,8 +2,7 @@ package com.example.demo.src.review;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.review.model.GetReviewRes;
-import com.example.demo.src.review.model.GetReviewsRes;
+import com.example.demo.src.review.model.*;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,6 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.example.demo.config.BaseResponseStatus.*;
+import static com.example.demo.utils.ValidationRegex.isRegexImage;
 
 @RestController
 @RequestMapping("")
@@ -68,6 +68,76 @@ public class ReviewController {
                 return new BaseResponse<>(exception.getStatus());
             }
         } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 37. 리뷰 작성 API
+     * [POST] /reviews
+     * @return BaseResponse<Map>
+     */
+    @ResponseBody
+    @PostMapping("/reviews")
+    public BaseResponse<Map> postReview(@RequestBody PostReviewReq postReviewReq) {
+        // Request 검증
+        if(postReviewReq.getOrderIdx() == null) {
+            return new BaseResponse<>(REVIEWS_EMPTY_ORDERIDX);
+        } else if(postReviewReq.getStoreIdx() == null) {
+            return new BaseResponse<>(REVIEWS_EMPTY_STOREIDX);
+        } else if(postReviewReq.getRating() == null) {
+            return new BaseResponse<>(REVIEWS_EMPTY_RATING);
+        } else if(postReviewReq.getRating() != null && !(postReviewReq.getRating() == 1 || postReviewReq.getRating() == 2 ||
+                postReviewReq.getRating() == 3 || postReviewReq.getRating() == 4 || postReviewReq.getRating() == 5 )) {
+            return new BaseResponse<>(REVIEWS_INVALID_RATING);
+        } else if(postReviewReq.getContents() == null || postReviewReq.getContents().isEmpty()) {
+            return new BaseResponse<>(REVIEWS_EMPTY_CONTENTS);
+        } else if(postReviewReq.getContents() != null && postReviewReq.getContents().length() > 300) {
+            return new BaseResponse<>(REVIEWS_LENGTH_CONTENTS);
+        } else if(postReviewReq.getDeliveryLiked() != null
+                && !(postReviewReq.getDeliveryLiked().equalsIgnoreCase("GOOD")
+                || postReviewReq.getDeliveryLiked().equalsIgnoreCase("BAD"))) {
+            return new BaseResponse<>(REVIEWS_INVALID_DELIVERY_LIKED);
+        }  else if(postReviewReq.getDeliveryComment() != null && postReviewReq.getDeliveryComment().length() > 80) {
+            return new BaseResponse<>(REVIEWS_LENGTH_DELIVERY);
+        } else if(postReviewReq.getUserIdx() == null) {
+            return new BaseResponse<>(REVIEWS_EMPTY_USERIDX);
+        }
+        if(postReviewReq.getImages() != null) {
+            for (String url : postReviewReq.getImages()) {
+                if(!isRegexImage(url)) {
+                    return new BaseResponse<>(INVALID_IMAGE_URL);
+                }
+            }
+        }
+        if(postReviewReq.getMenuReviews() != null) {
+            for (PostMenuReviewReq menuReview : postReviewReq.getMenuReviews()) {
+                if(menuReview.getOrderMenuIdx() == null) {
+                    return new BaseResponse<>(REVIEWS_EMPTY_MENUIDX);
+                }
+                if(menuReview.getMenuComment() != null && menuReview.getMenuComment().length() > 80) {
+                    return new BaseResponse<>(REVIEWS_LENGTH_MENU);
+                }
+                if(menuReview.getMenuLiked() != null && !(menuReview.getMenuLiked().equalsIgnoreCase("GOOD")
+                                                                || menuReview.getMenuLiked().equalsIgnoreCase("BAD"))) {
+                    return new BaseResponse<>(REVIEWS_INVALID_MENU_LIKED);
+                }
+            }
+        }
+
+        try {
+            // jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (postReviewReq.getUserIdx() != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            int createdIdx = reviewService.createReview(postReviewReq);
+            Map<String, Integer> result = new HashMap<>();
+            result.put("createdIdx", createdIdx);
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            logger.warn("#37. " +exception.getStatus().getMessage());
+            logger.warn(postReviewReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
