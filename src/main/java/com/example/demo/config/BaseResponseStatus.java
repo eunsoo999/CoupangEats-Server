@@ -87,7 +87,6 @@ public enum BaseResponseStatus {
     STORES_EMPTY_CATEGORY(false, 2086, "조회할 카테고리를 입력해주세요."),
     STORES_INVALID_CATEGORY(false, 2087, "유효한 가게 카테고리가 아닙니다."),
 
-
     /**
      * 3000 : Response 오류
      */
@@ -123,6 +122,8 @@ public enum BaseResponseStatus {
 
     COUPONS_NOT_FOUND(false, 3060, "존재하지않는 쿠폰입니다."),
     COUPONS_NOT_IN_STORES(false, 3061, "가게의 쿠폰이 아니거나, 지급 만료된 쿠폰입니다."),
+
+    REVIEWS_NOT_FOUND(false, 3062, "존재하지않는 리뷰입니다."),
 
 
     /**

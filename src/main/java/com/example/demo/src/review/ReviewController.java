@@ -2,12 +2,17 @@ package com.example.demo.src.review;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
+import com.example.demo.src.address.model.PatchAddressRes;
+import com.example.demo.src.review.model.GetReviewRes;
 import com.example.demo.src.review.model.GetReviewsRes;
+import com.example.demo.src.review.model.PostReviewReq;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -61,6 +66,29 @@ public class ReviewController {
                 return new BaseResponse<>(exception.getStatus());
             }
         } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 40. 리뷰 조회 API
+     * [GET] /users/:userIdx/reviews/:reviewIdx
+     * @return BaseResponse<Map>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/reviews/{reviewIdx}")
+    public BaseResponse<GetReviewRes> GetReview(@PathVariable int userIdx, @PathVariable int reviewIdx) {
+        try {
+            // jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetReviewRes getReviewRes = reviewProvider.getReview(userIdx, reviewIdx);
+            return new BaseResponse<>(getReviewRes);
+        } catch (BaseException exception) {
+            logger.warn("#40. " +exception.getStatus().getMessage());
+            logger.warn("(" + userIdx + ", " + reviewIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }

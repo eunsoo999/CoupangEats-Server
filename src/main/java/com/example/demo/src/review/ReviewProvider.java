@@ -1,9 +1,12 @@
 package com.example.demo.src.review;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.review.model.GetMenuReview;
 import com.example.demo.src.review.model.GetReview;
+import com.example.demo.src.review.model.GetReviewRes;
 import com.example.demo.src.review.model.GetReviewsRes;
 import com.example.demo.src.store.StoreDao;
+import com.example.demo.src.user.UserDao;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,19 +14,20 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.example.demo.config.BaseResponseStatus.DATABASE_ERROR;
-import static com.example.demo.config.BaseResponseStatus.STORES_NOT_FOUND;
+import static com.example.demo.config.BaseResponseStatus.*;
 
 @Service
 public class ReviewProvider {
     final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ReviewDao reviewDao;
     private final StoreDao storeDao;
+    private final UserDao userDao;
 
     @Autowired
-    public ReviewProvider(ReviewDao reviewDao, StoreDao storeDao) {
+    public ReviewProvider(ReviewDao reviewDao, StoreDao storeDao, UserDao userDao) {
         this.reviewDao = reviewDao;
         this.storeDao = storeDao;
+        this.userDao = userDao;
     }
 
     public GetReviewsRes getStoreReviews(Integer userIdx, int storeIdx, String type, String sort) throws BaseException {
@@ -48,5 +52,33 @@ public class ReviewProvider {
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }
+    }
+
+    public GetReviewRes getReview(int userIdx, int reviewIdx) throws BaseException {
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND); // 유저 존재 검증
+        } else if (reviewDao.checkReviewIdx(reviewIdx) == 0) {
+            throw new BaseException(REVIEWS_NOT_FOUND); // 리뷰 존재 검증
+        } else if (reviewDao.checkReviewByuserIdx(userIdx, reviewIdx) == 0) {
+            throw new BaseException(INVALID_USER_JWT); // 리뷰 작성자 == 유저 검증
+        }
+
+        try {
+            // 리뷰 기본 정보
+            GetReviewRes getReviewRes = reviewDao.selectReview(reviewIdx);
+
+            // 리뷰 이미지
+            List<String> images = reviewDao.selectReviewImages(reviewIdx);
+            getReviewRes.setImages(images);
+
+            // 메뉴 개별 리뷰
+            List<GetMenuReview> menuReviews = reviewDao.selectMenuReviews(reviewIdx);
+            getReviewRes.setMenuReviews(menuReviews);
+            
+            return getReviewRes;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
     }
 }

@@ -1,8 +1,6 @@
 package com.example.demo.src.review;
 
-import com.example.demo.src.review.model.GetPhotoReview;
-import com.example.demo.src.review.model.GetReview;
-import com.example.demo.src.review.model.GetReviewsRes;
+import com.example.demo.src.review.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -24,7 +22,7 @@ public class ReviewDao {
                 "from Review inner join " +
                 "(select reviewIdx, min(idx), imageUrl from ReviewImage group by reviewIdx) as FirstReviewImage " +
                 "on Review.idx = FirstReviewImage.reviewIdx " +
-                "where Review.storeIdx = ? and Review.status != 'N' " +
+                "where Review.storeIdx = ? and Review.status != 'N' and ReviewImage.status != 'N' " +
                 "order by Review.idx desc limit 3";
 
         return this.jdbcTemplate.query(selectPhotoReviewsQuery,
@@ -83,7 +81,7 @@ public class ReviewDao {
 
         // 포토리뷰만 보기
         if(type != null && type.equalsIgnoreCase("photo")) {
-            selectStoreReviewsQuery += "and (select count(*) from ReviewImage where Review.status != 'N' and Review.idx = ReviewImage.reviewIdx) > 0 ";
+            selectStoreReviewsQuery += "and (select count(*) from ReviewImage where Review.status != 'N' and ReviewImage.status != 'N' and Review.idx = ReviewImage.reviewIdx) > 0 ";
         }
 
         selectStoreReviewsQuery += "group by Review.idx) ReviewTable left join ReviewLike on ReviewTable.reviewIdx = ReviewLike.reviewIdx " +
@@ -120,10 +118,52 @@ public class ReviewDao {
     }
 
     public List<String> selectReviewImages(int reviewIdx) {
-        String selectReviewImagesQuery = "select imageUrl from ReviewImage where reviewIdx = ?";
+        String selectReviewImagesQuery = "select imageUrl from ReviewImage where reviewIdx = ? and status != 'N'";
         int selectReviewImagesParams = reviewIdx;
 
         return this.jdbcTemplate.query(selectReviewImagesQuery,
                 (rs,rowNum) -> new String(rs.getString("imageUrl")), selectReviewImagesParams);
+    }
+
+    public int checkReviewIdx(int reviewIdx) {
+        String checkReviewIdxQuery = "select exists(select idx from Review where idx = ? and status != 'N')";
+
+        return this.jdbcTemplate.queryForObject(checkReviewIdxQuery, int.class, reviewIdx);
+    }
+
+    public int checkReviewByuserIdx(int userIdx, int reviewIdx) {
+        String checkReviewByuserIdxQuery = "select exists(select idx from Review where idx = ? and userIdx = ? and status != 'N')";
+
+        return this.jdbcTemplate.queryForObject(checkReviewByuserIdxQuery, int.class, reviewIdx, userIdx);
+    }
+
+    public GetReviewRes selectReview(int reviewIdx) {
+        String selectReviewQuery = "select Store.storeName, truncate(Review.rating, 1) as 'rating', " +
+                "Review.contents, Review.deliveryLiked, Review.deliveryComment " +
+                "from Review inner join Store on Review.storeIdx = Store.idx " +
+                "where Review.status != 'N' and Review.idx = ?";
+
+        return this.jdbcTemplate.queryForObject(selectReviewQuery,
+                (rs,rowNum) -> new GetReviewRes(
+                        rs.getString("storeName"),
+                        rs.getDouble("rating"),
+                        rs.getString("contents"),
+                        rs.getString("deliveryLiked"),
+                        rs.getString("deliveryComment")), reviewIdx);
+    }
+
+    public List<GetMenuReview> selectMenuReviews(int reviewIdx) {
+        String selectMenuReviewsQuery = "select MenuReview.idx as 'menuReviewIdx', OrderMenu.menuName, OrderMenu.menuDetail, " +
+                "MenuReview.menuLiked, MenuReview.comment " +
+                "from MenuReview inner join OrderMenu on MenuReview.orderMenuIdx = OrderMenu.idx " +
+                "where MenuReview.status != 'N' and MenuReview.reviewIdx = ?";
+
+        return this.jdbcTemplate.query(selectMenuReviewsQuery,
+                (rs,rowNum) -> new GetMenuReview(
+                        rs.getInt("menuReviewIdx"),
+                        rs.getString("menuName"),
+                        rs.getString("menuDetail"),
+                        rs.getString("menuLiked"),
+                        rs.getString("comment")), reviewIdx);
     }
 }
