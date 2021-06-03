@@ -15,5 +15,5 @@ public class PostAddressReq {
     private String detailAddress;
     private String aliasType;
     private String alias;
-    private int userIdx;
+    private Integer userIdx;
 }

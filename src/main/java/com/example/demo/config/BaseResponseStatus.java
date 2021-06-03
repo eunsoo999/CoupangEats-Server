@@ -44,6 +44,8 @@ public enum BaseResponseStatus {
     POST_USERS_LENGTH_EMAIL(false, 2026, "이메일 길이는 45자이하여야합니다."),
 
     // Address
+    ADDRESSES_LENGTH_ALIAS(false, 2046, "별칭은 50자 이하여야합니다."),
+    ADDRESSES_LENGTH_ROADADDRESS(false, 2047, "도로명주소는 80자 이하여야합니다."),
     ADDRESSES_LENGTH_DETAILADDRESS(false, 2048, "상세 주소는 50자 이하여야합니다."),
     ADDRESSES_LENGTH_ADDRESS(false, 2049, "주소는 50자 이하여야합니다."),
     ADDRESSES_EMPTY_ADDRESS(false, 2050, "주소를 입력해주세요."),

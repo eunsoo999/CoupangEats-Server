@@ -68,8 +68,9 @@ public class AddressController {
             return new BaseResponse<>(ADDRESSES_LENGTH_ADDRESS);
         } else if (postAddressReq.getRoadAddress() == null || postAddressReq.getRoadAddress().isEmpty()) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ROADADDRESS);
-        } else if (postAddressReq.getDetailAddress() != null &&
-                postAddressReq.getDetailAddress().length() > 50) {
+        } else if (postAddressReq.getRoadAddress().length() > 80) {
+            return new BaseResponse<>(ADDRESSES_LENGTH_ROADADDRESS);
+        } else if (postAddressReq.getDetailAddress().length() > 50) {
             return new BaseResponse<>(ADDRESSES_LENGTH_DETAILADDRESS);
         } else if (postAddressReq.getAliasType() == null) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ALIASTYPE);
@@ -77,6 +78,8 @@ public class AddressController {
                 || postAddressReq.getAliasType().equalsIgnoreCase("COMPANY")
                 || postAddressReq.getAliasType().equalsIgnoreCase("ETC"))) {
             return new BaseResponse<>(ADDRESSES_INVALID_ALIASTYPE);
+        } else if (postAddressReq.getUserIdx() == null) {
+            return new BaseResponse<>(POST_ORDERS_EMPTY_USERIDX);
         }
 
         try {
@@ -136,6 +139,18 @@ public class AddressController {
                 || patchAddressReq.getAliasType().equalsIgnoreCase("COMPANY")
                 || patchAddressReq.getAliasType().equalsIgnoreCase("ETC"))) {
             return new BaseResponse<>(ADDRESSES_INVALID_ALIASTYPE);
+        } else if (patchAddressReq.getAddress() == null || patchAddressReq.getAddress().isEmpty()) {
+            return new BaseResponse<>(ADDRESSES_EMPTY_ADDRESS);
+        } else if (patchAddressReq.getAddress().length() > 50) {
+            return new BaseResponse<>(ADDRESSES_LENGTH_ADDRESS);
+        } else if (patchAddressReq.getRoadAddress() == null || patchAddressReq.getRoadAddress().isEmpty()) {
+            return new BaseResponse<>(ADDRESSES_EMPTY_ROADADDRESS);
+        } else if (patchAddressReq.getRoadAddress().length() > 80) {
+            return new BaseResponse<>(ADDRESSES_LENGTH_ROADADDRESS);
+        } else if (patchAddressReq.getDetailAddress() != null && patchAddressReq.getDetailAddress().length() > 50) {
+            return new BaseResponse<>(ADDRESSES_LENGTH_DETAILADDRESS);
+        } else if (patchAddressReq.getAddress() != null && patchAddressReq.getAlias().length() > 50) {
+            return new BaseResponse<>(ADDRESSES_LENGTH_ALIAS);
         }
 
         try {
