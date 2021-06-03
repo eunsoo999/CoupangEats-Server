@@ -258,4 +258,22 @@ public class StoreController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 26. 매장 상세 정보 조회 API
+     * [GET] /stores/:storesIdx/detail
+     * @return BaseResponse<GetStoreDetailRes>
+     */
+    @ResponseBody
+    @GetMapping("/{storeIdx}/detail")
+    public BaseResponse<GetStoreDetailRes> getStoreDetail(@PathVariable int storeIdx) {
+        try {
+            GetStoreDetailRes getStoreRes = storeProvider.getStoreDetail(storeIdx);
+            return new BaseResponse<>(getStoreRes);
+        } catch (BaseException exception) {
+            logger.warn("#26. " + exception.getStatus().getMessage());
+            logger.warn(String.valueOf(storeIdx));
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

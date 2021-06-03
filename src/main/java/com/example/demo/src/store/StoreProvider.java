@@ -240,4 +240,16 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public GetStoreDetailRes getStoreDetail(int storeIdx) throws BaseException {
+        // 가게 존재 확인
+        if (storeDao.checkStore(storeIdx) == 0) {
+            throw new BaseException(STORES_NOT_FOUND);
+        }
+        try{
+            return storeDao.selectStoreDetail(storeIdx);
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

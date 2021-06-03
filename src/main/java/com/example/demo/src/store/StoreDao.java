@@ -427,4 +427,33 @@ public class StoreDao {
 
         return this.jdbcTemplate.queryForObject(selectCheetahStoreCountQuery, int.class, lat, lon, lat);
     }
+
+    public GetStoreDetailRes selectStoreDetail(int storeIdx) {
+        String selectStoreDetailQuery = "select storeName, " +
+                "case length(phone) when 9 then concat(left(phone,2), '-', mid(phone,3,3), '-', right(phone,4)) " +
+                "when 10 then " +
+                "case left(phone,2) " +
+                "when '02' then concat( left(phone,2), '-', mid(phone,3,4), '-', right(phone,4)) " +
+                "else concat( left(phone,3), '-', mid(phone,4,3), '-', right(phone,4)) " +
+                "end " +
+                "when 11 then concat( left(phone,3), '-', mid(phone,4,4), '-', right(phone,4)) " +
+                "when 12 then concat( left(phone,4), '-', mid(phone,4,4), '-', right(phone,4)) " +
+                "end phone, address, latitude, longitude, ceoName, businessNumber, companyName, businessHours, introduction, notice, countryOfOrigin " +
+                "from Store where idx = ? and status != 'N'";
+
+        return this.jdbcTemplate.queryForObject(selectStoreDetailQuery,
+                (rs,rowNum)-> new GetStoreDetailRes(
+                        rs.getString("latitude"),
+                        rs.getString("longitude"),
+                        rs.getString("storeName"),
+                        rs.getString("phone"),
+                        rs.getString("address"),
+                        rs.getString("ceoName"),
+                        rs.getString("businessNumber"),
+                        rs.getString("companyName"),
+                        rs.getString("businessHours"),
+                        rs.getString("introduction"),
+                        rs.getString("notice"),
+                        rs.getString("countryOfOrigin")), storeIdx);
+    }
 }
