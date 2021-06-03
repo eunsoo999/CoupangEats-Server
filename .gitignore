@@ -2,6 +2,7 @@
 
 secret
 application.yml
+firebase_service_key.json
 
 ### Java template
 # Compiled class file

@@ -56,6 +56,10 @@ dependencies {
     // JSON Simple
     compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
 
+    // FireBase FCM
+    compile group: 'com.google.firebase', name: 'firebase-admin', version: '7.1.0'
+    // okHttp
+    implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
 }
 
 test {
