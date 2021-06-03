@@ -252,4 +252,29 @@ public class StoreProvider {
             throw new BaseException(DATABASE_ERROR);
         }
     }
+
+    public GetSearchStoresRes getSearchStores(SearchOption searchOption) throws BaseException {
+        try {
+            GetSearchStoresRes getSearchStoresRes = new GetSearchStoresRes();
+
+            // 검색 후 조회된 가게 리스트
+            List<GetStoreMainBox> getStoreMainBoxList = storeDao.selectStoreMainBoxes(searchOption);
+            if (getStoreMainBoxList.isEmpty()) {
+                getSearchStoresRes.setSearchStores(null); // 검색된 가게 없다면 List null
+            } else {
+                for (GetStoreMainBox storeMainBox : getStoreMainBoxList) {
+                    int storeIdx = storeMainBox.getStoreIdx();
+                    List<String> getImageUrls = storeDao.selectStoreImageUrls(storeIdx);
+                    storeMainBox.setImageUrls(getImageUrls);
+                }
+                getSearchStoresRes.setSearchStores(getStoreMainBoxList);
+            }
+
+            // 주변맛집추천 가게 개수
+            getSearchStoresRes.setTotalCount(getStoreMainBoxList.size());
+            return getSearchStoresRes;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
 }

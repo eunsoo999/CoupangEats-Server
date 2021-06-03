@@ -99,6 +99,7 @@ public enum BaseResponseStatus {
     REVIEWS_INVALID_MENU_LIKED(false, 2098, "메뉴 평가는 GOOD, BAD만 가능합니다."),
     REVIEWS_LENGTH_MENU(false, 2099, "메뉴 평가 의견은 80자 이하 만 가능합니다."),
     REVIEWS_EMPTY_MENUIDX(false, 2100, "주문메뉴번호를 입력해주세요."),
+    STORES_EMPTY_KEYWORD(false, 2100, "검색할 키워드를 입력해주세요"),
 
     /**
      * 3000 : Response 오류

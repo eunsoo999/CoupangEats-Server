@@ -16,4 +16,5 @@ public class SearchOption {
     private Integer minOrderPrice;
     private String coupon;
     private String category;
+    private String keyword;
 }

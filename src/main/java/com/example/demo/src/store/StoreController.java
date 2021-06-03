@@ -57,7 +57,7 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null, null);
 
         try {
             GetMainRes mainStores = storeProvider.getMainStores(searchOption);
@@ -110,7 +110,7 @@ public class StoreController {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
 
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null, null);
 
         try {
             GetOnSaleStoresRes getOnSaleStoresList = storeProvider.getOnsaleStores(searchOption);
@@ -145,7 +145,7 @@ public class StoreController {
         } else if(coupon != null && !coupon.equalsIgnoreCase("Y")) {
             return new BaseResponse<>(STORES_INVALID_COUPON);
         }
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null, null);
         try {
             GetNewStoresRes getNewStoresRes = storeProvider.getNewStores(searchOption);
             return new BaseResponse<>(getNewStoresRes);
@@ -189,12 +189,50 @@ public class StoreController {
                 || category.equals("버거") || category.equals("멕시칸") || category.equals("도시락") || category.equals("죽") || category.equals("프랜차이즈"))) {
              return new BaseResponse<>(STORES_INVALID_CATEGORY);
         }
-        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, category);
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, category,null);
         try {
             GetStoresByCategoryRes mainStores = storeProvider.getStoreByCategory(searchOption);
             return new BaseResponse<>(mainStores);
         } catch (BaseException exception) {
             logger.warn("#21. " + exception.getStatus().getMessage());
+            logger.warn(searchOption.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 22. 주변 맛집 검색 API
+     * [GET] /stores/search?lat=&lon=&keyword=&cheetah=&coupon=&ordermin=&sort=&deliverymin=&cursor=&numOfRows=
+     * @return BaseResponse<GetSearchStoresRes>
+     */
+    @ResponseBody
+    @GetMapping("/search")
+    public BaseResponse<GetSearchStoresRes> getStoresByKeyword(@RequestParam String lat, @RequestParam String lon,
+                                                                    @RequestParam(required = false) String keyword,
+                                                                    @RequestParam(required = false) String sort, @RequestParam(required = false) String cheetah,
+                                                                    @RequestParam(required = false) Integer deliverymin, @RequestParam(required = false) Integer ordermin,
+                                                                    @RequestParam(required = false) String coupon) {
+        if(!isRegexLatitude(lat)) {
+            return new BaseResponse<>(STORES_EMPTY_LATITUDE);
+        } else if(!isRegexLongitude(lon)) {
+            return new BaseResponse<>(STORES_EMPTY_LONGITUDE);
+        } else if(sort != null && !(sort.equalsIgnoreCase("recomm") || sort.equalsIgnoreCase("orders")
+                || sort.equalsIgnoreCase("nearby") || sort.equalsIgnoreCase("rating") || sort.equalsIgnoreCase("new"))) {
+            return new BaseResponse<>(STORES_INVALID_SORT);
+        } else if(cheetah != null && !cheetah.equalsIgnoreCase("Y")) {
+            return new BaseResponse<>(STORES_INVALID_CHEETAG);
+        } else if(coupon != null && !coupon.equalsIgnoreCase("Y")) {
+            return new BaseResponse<>(STORES_INVALID_COUPON);
+        } else if(keyword == null || (keyword != null && keyword.isEmpty())) {
+            return new BaseResponse<>(STORES_EMPTY_KEYWORD);
+        }
+        SearchOption searchOption = new SearchOption(lat, lon, sort, cheetah, deliverymin, ordermin, coupon, null, keyword);
+
+        try {
+            GetSearchStoresRes mainStores = storeProvider.getSearchStores(searchOption);
+            return new BaseResponse<>(mainStores);
+        } catch (BaseException exception) {
+            logger.warn("#22. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }

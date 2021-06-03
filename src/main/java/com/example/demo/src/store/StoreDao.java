@@ -47,6 +47,13 @@ public class StoreDao {
 
         selectAddressListQuery += "where Store.status != 'N' ";
 
+        String keywordParam = "";
+        // 검색 키워드가 있는 경우, 키워드가 들어있는 가게 이름 조회
+        if (searchOption.getKeyword() != null) {
+            selectAddressListQuery += "and Store.storeName like ? ";
+            keywordParam += "%" + searchOption.getKeyword() + "%";
+        }
+
         // 카테고리 : 신규인 경우, 최근 2주안에 등록된 가게 목록 조회
         if (searchOption.getCategory() != null && searchOption.getCategory().equals("신규 맛집")) {
             selectAddressListQuery += "and TIMESTAMPDIFF(WEEK, Store.createdAt, CURRENT_TIMESTAMP()) <= 2 ";
@@ -92,10 +99,16 @@ public class StoreDao {
         }
 
         Object[] selectStoreMainBoxParams;
-        if (searchOption.getCategory() == null || searchOption.getCategory().equals("신규 맛집")) {
+        // 일반검색) 카테고리 검색, keyword 검색이 아닌 경우, 신규맛집인 경우에는 디폴트 쿼리
+        if ((searchOption.getCategory() == null && searchOption.getKeyword() == null) || (searchOption.getCategory() != null && searchOption.getCategory().equals("신규 맛집"))) {
             selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
                     searchOption.getLat(), searchOption.getLon(), searchOption.getLat()};
+        } else if(searchOption.getCategory() == null && searchOption.getKeyword() != null) {
+            // 키워드검색) keyword 검색 시 category 구분 없다.
+            selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
+                    searchOption.getLat(), searchOption.getLon(), searchOption.getLat(), keywordParam};
         } else {
+            // 카테고리검색)
             selectStoreMainBoxParams = new Object[]{searchOption.getLat(), searchOption.getLon(), searchOption.getLat(),
                     searchOption.getLat(), searchOption.getLon(), searchOption.getLat(), searchOption.getCategory()};
         }
