@@ -230,11 +230,6 @@ public class UserController {
         }
 
         try{
-            // 휴대폰 번호 중복 체크
-            if(userProvider.checkPhone(postUserPhoneReq.getPhone()) == 1) {
-                return new BaseResponse<>(DUPLICATED_PHONE);
-            }
-
             PhoneAuthInfo postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone()); // 문자 발송
             // 인증번호 세션 저장
             session.setMaxInactiveInterval(30*5); // 세션유지시간 = 5분

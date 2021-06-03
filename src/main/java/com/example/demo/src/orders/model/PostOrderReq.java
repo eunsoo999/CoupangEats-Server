@@ -20,7 +20,7 @@ public class PostOrderReq {
     private Integer discountPrice;
     private Integer totalPrice;
     private String storeRequests;
-    private String CheckEchoProduct;
+    private String checkEchoProduct;
     private String deliveryRequests;
     private String payType;
     private Integer userIdx;

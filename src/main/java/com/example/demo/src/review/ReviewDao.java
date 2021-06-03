@@ -20,9 +20,9 @@ public class ReviewDao {
     public List<GetPhotoReview> selectPhotoReviewsUptoThree(int storeIdx) {
         String selectPhotoReviewsQuery = "select Review.idx as 'reviewIdx', Review.contents, Review.rating, FirstReviewImage.imageUrl " +
                 "from Review inner join " +
-                "(select reviewIdx, min(idx), imageUrl from ReviewImage group by reviewIdx) as FirstReviewImage " +
+                "(select reviewIdx, min(idx), imageUrl, ReviewImage.status from ReviewImage group by reviewIdx) as FirstReviewImage " +
                 "on Review.idx = FirstReviewImage.reviewIdx " +
-                "where Review.storeIdx = ? and Review.status != 'N' and ReviewImage.status != 'N' " +
+                "where Review.storeIdx = ? and Review.status != 'N' and FirstReviewImage.status != 'N' " +
                 "order by Review.idx desc limit 3";
 
         return this.jdbcTemplate.query(selectPhotoReviewsQuery,
