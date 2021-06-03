@@ -26,13 +26,10 @@ public class StoreController {
     @Autowired
     private final StoreProvider storeProvider;
     @Autowired
-    private final StoreService storeService;
-    @Autowired
     private final JwtService jwtService;
 
-    public StoreController(StoreProvider storeProvider, StoreService storeService, JwtService jwtService) {
+    public StoreController(StoreProvider storeProvider, JwtService jwtService) {
         this.storeProvider = storeProvider;
-        this.storeService = storeService;
         this.jwtService = jwtService;
     }
 
