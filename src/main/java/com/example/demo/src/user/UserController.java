@@ -13,8 +13,6 @@ import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
-
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.utils.ValidationRegex.*;
 
@@ -221,7 +219,7 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/auth/phone")
-    public BaseResponse<PostUserPhoneRes> sendMessage(@RequestBody PostUserPhoneReq postUserPhoneReq, HttpSession session) {
+    public BaseResponse<PostUserPhoneRes> sendMessage(@RequestBody PostUserPhoneReq postUserPhoneReq) {
         if(postUserPhoneReq.getPhone() == null || postUserPhoneReq.getPhone().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
         }
@@ -232,38 +230,39 @@ public class UserController {
         try{
             PhoneAuthInfo postUserPhoneRes = smsAuthService.sendPhoneAuth(postUserPhoneReq.getPhone()); // 문자 발송
             // 인증번호 세션 저장
-            session.setMaxInactiveInterval(30*5); // 세션유지시간 = 5분
-            session.setAttribute(postUserPhoneRes.getPhone(), postUserPhoneRes.getAuthNumber()); // key-value 휴대폰번호-인증번호로 세션에 저장
-            return new BaseResponse<>(new PostUserPhoneRes(postUserPhoneRes.getPhone(), "5분 이내로 인증번호를 입력해주세요."));
+            //session.setMaxInactiveInterval(30*5); // 세션유지시간 = 5분
+            //session.setAttribute(postUserPhoneRes.getPhone(), postUserPhoneRes.getAuthNumber()); // key-value 휴대폰번호-인증번호로 세션에 저장
+            return new BaseResponse<>(new PostUserPhoneRes(postUserPhoneRes.getPhone(), postUserPhoneRes.getAuthNumber()));
         } catch(BaseException exception){
             logger.warn(exception.getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
-    /**
-     * 7. 휴대폰 인증번호 확인 API
-     * [GET] /users/auth/phone/confirm
-     * @return BaseResponse<GetUserRes>
-     */
-    @ResponseBody
-    @PostMapping("/auth/phone/confirm")
-    public BaseResponse<PostUserPhoneRes> checkAuthNumber(@RequestBody PostAuthNumberReq postAuthNumberReq, HttpSession session) {
-        if(postAuthNumberReq.getPhone() == null || postAuthNumberReq.getPhone().isEmpty()) {
-            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
-        } else if(!isRegexPhone(postAuthNumberReq.getPhone())) {
-            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
-        }else if(postAuthNumberReq.getAuthNumber() == null || postAuthNumberReq.getAuthNumber().isEmpty()) {
-            return new BaseResponse<>(AUTH_PHONE_EMPTY_NUMBER);
-        }
-        String sessionAuthNumber = (String) session.getAttribute(postAuthNumberReq.getPhone());
-        if (postAuthNumberReq.getAuthNumber().equals(sessionAuthNumber)) {
-            session.removeAttribute(postAuthNumberReq.getPhone()); // 인증번호가 맞다면 세션삭제
-            return new BaseResponse<>(new PostUserPhoneRes(postAuthNumberReq.getPhone(), "인증이 완료되었습니다."));
-        } else {
-            return new BaseResponse<>(WRONG_AUTH_NUMBER);
-        }
-    }
+//    /**
+//     * 7. 휴대폰 인증번호 확인 API
+//     * [GET] /users/auth/phone/confirm
+//     * @return BaseResponse<GetUserRes>
+//     */
+//    @ResponseBody
+//    @PostMapping("/auth/phone/confirm")
+//    public BaseResponse<PostUserPhoneRes> checkAuthNumber(@RequestBody PostAuthNumberReq postAuthNumberReq, HttpSession session) {
+//        if(postAuthNumberReq.getPhone() == null || postAuthNumberReq.getPhone().isEmpty()) {
+//            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
+//        } else if(!isRegexPhone(postAuthNumberReq.getPhone())) {
+//            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+//        }else if(postAuthNumberReq.getAuthNumber() == null || postAuthNumberReq.getAuthNumber().isEmpty()) {
+//            return new BaseResponse<>(AUTH_PHONE_EMPTY_NUMBER);
+//        }
+//        String sessionAuthNumber = (String) session.getAttribute(postAuthNumberReq.getPhone());
+//
+//        if (postAuthNumberReq.getAuthNumber().equals(sessionAuthNumber)) {
+//            session.removeAttribute(postAuthNumberReq.getPhone()); // 인증번호가 맞다면 세션삭제
+//            return new BaseResponse<>(new PostUserPhoneRes(postAuthNumberReq.getPhone(), "인증이 완료되었습니다."));
+//        } else {
+//            return new BaseResponse<>(WRONG_AUTH_NUMBER);
+//        }
+//    }
 
     /**
      * 8. 로그인 유저 정보 조회 API
