@@ -70,7 +70,7 @@ public class AddressController {
             return new BaseResponse<>(ADDRESSES_EMPTY_ROADADDRESS);
         } else if (postAddressReq.getRoadAddress().length() > 80) {
             return new BaseResponse<>(ADDRESSES_LENGTH_ROADADDRESS);
-        } else if (postAddressReq.getDetailAddress().length() > 50) {
+        } else if (postAddressReq.getDetailAddress() != null && postAddressReq.getDetailAddress().length() > 50) {
             return new BaseResponse<>(ADDRESSES_LENGTH_DETAILADDRESS);
         } else if (postAddressReq.getAliasType() == null) {
             return new BaseResponse<>(ADDRESSES_EMPTY_ALIASTYPE);
