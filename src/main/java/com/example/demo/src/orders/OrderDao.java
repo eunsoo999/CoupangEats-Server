@@ -1,13 +1,13 @@
 package com.example.demo.src.orders;
 
-import com.example.demo.src.orders.model.GetCartRes;
-import com.example.demo.src.orders.model.PostOrderMenus;
-import com.example.demo.src.orders.model.PostOrderReq;
+import com.example.demo.src.orders.model.*;
+import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 @Repository
 public class OrderDao {
@@ -89,5 +89,96 @@ public class OrderDao {
         String checkOrderByUserIdxQuery = "select exists(select idx from Orders " +
                 "where Orders.status != 'N' and Orders.idx = ? and Orders.userIdx = ?)";
         return this.jdbcTemplate.queryForObject(checkOrderByUserIdxQuery, int.class, orderIdx, userIdx);
+    }
+
+    public List<GetPastOrder> selectPastOrders(int userIdx) {
+        String selectPastOrdersQuery = "select Orders.idx as 'orderIdx', Store.idx as 'storeIdx', Store.storeName, " +
+                "FirstStoreImage.imageUrl, Orders.createdAt as 'orderDate', " +
+                "case Orders.status when 'FINISH' then '배달 완료' " +
+                "when 'CANCEL' then '주문취소됨' end 'status', " +
+                "FORMAT(Orders.orderPrice, 0) as 'orderPrice', " +
+                "FORMAT(Orders.deliveryPrice, 0) as 'deliveryPrice', " +
+                "FORMAT(Orders.discountPrice, 0) as 'discountPrice', " +
+                "FORMAT(Orders.totalPrice , 0) as 'totalPrice', " +
+                "Orders.payType, " +
+                "Review.idx as 'reviewIdx', Review.rating " +
+                "from Orders join Store on Orders.storeIdx = Store.idx " +
+                "join (select storeIdx, min(idx) as 'firstReviewImage', imageUrl from StoreImage group by storeIdx) as FirstStoreImage on Store.idx = FirstStoreImage.storeIdx " +
+                "left join Review on Review.orderIdx = Orders.idx " +
+                "where Orders.userIdx = ? and (Orders.status = 'CANCEL' or Orders.status = 'FINISH') " +
+                "order by Orders.createdAt desc";
+
+        return this.jdbcTemplate.query(selectPastOrdersQuery,
+                (rs,rowNum)-> new GetPastOrder(
+                        rs.getInt("orderIdx"),
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName"),
+                        rs.getString("imageUrl"),
+                        rs.getString("orderDate"),
+                        rs.getString("status"),
+                        rs.getString("orderPrice"),
+                        rs.getString("deliveryPrice"),
+                        rs.getString("discountPrice"),
+                        rs.getString("totalPrice"),
+                        rs.getString("payType"),
+                        rs.getObject("reviewIdx") != null ? rs.getInt("reviewIdx") : null,
+                        rs.getObject("rating") != null ? rs.getInt("rating") : null), userIdx);
+
+        // todo null
+    }
+
+    public List<GetPreparingOrder> selectPreparingOrders(int userIdx) {
+        String selectPreparingOrders = "select Orders.idx as 'orderIdx', " +
+                "Store.idx as 'storeIdx', " +
+                "Store.storeName, " +
+                "FirstStoreImage.imageUrl, " +
+                "Orders.createdAt as 'orderDate', " +
+                "case Orders.status when 'WAITING' then '준비중' " +
+                "when 'DELIVERING' then '배달중' end 'status', " +
+                "FORMAT(Orders.orderPrice, 0) as 'orderPrice', " +
+                "FORMAT(Orders.deliveryPrice, 0) as 'deliveryPrice', " +
+                "FORMAT(Orders.discountPrice, 0) as 'discountPrice', " +
+                "FORMAT(Orders.totalPrice , 0) as 'totalPrice', " +
+                "Orders.payType " +
+                "from Orders join Store on Orders.storeIdx = Store.idx " +
+                "join (select storeIdx, min(idx) as 'firstReviewImage', imageUrl from StoreImage group by storeIdx) as FirstStoreImage on Store.idx = FirstStoreImage.storeIdx " +
+                "where Orders.userIdx = ? and (Orders.status = 'WAITING' or Orders.status = 'DELIVERING') " +
+                "order by Orders.createdAt desc";
+
+        return this.jdbcTemplate.query(selectPreparingOrders,
+                (rs,rowNum)-> new GetPreparingOrder(
+                        rs.getInt("orderIdx"),
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName"),
+                        rs.getString("imageUrl"),
+                        rs.getString("orderDate"),
+                        rs.getString("status"),
+                        rs.getString("orderPrice"),
+                        rs.getString("deliveryPrice"),
+                        rs.getString("discountPrice"),
+                        rs.getString("totalPrice"),
+                        rs.getString("payType")), userIdx);
+    }
+
+    public List<GetOrderMenu> selectOrderMenus(int orderIdx) {
+        String selectOrderMenuQuery2 = "select OrderMenu.count, OrderMenu.menuName, OrderMenu.menuDetail, FORMAT(OrderMenu.totalPrice, 0) as 'menuPrice' " +
+                "from Orders join OrderMenu on Orders.idx = OrderMenu.orderIdx where Orders.idx = ?";
+
+        String selectOrderMenuQuery = "select OrderMenu.count, OrderMenu.menuName, OrderMenu.menuDetail, " +
+                "FORMAT(OrderMenu.totalPrice, 0) as 'menuPrice', MenuReviewInfo.menuLiked " +
+                "from OrderMenu left join " +
+                "(select Review.orderIdx, MenuReview.idx as menuReviewIdx, MenuReview.orderMenuIdx, MenuReview.reviewIdx, MenuReview.menuLiked " +
+                "from Review left join MenuReview on Review.idx = MenuReview.reviewIdx " +
+                "where  MenuReview.status != 'N' and Review.status != 'N') " +
+                "MenuReviewInfo on OrderMenu.idx = MenuReviewInfo.orderMenuIdx and MenuReviewInfo.orderIdx = OrderMenu.orderIdx " +
+                "where OrderMenu.orderIdx = ?";
+
+        return this.jdbcTemplate.query(selectOrderMenuQuery,
+                (rs,rowNum)-> new GetOrderMenu(
+                        rs.getInt("count"),
+                        rs.getString("menuName"),
+                        rs.getString("menuDetail"),
+                        rs.getString("menuPrice"),
+                        rs.getString("menuLiked")), orderIdx);
     }
 }

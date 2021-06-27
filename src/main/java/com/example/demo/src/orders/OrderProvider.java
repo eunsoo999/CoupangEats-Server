@@ -3,7 +3,8 @@ package com.example.demo.src.orders;
 import com.example.demo.config.BaseException;
 import com.example.demo.src.coupon.CouponDao;
 import com.example.demo.src.coupon.model.GetCartCoupon;
-import com.example.demo.src.orders.model.GetCartRes;
+import com.example.demo.src.orders.model.*;
+import com.example.demo.src.review.ReviewDao;
 import com.example.demo.src.store.StoreDao;
 import com.example.demo.src.store.model.GetStoreRes;
 import com.example.demo.src.user.UserDao;
@@ -12,6 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -23,13 +26,15 @@ public class OrderProvider {
     private StoreDao storeDao;
     private UserDao userDao;
     private CouponDao couponDao;
+    private ReviewDao reviewDao;
 
     @Autowired
-    public OrderProvider(OrderDao orderDao, StoreDao storeDao, UserDao userDao, CouponDao couponDao) {
+    public OrderProvider(OrderDao orderDao, StoreDao storeDao, UserDao userDao, CouponDao couponDao, ReviewDao reviewDao) {
         this.orderDao = orderDao;
         this.storeDao = storeDao;
         this.userDao = userDao;
         this.couponDao = couponDao;
+        this.reviewDao = reviewDao;
     }
 
     public GetCartRes getCart(int userIdx, int storeIdx) throws BaseException {
@@ -70,6 +75,48 @@ public class OrderProvider {
 
             getCartInfo.setCoupon(getCartCoupon);
             return getCartInfo;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public List<GetPastOrder> getUserPastOrders(int userIdx) throws BaseException {
+        // 유저 존재 확인
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND);
+        }
+        try {
+            // 과거 주문 내역 (+ 작성된 리뷰 정보 포함)
+            List<GetPastOrder> pastOrderList = orderDao.selectPastOrders(userIdx);
+
+            // 과거 주문 내역 - 메뉴목록
+            for (GetPastOrder pastOrders : pastOrderList) {
+                List<GetOrderMenu> orderMenuList = orderDao.selectOrderMenus(pastOrders.getOrderIdx());
+                pastOrders.setOrderMenus(orderMenuList);
+            }
+
+            return pastOrderList;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public List<GetPreparingOrder> getUserPreparingOrders(int userIdx) throws BaseException {
+        // 유저 존재 확인
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND);
+        }
+        try {
+            // 준비중 내역
+            List<GetPreparingOrder> GetPreparingOrderList = orderDao.selectPreparingOrders(userIdx);
+
+            // 준비중 내역 - 메뉴목록
+            for (GetPreparingOrder preparingOrder : GetPreparingOrderList) {
+                List<GetOrderMenu> orderMenuList = orderDao.selectOrderMenus(preparingOrder.getOrderIdx());
+                preparingOrder.setOrderMenus(orderMenuList);
+            }
+
+            return GetPreparingOrderList;
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }

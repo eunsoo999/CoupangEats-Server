@@ -2,15 +2,14 @@ package com.example.demo.src.orders;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
-import com.example.demo.src.orders.model.GetCartRes;
-import com.example.demo.src.orders.model.PostOrderMenus;
-import com.example.demo.src.orders.model.PostOrderReq;
-import com.example.demo.src.orders.model.PostOrderRes;
+import com.example.demo.src.orders.model.*;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.example.demo.config.BaseResponseStatus.*;
 
@@ -122,6 +121,52 @@ public class OrderController {
         } catch (BaseException exception) {
             logger.warn("#28 " + exception.getStatus().getMessage());
             logger.warn(postOrderReq.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 29-1. 과거 주문 내역 조회 API
+     * [GET] /users/:userIdx/orders/past
+     * @return BaseResponse<GetUserOrdersRes>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/orders/past")
+    public BaseResponse<List<GetPastOrder>> getUserPastOrders(@PathVariable int userIdx) {
+        try {
+            // 유저 JWT 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdxByJwt != userIdx) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetPastOrder> getPastOrders = orderProvider.getUserPastOrders(userIdx);
+            return new BaseResponse<>(getPastOrders);
+        } catch (BaseException exception) {
+            logger.warn("#29-1 " + exception.getStatus().getMessage());
+            logger.warn("(userIdx : " + userIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 29-2. 준비중 주문 내역 조회 API
+     * [GET] /users/:userIdx/orders/preparing
+     * @return BaseResponse<GetUserOrdersRes>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/orders/preparing")
+    public BaseResponse<List<GetPreparingOrder>> getUserPreparingOrders(@PathVariable int userIdx) {
+        try {
+            // 유저 JWT 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdxByJwt != userIdx) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            List<GetPreparingOrder> getPreparingOrders = orderProvider.getUserPreparingOrders(userIdx);
+            return new BaseResponse<>(getPreparingOrders);
+        } catch (BaseException exception) {
+            logger.warn("#29-2 " + exception.getStatus().getMessage());
+            logger.warn("(userIdx : " + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
