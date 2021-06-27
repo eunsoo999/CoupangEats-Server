@@ -16,7 +16,7 @@ public class BaseResponse<T> {
     private final Boolean isSuccess;
     private final String message;
     private final int code;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private T result;
 
     // 요청에 성공한 경우

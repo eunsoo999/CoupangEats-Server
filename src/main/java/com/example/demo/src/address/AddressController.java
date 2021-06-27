@@ -149,7 +149,7 @@ public class AddressController {
             return new BaseResponse<>(ADDRESSES_LENGTH_ROADADDRESS);
         } else if (patchAddressReq.getDetailAddress() != null && patchAddressReq.getDetailAddress().length() > 50) {
             return new BaseResponse<>(ADDRESSES_LENGTH_DETAILADDRESS);
-        } else if (patchAddressReq.getAddress() != null && patchAddressReq.getAlias().length() > 50) {
+        } else if (patchAddressReq.getAlias() != null && patchAddressReq.getAlias().length() > 50) {
             return new BaseResponse<>(ADDRESSES_LENGTH_ALIAS);
         }
 
@@ -162,7 +162,7 @@ public class AddressController {
             int updatedCount = addressService.updateAddress(patchAddressReq, addressIdx, userIdx);
             return new BaseResponse<>(new PatchAddressRes(updatedCount));
         } catch (BaseException exception) {
-            logger.warn("#12. " +exception.getStatus().getMessage());
+            logger.warn("#12. " + exception.getStatus().getMessage());
             logger.warn(patchAddressReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }

@@ -9,7 +9,7 @@ import lombok.Getter;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetStoreDetailRes {
     private String latitude;
-    private String longtitude;
+    private String longitude;
     private String storeName;
     private String phone;
     private String address;

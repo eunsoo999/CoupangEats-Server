@@ -131,7 +131,7 @@ public class CouponDao {
         String query = "select case UserCoupon.redeemStatus when 'AUTO' then '쿠폰 자동적용' " +
                 "when 'SELECTED' then '쿠폰 적용' " +
                 "when 'NONE' then '쿠폰 적용가능' end as 'redeemStatus', " +
-                "if(UserCoupon.redeemStatus = 'NONE', null, UserCoupon.couponIdx) as 'couponIdx', " +
+                "if(UserCoupon.redeemStatus = 'NONE', null, UserCoupon.idx) as 'couponIdx', " +
                 "if(UserCoupon.redeemStatus = 'NONE', 0, Coupon.discountPrice) as 'discountPrice' " +
                 "from UserCoupon inner join Coupon on UserCoupon.couponIdx = Coupon.idx " +
                 "where UserCoupon.status != 'N' and userIdx = ? and (Coupon.storeIdx = ? or Coupon.storeIdx = 0) " +
