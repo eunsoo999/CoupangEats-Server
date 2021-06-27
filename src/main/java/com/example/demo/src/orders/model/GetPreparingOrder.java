@@ -19,7 +19,7 @@ public class GetPreparingOrder {
     private String imageUrl;
     private String orderDate;
     private String status;
-    private List<GetOrderMenu> orderMenus = new ArrayList<>();
+    private List<GetOrderMenuReview> orderMenus = new ArrayList<>();
     private String orderPrice;
     private String deliveryPrice;
     private String discountPrice;

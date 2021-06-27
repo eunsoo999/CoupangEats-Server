@@ -1,7 +1,6 @@
 package com.example.demo.src.orders;
 
 import com.example.demo.src.orders.model.*;
-import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -160,10 +159,7 @@ public class OrderDao {
                         rs.getString("payType")), userIdx);
     }
 
-    public List<GetOrderMenu> selectOrderMenus(int orderIdx) {
-        String selectOrderMenuQuery2 = "select OrderMenu.count, OrderMenu.menuName, OrderMenu.menuDetail, FORMAT(OrderMenu.totalPrice, 0) as 'menuPrice' " +
-                "from Orders join OrderMenu on Orders.idx = OrderMenu.orderIdx where Orders.idx = ?";
-
+    public List<GetOrderMenuReview> selectOrderMenus(int orderIdx) {
         String selectOrderMenuQuery = "select OrderMenu.count, OrderMenu.menuName, OrderMenu.menuDetail, " +
                 "FORMAT(OrderMenu.totalPrice, 0) as 'menuPrice', MenuReviewInfo.menuLiked " +
                 "from OrderMenu left join " +
@@ -174,11 +170,33 @@ public class OrderDao {
                 "where OrderMenu.orderIdx = ?";
 
         return this.jdbcTemplate.query(selectOrderMenuQuery,
-                (rs,rowNum)-> new GetOrderMenu(
+                (rs,rowNum)-> new GetOrderMenuReview(
                         rs.getInt("count"),
                         rs.getString("menuName"),
                         rs.getString("menuDetail"),
                         rs.getString("menuPrice"),
                         rs.getString("menuLiked")), orderIdx);
+    }
+
+    public GetOrderRes selectOrderDetail(int orderIdx) {
+        String query = "select Store.idx as 'storeIdx', Store.storeName " +
+                "from Orders join Store on Orders.storeIdx = Store.idx " +
+                "where Orders.idx = ?";
+
+        return this.jdbcTemplate.queryForObject(query,
+                (rs,rowNum)-> new GetOrderRes(
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName")), orderIdx);
+
+    }
+
+    public List<GetOrderMenuRes> selectOrderMenusIdxAndNameAndDetail(int orderIdx) {
+        String query = "select idx, menuName, menuDetail from OrderMenu where OrderMenu.orderIdx = ?";
+
+        return this.jdbcTemplate.query(query,
+                (rs,rowNum)-> new GetOrderMenuRes(
+                        rs.getInt("idx"),
+                        rs.getString("menuName"),
+                        rs.getString("menuDetail")), orderIdx);
     }
 }

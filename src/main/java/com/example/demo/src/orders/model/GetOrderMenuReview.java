@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GetOrderMenu {
+public class GetOrderMenuReview {
     private int count;
     private String menuName;
     private String menuDetail;

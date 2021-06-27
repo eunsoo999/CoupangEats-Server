@@ -170,4 +170,28 @@ public class OrderController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+    /**
+     * 53. 주문 상세 조회 API (리뷰 작성 화면)
+     * [GET] /users/:userIdx/orders/orderIdx
+     * @return BaseResponse<GetOrderRes>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/orders/{orderIdx}")
+    public BaseResponse<GetOrderRes> getOrderDetail(@PathVariable int userIdx, @PathVariable int orderIdx) {
+        try {
+            // 유저 JWT 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdxByJwt != userIdx) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetOrderRes getOrderRes = orderProvider.getOrderDetail(userIdx, orderIdx);
+            return new BaseResponse<>(getOrderRes);
+        } catch (BaseException exception) {
+            logger.warn("#53 " + exception.getStatus().getMessage());
+            logger.warn("(userIdx : " + userIdx + ", " + orderIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 }

@@ -91,7 +91,7 @@ public class OrderProvider {
 
             // 과거 주문 내역 - 메뉴목록
             for (GetPastOrder pastOrders : pastOrderList) {
-                List<GetOrderMenu> orderMenuList = orderDao.selectOrderMenus(pastOrders.getOrderIdx());
+                List<GetOrderMenuReview> orderMenuList = orderDao.selectOrderMenus(pastOrders.getOrderIdx());
                 pastOrders.setOrderMenus(orderMenuList);
             }
 
@@ -112,11 +112,34 @@ public class OrderProvider {
 
             // 준비중 내역 - 메뉴목록
             for (GetPreparingOrder preparingOrder : GetPreparingOrderList) {
-                List<GetOrderMenu> orderMenuList = orderDao.selectOrderMenus(preparingOrder.getOrderIdx());
+                List<GetOrderMenuReview> orderMenuList = orderDao.selectOrderMenus(preparingOrder.getOrderIdx());
                 preparingOrder.setOrderMenus(orderMenuList);
             }
 
             return GetPreparingOrderList;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public GetOrderRes getOrderDetail(int userIdx, int orderIdx) throws BaseException {
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND); // 유저 존재 검증
+        } else if (orderDao.checkOrderIdx(orderIdx) == 0) {
+            throw new BaseException(ORDERS_NOT_FOUND); // 주문 존재 검증
+        } else if (orderDao.checkOrderByUserIdx(orderIdx, userIdx) == 0) {
+            throw new BaseException(ORDER_NOT_ORDERER); // 유저가 주문한 주문번호가 맞는지 검증
+        }
+
+        try {
+            // 주문한 가게번호, 가게이름
+            GetOrderRes getOrderRes = orderDao.selectOrderDetail(orderIdx);
+
+            // 주문한 메뉴 목록
+            List<GetOrderMenuRes> orderMenus = orderDao.selectOrderMenusIdxAndNameAndDetail(orderIdx);
+            getOrderRes.setOrderMenus(orderMenus);
+
+            return getOrderRes;
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }
