@@ -187,11 +187,11 @@ public class ReviewDao {
     }
 
     public int insertReview(PostReviewReq postReviewReq) {
-        String insertReviewQuery = "INSERT INTO Review (contents, rating, userIdx, orderIdx, "
-                                    + "storeIdx, deliveryLiked, deliveryComment) "
-                                    + "VALUES (?,?,?,?,?,?,?)";
-        Object[] params = new Object[]{postReviewReq.getContents(), postReviewReq.getRating(), postReviewReq.getUserIdx(),
-                                        postReviewReq.getOrderIdx(), postReviewReq.getStoreIdx(), postReviewReq.getDeliveryLiked(), postReviewReq.getDeliveryComment()};
+        String insertReviewQuery = "INSERT INTO Review (contents, rating, storeBadReason, userIdx, orderIdx, "
+                                    + "storeIdx, deliveryLiked, deliveryBadReason, deliveryComment) "
+                                    + "VALUES (?,?,?,?,?,?,?,?,?)";
+        Object[] params = new Object[]{postReviewReq.getContents(), postReviewReq.getRating(), postReviewReq.getBadReason(), postReviewReq.getUserIdx(),
+                                        postReviewReq.getOrderIdx(), postReviewReq.getStoreIdx(), postReviewReq.getDeliveryReview().getDeliveryLiked(), postReviewReq.getDeliveryReview().getDeliveryBadReason(), postReviewReq.getDeliveryReview().getDeliveryComment()};
         this.jdbcTemplate.update(insertReviewQuery, params);
 
         String lastInserIdQuery = "select last_insert_id()";
@@ -204,9 +204,9 @@ public class ReviewDao {
     }
 
     public void insertMenuReview(int reviewIdx, PostMenuReviewReq menuReview) {
-        String insertMenuReviewQuery = "INSERT INTO MenuReview (OrderMenuIdx, reviewIdx, menuLiked, comment) " +
-                                        "VALUES (?, ?, ?, ?)";
-        Object[] params = new Object[]{menuReview.getOrderMenuIdx(), reviewIdx, menuReview.getMenuLiked(), menuReview.getMenuComment()};
+        String insertMenuReviewQuery = "INSERT INTO MenuReview (OrderMenuIdx, reviewIdx, menuLiked, menuBadReason, comment) " +
+                                        "VALUES (?, ?, ?, ?, ?)";
+        Object[] params = new Object[]{menuReview.getOrderMenuIdx(), reviewIdx, menuReview.getMenuLiked(), menuReview.getBadReason(), menuReview.getMenuComment()};
 
         this.jdbcTemplate.update(insertMenuReviewQuery, params);
     }

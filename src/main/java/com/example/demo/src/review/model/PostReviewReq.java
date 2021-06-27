@@ -1,8 +1,6 @@
 package com.example.demo.src.review.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,10 +12,10 @@ public class PostReviewReq {
     private Integer orderIdx;
     private Integer storeIdx;
     private Integer rating;
+    private String badReason;
     private String contents;
     private List<String> images = new ArrayList<>();
     private List<PostMenuReviewReq> menuReviews = new ArrayList<>();
-    private String deliveryLiked;
-    private String deliveryComment;
+    private PostDeliveryReviewReq deliveryReview;
     private Integer userIdx;
 }

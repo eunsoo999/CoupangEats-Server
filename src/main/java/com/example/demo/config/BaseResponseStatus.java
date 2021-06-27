@@ -109,6 +109,8 @@ public enum BaseResponseStatus {
     BOOKMARKS_EMPTY_STOREIDX(false, 2104, "즐겨찾기에서 삭제할 가게번호를 입력해주세요."),
     REVIEWLIKES_EMPTY_REVIEWIDX(false, 2105, "리뷰번호를 입력해주세요."),
 
+    REVIEWS_LENGTH_BADREASON(false, 2106, "낮은 평가 이유는 300자 이하만 가능합니다."),
+
     /**
      * 3000 : Response 오류
      */

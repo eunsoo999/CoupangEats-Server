@@ -87,19 +87,23 @@ public class ReviewController {
             return new BaseResponse<>(STOREIDX_EMPTY);
         } else if(postReviewReq.getRating() == null) {
             return new BaseResponse<>(REVIEWS_EMPTY_RATING);
-        } else if(postReviewReq.getRating() != null && !(postReviewReq.getRating() == 1 || postReviewReq.getRating() == 2 ||
+        }  else if(postReviewReq.getRating() != null && !(postReviewReq.getRating() == 1 || postReviewReq.getRating() == 2 ||
                 postReviewReq.getRating() == 3 || postReviewReq.getRating() == 4 || postReviewReq.getRating() == 5 )) {
             return new BaseResponse<>(REVIEWS_INVALID_RATING);
+        } else if(postReviewReq.getBadReason() != null && postReviewReq.getBadReason().length() > 300) {
+            return new BaseResponse<>(REVIEWS_LENGTH_BADREASON);
         } else if(postReviewReq.getContents() == null || postReviewReq.getContents().isEmpty()) {
             return new BaseResponse<>(REVIEWS_EMPTY_CONTENTS);
         } else if(postReviewReq.getContents() != null && postReviewReq.getContents().length() > 300) {
             return new BaseResponse<>(REVIEWS_LENGTH_CONTENTS);
-        } else if(postReviewReq.getDeliveryLiked() != null
-                && !(postReviewReq.getDeliveryLiked().equalsIgnoreCase("GOOD")
-                || postReviewReq.getDeliveryLiked().equalsIgnoreCase("BAD"))) {
+        } else if(postReviewReq.getDeliveryReview().getDeliveryLiked() != null
+                && !(postReviewReq.getDeliveryReview().getDeliveryLiked().equalsIgnoreCase("GOOD")
+                || postReviewReq.getDeliveryReview().getDeliveryLiked().equalsIgnoreCase("BAD"))) {
             return new BaseResponse<>(REVIEWS_INVALID_DELIVERY_LIKED);
-        }  else if(postReviewReq.getDeliveryComment() != null && postReviewReq.getDeliveryComment().length() > 80) {
+        }  else if(postReviewReq.getDeliveryReview().getDeliveryComment() != null && postReviewReq.getDeliveryReview().getDeliveryComment().length() > 80) {
             return new BaseResponse<>(REVIEWS_LENGTH_DELIVERY);
+        } else if(postReviewReq.getDeliveryReview().getDeliveryBadReason() != null && postReviewReq.getDeliveryReview().getDeliveryBadReason().length() > 300) {
+            return new BaseResponse<>(REVIEWS_LENGTH_BADREASON);
         } else if(postReviewReq.getUserIdx() == null) {
             return new BaseResponse<>(REVIEWS_EMPTY_USERIDX);
         }
@@ -121,6 +125,9 @@ public class ReviewController {
                 if(menuReview.getMenuLiked() != null && !(menuReview.getMenuLiked().equalsIgnoreCase("GOOD")
                                                                 || menuReview.getMenuLiked().equalsIgnoreCase("BAD"))) {
                     return new BaseResponse<>(REVIEWS_INVALID_MENU_LIKED);
+                }
+                if(menuReview.getBadReason() != null && menuReview.getBadReason().length() > 300) {
+                    return new BaseResponse<>(REVIEWS_LENGTH_BADREASON);
                 }
             }
         }

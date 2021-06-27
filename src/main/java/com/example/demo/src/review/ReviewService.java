@@ -29,7 +29,6 @@ public class ReviewService {
         this.storeDao = storeDao;
     }
 
-
     public int updateStatusReview(int userIdx, int reviewIdx) throws BaseException {
         if (userDao.checkUserIdx(userIdx) == 0) {
             throw new BaseException(USERS_NOT_FOUND); // 유저 존재 검증

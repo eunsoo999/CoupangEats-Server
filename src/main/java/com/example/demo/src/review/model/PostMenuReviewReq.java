@@ -8,5 +8,6 @@ import lombok.Getter;
 public class PostMenuReviewReq {
     private Integer orderMenuIdx;
     private String menuLiked;
+    private String badReason;
     private String menuComment;
 }
