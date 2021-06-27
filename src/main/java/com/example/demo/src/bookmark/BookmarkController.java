@@ -3,6 +3,7 @@ package com.example.demo.src.bookmark;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
 import com.example.demo.src.bookmark.model.GetBookmarkRes;
+import com.example.demo.src.bookmark.model.PatchBookmarksStatusReq;
 import com.example.demo.src.bookmark.model.PostBookmarkReq;
 import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
@@ -71,7 +72,7 @@ public class BookmarkController {
      */
     @ResponseBody
     @PostMapping("/bookmarks")
-    public BaseResponse<Map> createBookmarks(@RequestBody PostBookmarkReq postBookmarkReq) {
+    public BaseResponse<Map> postBookmarks(@RequestBody PostBookmarkReq postBookmarkReq) {
         if (postBookmarkReq.getUserIdx() == null) {
             return new BaseResponse<>(USERS_EMPTY_USER_ID); // 유저번호 입력값 검증
         } else if (postBookmarkReq.getStoreIdx() == null) {
@@ -92,6 +93,36 @@ public class BookmarkController {
         } catch (BaseException exception) {
             logger.warn("#49. " + exception.getStatus().getMessage());
             logger.warn(postBookmarkReq.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 50. 가게 즐겨찾기 삭제 API
+     * [POST] /users/:userIdx/bookmarks/status
+     * @return BaseResponse<Map>
+     */
+    @ResponseBody
+    @PatchMapping("/users/{userIdx}/bookmarks/status")
+    public BaseResponse<Map> patchBookmarksStatus(@RequestBody PatchBookmarksStatusReq patchBookmarksStatusReq, @PathVariable Integer userIdx) {
+        if (userIdx == null) {
+            return new BaseResponse<>(USERS_EMPTY_USER_ID); // 유저번호 입력값 검증
+        } else if (patchBookmarksStatusReq.getStoreIdxList().isEmpty()) {
+            return new BaseResponse<>(BOOKMARKS_EMPTY_STOREIDX); // 가게번호 입력값 검증
+        }
+
+        try {
+            //jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if(userIdx != userIdxByJwt){
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            Map<String, Integer> result = new HashMap<>();
+            bookmarkService.updateBookmarksStatus(patchBookmarksStatusReq, userIdx);
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            logger.warn("#50. " + exception.getStatus().getMessage());
+            logger.warn("userIdx : " + userIdx + ",  " + patchBookmarksStatusReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }

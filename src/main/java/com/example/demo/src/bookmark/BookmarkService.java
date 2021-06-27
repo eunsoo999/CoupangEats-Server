@@ -4,6 +4,7 @@ import com.example.demo.config.BaseException;
 import com.example.demo.src.address.AddressDao;
 import com.example.demo.src.address.AddressProvider;
 import com.example.demo.src.bookmark.model.GetBookmarkRes;
+import com.example.demo.src.bookmark.model.PatchBookmarksStatusReq;
 import com.example.demo.src.bookmark.model.PostBookmarkReq;
 import com.example.demo.src.store.StoreDao;
 import com.example.demo.src.user.UserDao;
@@ -44,6 +45,25 @@ public class BookmarkService {
         try {
             int createdIdx = bookmarkDao.insertBookmark(postBookmarkReq);
             return createdIdx;
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public void updateBookmarksStatus(PatchBookmarksStatusReq patchBookmarksStatusReq, int userIdx) throws BaseException {
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND);// 유저 존재 확인
+        }
+        for (int storeIdx : patchBookmarksStatusReq.getStoreIdxList()) {
+            if (bookmarkDao.checkStoreInBookmarks(userIdx, storeIdx) == 0) {
+                throw new BaseException(BOOKMARKS_NOT_FOUND_STORE); // 즐겨찾기 목록에 있는 가게인지 검증
+            }
+        }
+
+        try {
+            for (int storeIdx : patchBookmarksStatusReq.getStoreIdxList()) {
+                bookmarkDao.updateBookmarkStatus(userIdx, storeIdx);
+            }
         } catch (Exception exception) {
             throw new BaseException(DATABASE_ERROR);
         }

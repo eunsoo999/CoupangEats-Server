@@ -67,4 +67,9 @@ public class BookmarkDao {
         String query = "select exists(select 1 from Bookmark where status = 'Y' and userIdx = ? and storeIdx = ?)";
         return this.jdbcTemplate.queryForObject(query, int.class, userIdx, storeIdx);
     }
+
+    public int updateBookmarkStatus(int userIdx, int storeIdx) {
+        String query = "update Bookmark set status = 'N' where userIdx = ? and storeIdx = ? and status = 'Y'";
+        return this.jdbcTemplate.update(query, userIdx, storeIdx);
+    }
 }

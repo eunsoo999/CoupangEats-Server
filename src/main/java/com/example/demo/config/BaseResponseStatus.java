@@ -106,8 +106,8 @@ public enum BaseResponseStatus {
     // Bookmark
     BOOKMARKS_EMPTY_SORT(false, 2102, "즐겨찾기 정렬값을 입력해주세요."),
     BOOKMARKS_INVALID_SORT(false, 2103, "잘못된 즐겨찾기 정렬값입니다."),
-
-    REVIEWLIKES_EMPTY_REVIEWIDX(false, 2104, "리뷰번호를 입력해주세요."),
+    BOOKMARKS_EMPTY_STOREIDX(false, 2104, "즐겨찾기에서 삭제할 가게번호를 입력해주세요."),
+    REVIEWLIKES_EMPTY_REVIEWIDX(false, 2105, "리뷰번호를 입력해주세요."),
 
     /**
      * 3000 : Response 오류
@@ -161,6 +161,7 @@ public enum BaseResponseStatus {
     REVIEW_LIKES_NOT_FOUND(false, 3073, "해당 리뷰의 도움 여부 체크 상태가 아닙니다."),
 
     BOOKMARKS_DUPLICATED_STORE(false, 3074, "이미 즐겨찾기에 해당 가게가 존재합니다."),
+    BOOKMARKS_NOT_FOUND_STORE(false, 3075, "즐겨찾기에 존재하지 않는 가게입니다."),
 
     /**
      * 4000 : Database, Server 오류
