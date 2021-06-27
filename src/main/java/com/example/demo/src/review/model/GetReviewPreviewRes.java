@@ -4,38 +4,39 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_EMPTY;
+import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
+@ToString
 @JsonInclude(NON_EMPTY)
-public class GetReview {
+public class GetReviewPreviewRes {
     private int reviewIdx;
-    private String c;
-    private String writerName;
+    private int storeIdx;
+    private String storeName;
     private int rating;
     private String writingTimeStamp;
-    private List<String> imageUrls = new ArrayList<>();
     private String contents;
     private String orderMenus;
+    private List<String> reviewImageUrls = new ArrayList<>();
     private int likeCount;
-    private String isLiked; // 도움이돼요 : Y, 도움안돼요 : N, null
-    private String isWriter;
+    private int remainingReviewTime;
 
-    public GetReview(int reviewIdx, String writerName, int rating, String writingTimeStamp, String contents, String orderMenus, int likeCount, String isLiked, String isWriter) {
+    public GetReviewPreviewRes(int reviewIdx, int storeIdx, String storeName, int rating, String writingTimeStamp, String contents, String orderMenus, int likeCount, int remainingReviewTime) {
         this.reviewIdx = reviewIdx;
-        this.writerName = writerName;
+        this.storeIdx = storeIdx;
+        this.storeName = storeName;
         this.rating = rating;
         this.writingTimeStamp = writingTimeStamp;
         this.contents = contents;
         this.orderMenus = orderMenus;
         this.likeCount = likeCount;
-        this.isLiked = isLiked;
-        this.isWriter = isWriter;
+        this.remainingReviewTime = remainingReviewTime;
     }
 }

@@ -1,6 +1,7 @@
 package com.example.demo.src.review;
 
 import com.example.demo.src.review.model.*;
+import org.apache.catalina.Store;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -73,9 +74,10 @@ public class ReviewDao {
             selectStoreReviewsQuery += ", null as 'isLiked' "; // 비로그인
         }
 
-        selectStoreReviewsQuery += "from (select ReviewTable.reviewIdx, userName, rating, contents, orderMenus, ReviewTable.createdAt, " +
+        selectStoreReviewsQuery += ", if(writerIdx = ?, 'Y', 'N') as isWriter " +
+                "from (select ReviewTable.reviewIdx, userName, writerIdx, rating, contents, orderMenus, ReviewTable.createdAt, " +
                 "count(case when ReviewLike.likeFlag = 'Y' then 1 end) as likeCount " +
-                "from (select Review.idx as 'reviewIdx', User.userName, truncate(avg(Review.rating), 1) as 'rating' ,Review.contents, group_concat(distinct OrderMenu.menuName separator '·') as 'orderMenus', Review.createdAt " +
+                "from (select Review.idx as 'reviewIdx', User.userName, User.idx as writerIdx, truncate(avg(Review.rating), 1) as 'rating' ,Review.contents, group_concat(distinct OrderMenu.menuName separator '·') as 'orderMenus', Review.createdAt " +
                 "from Review inner join User on Review.userIdx = User.idx inner join Orders on Review.orderIdx = Orders.idx join OrderMenu on OrderMenu.orderIdx = Orders.idx " +
                 "where Review.status != 'N' and User.status != 'N' and Orders.status != 'N' and OrderMenu.status != 'N' and Review.storeIdx = ? ";
 
@@ -102,7 +104,7 @@ public class ReviewDao {
         if (userIdx == null) {
             params = new Object[] {storeIdx}; // 비로그인 유저
         } else {
-            params = new Object[] {userIdx, userIdx, storeIdx}; // 로그인 유저
+            params = new Object[] {userIdx, userIdx, userIdx, storeIdx}; // 로그인 유저
         }
 
         return this.jdbcTemplate.query(selectStoreReviewsQuery,
@@ -114,7 +116,8 @@ public class ReviewDao {
                         rs.getString("contents"),
                         rs.getString("orderMenus"),
                         rs.getInt("likeCount"),
-                        rs.getString("isLiked")), params);
+                        rs.getString("isLiked"),
+                        rs.getString("isWriter")), params);
     }
 
     public List<String> selectReviewImages(int reviewIdx) {
@@ -213,5 +216,44 @@ public class ReviewDao {
                 "where Review.status != 'N' and Review.orderIdx = ?)";
 
         return this.jdbcTemplate.queryForObject(checkReviewByOrderIdxQuery, int.class, orderIdx);
+    }
+
+    public GetReviewPreviewRes selectReviewPreview(int reviewIdx) {
+        String selectReviewPreview = "select Review.idx as reviewIdx, Review.storeIdx, Store.storeName, Review.rating, " +
+                "CASE WHEN timestampdiff(SECOND, Review.updatedAt, current_timestamp) < 60 " +
+                "THEN concat(TIMESTAMPDIFF(SECOND, Review.updatedAt, CURRENT_TIMESTAMP()), '초 전') " +
+                "WHEN timestampdiff(MINUTE, Review.updatedAt, current_timestamp) < 60 " +
+                "THEN concat(timestampdiff(MINUTE, Review.updatedAt, current_timestamp), '분 전') " +
+                "WHEN timestampdiff(HOUR, Review.updatedAt, current_timestamp) < 24 " +
+                "THEN concat(timestampdiff(HOUR, Review.updatedAt, current_timestamp), '시간 전') " +
+                "WHEN timestampdiff(DAY, Review.updatedAt, current_timestamp) = 0 " +
+                "THEN '오늘' " +
+                "WHEN timestampdiff(DAY, Review.updatedAt, current_timestamp) < 7 " +
+                "THEN concat(timestampdiff(DAY, Review.updatedAt, current_timestamp), '일 전') " +
+                "WHEN timestampdiff(WEEK, Review.updatedAt, current_timestamp) <= 1 " +
+                "THEN '지난 주' " +
+                "WHEN timestampdiff(MONTH , Review.updatedAt, current_timestamp) <= 1 " +
+                "THEN '지난 달' " +
+                "ELSE date_format(Review.updatedAt, '%Y-%m-%d') " +
+                "END AS writingTimeStamp, " +
+                "Review.contents, " +
+                "(select group_concat(distinct OrderMenu.menuName separator '·') from OrderMenu where OrderMenu.orderIdx = Orders.idx) as 'orderMenus', " +
+                "count(case when ReviewLike.likeFlag = 'Y' then 1 end) as likeCount, " +
+                "if(timestampdiff(DAY, current_timestamp, date_add(Orders.createdAt, INTERVAL 3 DAY)) > 0, timestampdiff(DAY, current_timestamp, date_add(Orders.createdAt, INTERVAL 3 DAY)), 0) as remainingReviewTime " +
+                "from Review join Store on Review.storeIdx = Store.idx left join ReviewLike on Review.idx = ReviewLike.reviewIdx join Orders on Review.orderIdx = Orders.idx " +
+                "where Review.idx = ? and ReviewLike.status != 'N'";
+
+        return this.jdbcTemplate.queryForObject(selectReviewPreview,
+                (rs,rowNum) -> new GetReviewPreviewRes(
+                        rs.getInt("reviewIdx"),
+                        rs.getInt("storeIdx"),
+                        rs.getString("storeName"),
+                        rs.getInt("rating"),
+                        rs.getString("writingTimeStamp"),
+                        rs.getString("contents"),
+                        rs.getString("orderMenus"),
+                        rs.getInt("likeCount"),
+                        rs.getInt("remainingReviewTime")), reviewIdx);
+
     }
 }

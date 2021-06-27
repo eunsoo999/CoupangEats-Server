@@ -84,7 +84,7 @@ public class ReviewController {
         if(postReviewReq.getOrderIdx() == null) {
             return new BaseResponse<>(REVIEWS_EMPTY_ORDERIDX);
         } else if(postReviewReq.getStoreIdx() == null) {
-            return new BaseResponse<>(REVIEWS_EMPTY_STOREIDX);
+            return new BaseResponse<>(STOREIDX_EMPTY);
         } else if(postReviewReq.getRating() == null) {
             return new BaseResponse<>(REVIEWS_EMPTY_RATING);
         } else if(postReviewReq.getRating() != null && !(postReviewReq.getRating() == 1 || postReviewReq.getRating() == 2 ||
@@ -174,7 +174,7 @@ public class ReviewController {
      */
     @ResponseBody
     @GetMapping("/users/{userIdx}/reviews/{reviewIdx}")
-    public BaseResponse<GetReviewRes> GetReview(@PathVariable int userIdx, @PathVariable int reviewIdx) {
+    public BaseResponse<GetReviewRes> getReview(@PathVariable int userIdx, @PathVariable int reviewIdx) {
         try {
             // jwt 확인
             int userIdxByJwt = jwtService.getUserIdx();
@@ -185,6 +185,29 @@ public class ReviewController {
             return new BaseResponse<>(getReviewRes);
         } catch (BaseException exception) {
             logger.warn("#40. " +exception.getStatus().getMessage());
+            logger.warn("(" + userIdx + ", " + reviewIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 41. 내가 작성한 리뷰 조회 API
+     * [GET] /users/:userIdx/reviews/:reviewIdx/preview
+     * @return BaseResponse<GetReviewPreviewRes>
+     */
+    @ResponseBody
+    @GetMapping("/users/{userIdx}/reviews/{reviewIdx}/preview")
+    public BaseResponse<GetReviewPreviewRes> getReviewPreview(@PathVariable int userIdx, @PathVariable int reviewIdx) {
+        try {
+            // jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            GetReviewPreviewRes getReviewPreviewRes = reviewProvider.getReviewPreview(userIdx, reviewIdx);
+            return new BaseResponse<>(getReviewPreviewRes);
+        } catch (BaseException exception) {
+            logger.warn("#41. " +exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ", " + reviewIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }

@@ -19,7 +19,7 @@ public class GetReviewRes {
     private String storeName;
     private double rating;
     private String contents;
-    private List<String> images = new ArrayList<>();
+    private List<String> imageUrls = new ArrayList<>();
     private List<GetMenuReview> menuReviews = new ArrayList<>();
     private String deliveryLiked;
     private String deliveryComment;
