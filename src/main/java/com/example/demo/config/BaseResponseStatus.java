@@ -89,7 +89,7 @@ public enum BaseResponseStatus {
     STORES_EMPTY_CATEGORY(false, 2086, "조회할 카테고리를 입력해주세요."),
     STORES_INVALID_CATEGORY(false, 2087, "유효한 가게 카테고리가 아닙니다."),
     REVIEWS_EMPTY_ORDERIDX(false, 2088, "주문번호를 입력해주세요."),
-    REVIEWS_EMPTY_STOREIDX(false, 2089, "가게번호를 입력해주세요."),
+    STOREIDX_EMPTY(false, 2089, "가게번호를 입력해주세요."),
     REVIEWS_EMPTY_RATING(false, 2090, "평점을 입력해주세요."),
     REVIEWS_INVALID_RATING(false, 2091, "평점은 1,2,3,4,5 점만 가능합니다."),
     REVIEWS_EMPTY_CONTENTS(false, 2092, "리뷰 내용을 입력해주세요."),
@@ -101,7 +101,13 @@ public enum BaseResponseStatus {
     REVIEWS_INVALID_MENU_LIKED(false, 2098, "메뉴 평가는 GOOD, BAD만 가능합니다."),
     REVIEWS_LENGTH_MENU(false, 2099, "메뉴 평가 의견은 80자 이하 만 가능합니다."),
     REVIEWS_EMPTY_MENUIDX(false, 2100, "주문메뉴번호를 입력해주세요."),
-    STORES_EMPTY_KEYWORD(false, 2100, "검색할 키워드를 입력해주세요"),
+    STORES_EMPTY_KEYWORD(false, 2101, "검색할 키워드를 입력해주세요"),
+
+    // Bookmark
+    BOOKMARKS_EMPTY_SORT(false, 2102, "즐겨찾기 정렬값을 입력해주세요."),
+    BOOKMARKS_INVALID_SORT(false, 2103, "잘못된 즐겨찾기 정렬값입니다."),
+
+    REVIEWLIKES_EMPTY_REVIEWIDX(false, 2104, "리뷰번호를 입력해주세요."),
 
     /**
      * 3000 : Response 오류
@@ -146,6 +152,16 @@ public enum BaseResponseStatus {
     ORDER_NOT_ORDERER(false, 3066, "해당 주문을 한 유저가 아닙니다."),
     ORDER_EXISTS_REVIEW(false, 3067, "이미 해당 주문에 대한 리뷰가 존재합니다."),
 
+    EVENTS_NOT_FOUND(false, 3068, "존재하지않거나 기간이 지난 이벤트입니다."),
+
+    REVIEW_LIKES_IMPOSSIBLE_MINE(false, 3069, "자신의 리뷰에는 도움 체크가 불가능합니다."),
+    REVIEW_LIKES_DUPLICATED_LIKE(false, 3070, "이미 해당 리뷰에 대한 '도움이 돼요' 체크 상태입니다."),
+    REVIEW_LIKES_DUPLICATED_UNLIKE(false, 3071, "이미 해당 리뷰에 대한 '도움이 안돼요' 체크 상태입니다."),
+    REVIEW_LIKES_INVALID_DATA(false, 3072, "유효하지않은 ReviewLike 값입니다."),
+    REVIEW_LIKES_NOT_FOUND(false, 3073, "해당 리뷰의 도움 여부 체크 상태가 아닙니다."),
+
+    BOOKMARKS_DUPLICATED_STORE(false, 3074, "이미 즐겨찾기에 해당 가게가 존재합니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
@@ -162,7 +178,9 @@ public enum BaseResponseStatus {
     FAILED_TO_UPDATE_STATUS_ADDRESSES(false, 4021, "배달 주소 삭제에 실패하였습니다."),
     FAILED_TO_UPDATE_USER_ADDRESS(false, 4022, "주소 선택에 실패하였습니다."),
     FAILED_TO_UPDATE_USER_COUPON(false, 4023, "쿠폰 사용에 실패하였습니다."),
-    FAILED_TO_UPDATE_STATUS_REVIEW(false, 4024, "리뷰 삭제에 실패하였습니다.");
+    FAILED_TO_UPDATE_STATUS_REVIEW(false, 4024, "리뷰 삭제에 실패하였습니다."),
+    FAILED_TO_UPDATE_STATUS_REVIEW_UNLIKE(false, 4025, "리뷰 도움이 안돼요 취소에 실패하였습니다."),
+    FAILED_TO_UPDATE_STATUS_REVIEW_LIKE(false, 4026, "리뷰 도움이 돼요 취소에 실패하였습니다.");
 
     // 5000 : 필요시 만들어서 쓰세요
     // 6000 : 필요시 만들어서 쓰세요
