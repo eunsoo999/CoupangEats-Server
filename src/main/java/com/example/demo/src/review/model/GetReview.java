@@ -26,8 +26,9 @@ public class GetReview {
     private int likeCount;
     private String isLiked; // 도움이돼요 : Y, 도움안돼요 : N, null
     private String isWriter;
+    private String isModifiable;
 
-    public GetReview(int reviewIdx, String writerName, int rating, String writingTimeStamp, String contents, String orderMenus, int likeCount, String isLiked, String isWriter) {
+    public GetReview(int reviewIdx, String writerName, int rating, String writingTimeStamp, String contents, String orderMenus, int likeCount, String isLiked, String isWriter, String isModifiable) {
         this.reviewIdx = reviewIdx;
         this.writerName = writerName;
         this.rating = rating;
@@ -37,5 +38,6 @@ public class GetReview {
         this.likeCount = likeCount;
         this.isLiked = isLiked;
         this.isWriter = isWriter;
+        this.isModifiable = isModifiable;
     }
 }

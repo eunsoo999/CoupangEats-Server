@@ -74,9 +74,18 @@ public class ReviewDao {
             selectStoreReviewsQuery += ", null as 'isLiked' "; // 비로그인
         }
 
-        selectStoreReviewsQuery += ", if(writerIdx = ?, 'Y', 'N') as isWriter " +
-                "from (select ReviewTable.reviewIdx, userName, writerIdx, rating, contents, orderMenus, ReviewTable.createdAt, " +
-                "count(case when ReviewLike.likeFlag = 'Y' then 1 end) as likeCount " +
+        // 로그인상태일 경우 리뷰의 작성자가 자신인지 확인
+        if(userIdx != null) {
+            selectStoreReviewsQuery +=  ", if(writerIdx = ?, 'Y', 'N') as 'isWriter', " +
+                    "if(timestampdiff(DAY, current_timestamp, date_add(Result.createdAt, INTERVAL 3 DAY)) > 0, 'Y', null) as isModifiable " +
+                    "from (select ReviewTable.reviewIdx, userName, writerIdx, rating, contents, orderMenus, ReviewTable.createdAt, ";
+        } else {
+            selectStoreReviewsQuery += ", 'N' as 'isWriter', " +
+                    "null as 'isModifiable' " +
+                    "from (select ReviewTable.reviewIdx, userName, rating, contents, orderMenus, ReviewTable.createdAt, ";
+        }
+
+        selectStoreReviewsQuery += "count(case when ReviewLike.likeFlag = 'Y' then 1 end) as likeCount " +
                 "from (select Review.idx as 'reviewIdx', User.userName, User.idx as writerIdx, truncate(avg(Review.rating), 1) as 'rating' ,Review.contents, group_concat(distinct OrderMenu.menuName separator '·') as 'orderMenus', Review.createdAt " +
                 "from Review inner join User on Review.userIdx = User.idx inner join Orders on Review.orderIdx = Orders.idx join OrderMenu on OrderMenu.orderIdx = Orders.idx " +
                 "where Review.status != 'N' and User.status != 'N' and Orders.status != 'N' and OrderMenu.status != 'N' and Review.storeIdx = ? ";
@@ -107,6 +116,7 @@ public class ReviewDao {
             params = new Object[] {userIdx, userIdx, userIdx, storeIdx}; // 로그인 유저
         }
 
+        System.out.println(selectStoreReviewsQuery);
         return this.jdbcTemplate.query(selectStoreReviewsQuery,
                 (rs,rowNum) -> new GetReview(
                         rs.getInt("reviewIdx"),
@@ -117,7 +127,8 @@ public class ReviewDao {
                         rs.getString("orderMenus"),
                         rs.getInt("likeCount"),
                         rs.getString("isLiked"),
-                        rs.getString("isWriter")), params);
+                        rs.getString("isWriter"),
+                        rs.getString("isModifiable")), params);
     }
 
     public List<String> selectReviewImages(int reviewIdx) {
@@ -197,7 +208,7 @@ public class ReviewDao {
                                     + "storeIdx, deliveryLiked, deliveryBadReason, deliveryComment) "
                                     + "VALUES (?,?,?,?,?,?,?,?,?)";
         Object[] params = new Object[]{postReviewReq.getContents(), postReviewReq.getRating(), postReviewReq.getBadReason(), postReviewReq.getUserIdx(),
-                                        postReviewReq.getOrderIdx(), postReviewReq.getStoreIdx(), postReviewReq.getDeliveryReview().getDeliveryLiked(), postReviewReq.getDeliveryReview().getDeliveryBadReason(), postReviewReq.getDeliveryReview().getDeliveryComment()};
+                postReviewReq.getOrderIdx(), postReviewReq.getStoreIdx(), postReviewReq.getDeliveryReview().getDeliveryLiked(), postReviewReq.getDeliveryReview().getDeliveryBadReason(), postReviewReq.getDeliveryReview().getDeliveryComment()};
         this.jdbcTemplate.update(insertReviewQuery, params);
 
         String lastInserIdQuery = "select last_insert_id()";
