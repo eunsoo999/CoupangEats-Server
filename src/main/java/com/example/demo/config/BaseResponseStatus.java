@@ -127,6 +127,8 @@ public enum BaseResponseStatus {
     FAILED_TO_KAKAO_AUTH(false, 3019, "카카오 유저 정보 조회에 실패하였습니다."),
     FAILED_TO_KAKAO_EMAIL(false, 3020, "카카오 정보에 등록된 이메일이 없습니다. 이메일을 추가 입력해주세요."),
     USERS_INAPP_EXISTS(false, 3021, "이미 서비스에 가입이 되어 있는 이메일입니다. 이메일 로그인을 통해 로그인을 진행해주세요."),
+    USERS_NOT_FOUND_PHONE(false, 3022, "해당 전화번호로 가입된 회원이 없습니다."),
+    USERS_NOT_FOUND_INFO(false, 3023, "해당 정보로 가입된 회원이 없습니다."),
 
     // Address
     ADDRESSES_NOT_FOUND(false, 3050, "존재하지않는 배달주소입니다."),

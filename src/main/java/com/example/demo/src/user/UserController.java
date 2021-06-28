@@ -13,6 +13,9 @@ import com.example.demo.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.utils.ValidationRegex.*;
 
@@ -357,6 +360,56 @@ public class UserController {
         } catch (BaseException exception) {
             logger.warn("#16. " + exception.getStatus().getMessage());
             logger.warn("(" + userIdx + ")");
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 51. 아이디 찾기 인증번호 요청 API
+     * [POST] /users/find-email/auth
+     * @return BaseResponse<GetUserAddressRes>
+     */
+    @ResponseBody
+    @PostMapping("/find-email/auth")
+    public BaseResponse<PhoneAuthInfo> sendfindUserEmailAuth(@RequestBody PostFindEmailAuthReq postFindEmailAuthReq) {
+        if (postFindEmailAuthReq.getUserName() == null || postFindEmailAuthReq.getUserName().isEmpty()) {
+            return new BaseResponse<>(POST_USERS_EMPTY_USERNAME);
+        } else if (postFindEmailAuthReq.getPhone() == null || postFindEmailAuthReq.getUserName().isEmpty()) {
+            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
+        } else if (!isRegexPhone(postFindEmailAuthReq.getPhone())) {
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+        }
+
+        try{
+            PhoneAuthInfo phoneAuthInfo = smsAuthService.checkExistUserPhoneAndSendAuth(postFindEmailAuthReq); // 문자 발송
+            return new BaseResponse<>(phoneAuthInfo);
+        } catch(BaseException exception){
+            logger.warn("#51 " + exception.getMessage());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 52. 아이디 찾기 API
+     * [GET] /users/find-email/{phone}
+     * @return BaseResponse<PhoneAuthInfo>
+     */
+    @ResponseBody
+    @GetMapping("/find-email/{phone}")
+    public BaseResponse<Map> findUserEmail(@PathVariable String phone) {
+        if (phone == null || phone.isEmpty()) {
+            return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
+        } else if (!isRegexPhone(phone)) {
+            return new BaseResponse<>(POST_USERS_INVALID_PHONE);
+        }
+
+        try{
+            String email = userProvider.getMaskingEmailByPhone(phone);
+            Map<String, String> result = new HashMap<>();
+            result.put("email", email);
+            return new BaseResponse<>(result);
+        } catch(BaseException exception){
+            logger.warn("#52 " + phone + exception.getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }

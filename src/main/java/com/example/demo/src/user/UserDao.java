@@ -169,4 +169,9 @@ public class UserDao {
         String checkKakaoUserEmailQuery = "select exists(select idx from User where email = ? and status != 'N' and joinType = 'KAKAO')";
         return this.jdbcTemplate.queryForObject(checkKakaoUserEmailQuery, int.class, email);
     }
+
+    public int checkUserByNameAndPhone(String userName, String phone) {
+        String checkUserByNameAndPhoneQuery = "select exists(select 1 from User where userName = ? and phone = ? and status != 'N')";
+        return this.jdbcTemplate.queryForObject(checkUserByNameAndPhoneQuery, int.class, userName, phone);
+    }
 }

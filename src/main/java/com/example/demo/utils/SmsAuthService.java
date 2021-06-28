@@ -1,9 +1,12 @@
 package com.example.demo.utils;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.user.UserDao;
 import com.example.demo.src.user.model.PhoneAuthInfo;
+import com.example.demo.src.user.model.PostFindEmailAuthReq;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Mac;
@@ -15,11 +18,26 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import static com.example.demo.config.BaseResponseStatus.FAILED_TO_SEND_PHONE_AUTH;
+import static com.example.demo.config.BaseResponseStatus.*;
 import static com.example.demo.config.secret.Secret.*;
 
 @Service
 public class SmsAuthService {
+    private final UserDao userDao;
+
+    @Autowired
+    public SmsAuthService(UserDao userDao) {
+        this.userDao = userDao;
+    }
+
+    public PhoneAuthInfo checkExistUserPhoneAndSendAuth(PostFindEmailAuthReq postFindEmailAuthReq) throws BaseException {
+        if (userDao.checkUserByNameAndPhone(postFindEmailAuthReq.getUserName(), postFindEmailAuthReq.getPhone()) == 1) {
+            return sendPhoneAuth(postFindEmailAuthReq.getPhone()); // 해당 이름과 전화번호로 가입된 회원이 있다면 인증번호를 발송한다.
+        } else {
+            throw new BaseException(USERS_NOT_FOUND_INFO); // 입력된 이름과 전화번호로 가입된 회원이 없음
+        }
+    }
+
     public PhoneAuthInfo sendPhoneAuth(String toPhone) throws BaseException {
         int authNumber = (int) (Math.random() * (99999 - 10000 + 1)) + 10000; // 인증번호 난수 생성
         String accessKey = SENS_ACCESS_KEY;
@@ -41,7 +59,7 @@ public class SmsAuthService {
         bodyJson.put("type", "sms");
         bodyJson.put("contentType", "comm");
         bodyJson.put("countryCode", "82");
-        bodyJson.put("from", "01099686284");
+        bodyJson.put("from", SENDERNUMBER);
         bodyJson.put("content", "[13th-쿠팡이츠] 인증번호\n" + authNumber);
         bodyJson.put("messages", toArr);
 

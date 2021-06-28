@@ -87,6 +87,9 @@ public class UserProvider {
     }
 
     public String getMaskingEmailByPhone(String phone) throws BaseException {
+        if (userDao.checkPhone(phone) == 0) {
+            throw new BaseException(USERS_NOT_FOUND_PHONE);
+        }
         try{
             return userDao.selectMaskingEmailByPhone(phone);
         } catch (Exception exception){
