@@ -141,8 +141,8 @@ public class ReviewDao {
     }
 
     public GetReviewRes selectReview(int reviewIdx) {
-        String selectReviewQuery = "select Store.idx as 'storeIdx', Store.storeName, truncate(Review.rating, 1) as 'rating', " +
-                "Review.contents, Review.deliveryLiked, Review.deliveryComment " +
+        String selectReviewQuery = "select Store.idx as 'storeIdx', Store.storeName, truncate(Review.rating, 1) as 'rating', Review.storeBadReason, " +
+                "Review.contents, Review.deliveryLiked, Review.deliveryBadReason, Review.deliveryComment " +
                 "from Review inner join Store on Review.storeIdx = Store.idx " +
                 "where Review.status != 'N' and Review.idx = ?";
 
@@ -150,25 +150,31 @@ public class ReviewDao {
                 (rs,rowNum) -> new GetReviewRes(
                         rs.getInt("storeIdx"),
                         rs.getString("storeName"),
-                        rs.getDouble("rating"),
+                        rs.getInt("rating"),
+                        rs.getString("storeBadReason"),
                         rs.getString("contents"),
-                        rs.getString("deliveryLiked"),
-                        rs.getString("deliveryComment")), reviewIdx);
+                        new GetDeliveryReviewRes(
+                                rs.getString("deliveryLiked"),
+                                rs.getString("deliveryBadReason"),
+                                rs.getString("deliveryComment"))), reviewIdx);
     }
 
     public List<GetMenuReview> selectMenuReviews(int reviewIdx) {
-        String selectMenuReviewsQuery = "select MenuReview.idx as 'menuReviewIdx', OrderMenu.menuName, OrderMenu.menuDetail, " +
-                "MenuReview.menuLiked, MenuReview.comment " +
-                "from MenuReview inner join OrderMenu on MenuReview.orderMenuIdx = OrderMenu.idx " +
-                "where MenuReview.status != 'N' and MenuReview.reviewIdx = ?";
+        String selectMenuReviewsQuery = "select OrderMenu.idx as 'orderMenuIdx', OrderMenu.menuName, OrderMenu.menuDetail, MenuReview.menuLiked, MenuReview.menuBadReason, MenuReview.comment " +
+                "from (select idx, menuLiked, comment, orderMenuIdx, menuBadReason " +
+                "from MenuReview " +
+                "where reviewIdx = ? and MenuReview.status != 'N') MenuReview right outer join (select OrderMenu.idx, menuName, menuDetail " +
+                "from OrderMenu join Review on OrderMenu.orderIdx = Review.orderIdx " +
+                "where Review.idx = ? and OrderMenu.status != 'N') OrderMenu on MenuReview.orderMenuIdx = OrderMenu.idx";
 
         return this.jdbcTemplate.query(selectMenuReviewsQuery,
                 (rs,rowNum) -> new GetMenuReview(
-                        rs.getInt("menuReviewIdx"),
+                        rs.getInt("orderMenuIdx"),
                         rs.getString("menuName"),
                         rs.getString("menuDetail"),
                         rs.getString("menuLiked"),
-                        rs.getString("comment")), reviewIdx);
+                        rs.getString("menuBadReason"),
+                        rs.getString("comment")), reviewIdx, reviewIdx);
     }
 
     public int updateStatusReview(int reviewIdx) {

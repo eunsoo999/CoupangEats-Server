@@ -8,9 +8,10 @@ import lombok.Getter;
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GetMenuReview {
-    private int menuReviewIdx;
+    private int orderMenuIdx;
     private String menuName;
     private String menuDetail;
     private String menuLiked;
+    private String menuBadReason;
     private String menuComment;
 }
