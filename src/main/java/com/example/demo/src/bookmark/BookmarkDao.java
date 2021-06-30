@@ -26,7 +26,10 @@ public class BookmarkDao {
                 "if (distance > 4, null, bookmarkTable.deliveryTime) as 'deliveryTime', " +
                 "case when distance <= 0.1 then '0.1' " +
                 "when distance > 4 then '배달불가능' " +
-                "when distance > 0.1 then concat(distance, 'km') end 'distance' " +
+                "when distance > 0.1 then concat(distance, 'km') end 'distance', " +
+                "if (distance > 4, null, (select concat(FORMAT(Coupon.discountPrice , 0), '원 쿠폰') " +
+                "from Coupon " +
+                "where Coupon.status != 'N' and date_format(now(), '%Y%m%d') < Coupon.ExpirationDate and bookmarkTable.storeIdx = Coupon.storeIdx limit 1)) as 'coupon' "+
                 "from (select Bookmark.createdAt as 'bookmarkCreatedAt', Store.idx as 'storeIdx', Store.storeName, Store.cheetahDelivery, case when Store.deliveryPrice = 0 then '무료배달' " +
                 "else concat('배달비 ', FORMAT(Store.deliveryPrice , 0), '원') " +
                 "end as 'deliveryPrice', Store.deliveryTime, truncate((6371*acos(cos(radians(Address.latitude))*cos(radians(Store.latitude)) " +
@@ -52,7 +55,8 @@ public class BookmarkDao {
                         rs.getString("totalReview"),
                         rs.getString("distance"),
                         rs.getString("deliveryTime"),
-                        rs.getString("deliveryPrice")), userIdx);
+                        rs.getString("deliveryPrice"),
+                        rs.getString("coupon")), userIdx);
     }
 
     public int insertBookmark(PostBookmarkReq postBookmarkReq) {

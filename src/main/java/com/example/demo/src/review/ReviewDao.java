@@ -116,7 +116,6 @@ public class ReviewDao {
             params = new Object[] {userIdx, userIdx, userIdx, storeIdx}; // 로그인 유저
         }
 
-        System.out.println(selectStoreReviewsQuery);
         return this.jdbcTemplate.query(selectStoreReviewsQuery,
                 (rs,rowNum) -> new GetReview(
                         rs.getInt("reviewIdx"),

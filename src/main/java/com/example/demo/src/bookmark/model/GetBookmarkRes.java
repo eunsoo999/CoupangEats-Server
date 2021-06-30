@@ -16,4 +16,5 @@ public class GetBookmarkRes {
     private String distance;
     private String deliveryTime;
     private String deliveryPrice;
+    private String coupon;
 }
