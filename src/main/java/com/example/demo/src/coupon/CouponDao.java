@@ -187,4 +187,12 @@ public class CouponDao {
         return this.jdbcTemplate.queryForObject(checkCouponQuery, int.class, couponIdx);
 
     }
+
+    // 현재 가게에서 지급중인 쿠폰을 사용했는지 확인
+    public int checkUsedUserCoupon(int couponIdx, Integer userIdx) {
+        String checkQuery = "select exists(select 1 from UserCoupon " +
+                "where couponIdx = ? and userIdx = ? and useDate is not null and status != 'N')";
+
+        return this.jdbcTemplate.queryForObject(checkQuery, int.class, couponIdx, userIdx);
+    }
 }

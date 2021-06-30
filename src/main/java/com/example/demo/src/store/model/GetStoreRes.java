@@ -23,6 +23,7 @@ public class GetStoreRes {
     private List<String> imageUrls = new ArrayList<String>();
     private String rating;
     private String reviewCount;
+    private String isBookmarked;
     private GetStoreCoupon coupon;
     private String deliveryTime;
     private int deliveryPrice;
@@ -30,7 +31,6 @@ public class GetStoreRes {
     private String cheetahDelivery;
     private List<GetPhotoReview> photoReviews = new ArrayList<>();
     private List<GetMenuByCategory> menuCategories = new ArrayList<>();
-
 
     public GetStoreRes(String storeName, String rating, String reviewCount, String deliveryTime, int deliveryPrice, int minOrderPrice, String cheetahDelivery) {
         this.storeName = storeName;

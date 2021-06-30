@@ -1,6 +1,7 @@
 package com.example.demo.src.store;
 
 import com.example.demo.config.BaseException;
+import com.example.demo.src.bookmark.BookmarkDao;
 import com.example.demo.src.coupon.CouponDao;
 import com.example.demo.src.coupon.model.GetStoreCoupon;
 import com.example.demo.src.event.EventDao;
@@ -29,18 +30,18 @@ public class StoreProvider {
     private final ReviewDao reviewDao;
     private final CouponDao couponDao;
     private final MenuDao menuDao;
-    private final JwtService jwtService;
+    private final BookmarkDao bookmarkDao;
 
     final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     @Autowired
-    public StoreProvider(StoreDao storeDao, EventDao eventDao, ReviewDao reviewDao, CouponDao couponDao, MenuDao menuDao, JwtService jwtService) {
+    public StoreProvider(StoreDao storeDao, EventDao eventDao, ReviewDao reviewDao, CouponDao couponDao, MenuDao menuDao, BookmarkDao bookmarkDao) {
         this.storeDao = storeDao;
         this.eventDao = eventDao;
         this.reviewDao = reviewDao;
         this.couponDao = couponDao;
         this.menuDao = menuDao;
-        this.jwtService = jwtService;
+        this.bookmarkDao = bookmarkDao;
     }
 
     public GetMainRes getMainStores(SearchOption searchOption) throws BaseException {
@@ -151,6 +152,18 @@ public class StoreProvider {
             List<String> getImageUrls = storeDao.selectStoreImageUrls(storeIdx);
             getStoreRes.setImageUrls(getImageUrls);
 
+            // 로그인된 유저의 경우 북마크했는지 체크
+            if (userIdx != null) {
+                if (bookmarkDao.checkStoreInBookmarks(userIdx, storeIdx) == 1) {
+                    getStoreRes.setIsBookmarked("Y");
+                } else {
+                    getStoreRes.setIsBookmarked("N");
+                }
+            } else {
+                getStoreRes.setIsBookmarked("N");
+            }
+
+
             // 가게 할인쿠폰 정보
             if (couponDao.checkCouponByStoreIdx(storeIdx) == 1) {
                 GetStoreCoupon storeCoupon = couponDao.selectStoreCoupon(storeIdx);
@@ -159,8 +172,11 @@ public class StoreProvider {
                     if (couponDao.checkAvailableUserCouponInStore(storeCoupon.getCouponIdx(), userIdx) == 1) {
                         // 유저가 사용가능한 가게의 쿠폰을 소유하고있음.
                         storeCoupon.setHasCoupon("Y");
+                    } else if (couponDao.checkUsedUserCoupon(storeCoupon.getCouponIdx(), userIdx) == 1) {
+                        // 유저가 가게의 쿠폰을 발급받아 사용하였음. (발급받은 쿠폰을 사용한 상태더라도 또 쿠폰을 받을 수 없음)
+                        storeCoupon.setHasCoupon("Y");
                     } else {
-                        // 유저가 가게의 쿠폰을 소유하고 있지않거나 이미 사용함.
+                        // 유저가 가게의 쿠폰을 소유하고 있지않음.
                         storeCoupon.setHasCoupon("N");
                     }
                 } else {
