@@ -3,6 +3,7 @@ package com.example.demo.src.event;
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponseStatus;
 import com.example.demo.src.event.model.GetEventBannerRes;
+import com.example.demo.src.event.model.GetEventContentsRes;
 import com.example.demo.src.event.model.GetEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,13 +35,13 @@ public class EventProvider {
         }
     }
 
-    public String getEventContents(int eventIdx) throws BaseException {
+    public GetEventContentsRes getEventContents(int eventIdx) throws BaseException {
         if (eventDao.checkEvent(eventIdx) == 0) {
             throw new BaseException(EVENTS_NOT_FOUND);
         }
 
         try {
-            String eventContents = eventDao.selectEventContent(eventIdx);
+            GetEventContentsRes eventContents = eventDao.selectEventContent(eventIdx);
             return eventContents;
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);

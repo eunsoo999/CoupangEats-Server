@@ -1,6 +1,8 @@
 package com.example.demo.src.event;
 
+import com.example.demo.src.coupon.model.GetCouponsRes;
 import com.example.demo.src.event.model.GetEventBannerRes;
+import com.example.demo.src.event.model.GetEventContentsRes;
 import com.example.demo.src.event.model.GetEvents;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -37,10 +39,13 @@ public class EventDao {
                         rs.getString("endDate")));
     }
 
-    public String selectEventContent(int eventIdx) {
-        String selectEventContent = "select contentsUrl from Event where idx = ?";
+    public GetEventContentsRes selectEventContent(int eventIdx) {
+        String selectEventContent = "select title, contentsUrl from Event where idx = ?";
 
-        return this.jdbcTemplate.queryForObject(selectEventContent, String.class, eventIdx);
+        return this.jdbcTemplate.queryForObject(selectEventContent,
+                (rs,rowNum) -> new GetEventContentsRes(
+                        rs.getString("title"),
+                        rs.getString("contentsUrl")), eventIdx);
     }
 
     public int checkEvent(int eventIdx) {

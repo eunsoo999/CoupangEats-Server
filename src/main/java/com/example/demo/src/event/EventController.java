@@ -2,6 +2,7 @@ package com.example.demo.src.event;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.config.BaseResponse;
+import com.example.demo.src.event.model.GetEventContentsRes;
 import com.example.demo.src.event.model.GetEvents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,16 +48,14 @@ public class EventController {
     /**
      * 47. 이벤트 상세 조회 API
      * [GET] /events/:eventIdx
-     * @return BaseResponse<Map>
+     * @return BaseResponse<GetEventContentsRes>
      */
     @ResponseBody
     @GetMapping("/{eventIdx}")
-    public BaseResponse<Map> getAllEvent(@PathVariable int eventIdx) {
+    public BaseResponse<GetEventContentsRes> getAllEvent(@PathVariable int eventIdx) {
         try {
-            String eventContents = eventProvider.getEventContents(eventIdx);
-            Map<String, String> responseData = new HashMap<>();
-            responseData.put("imageUrl", eventContents);
-            return new BaseResponse<>(responseData);
+            GetEventContentsRes eventContents = eventProvider.getEventContents(eventIdx);
+            return new BaseResponse<>(eventContents);
         } catch (BaseException exception) {
             logger.warn("#47. " + exception.getStatus().getMessage());
             logger.warn("(" + eventIdx + ")");

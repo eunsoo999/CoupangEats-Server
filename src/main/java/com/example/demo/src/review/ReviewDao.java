@@ -256,8 +256,8 @@ public class ReviewDao {
                 "(select group_concat(distinct OrderMenu.menuName separator '·') from OrderMenu where OrderMenu.orderIdx = Orders.idx) as 'orderMenus', " +
                 "count(case when ReviewLike.likeFlag = 'Y' then 1 end) as likeCount, " +
                 "if(timestampdiff(DAY, current_timestamp, date_add(Orders.createdAt, INTERVAL 3 DAY)) > 0, timestampdiff(DAY, current_timestamp, date_add(Orders.createdAt, INTERVAL 3 DAY)), 0) as remainingReviewTime " +
-                "from Review join Store on Review.storeIdx = Store.idx left join ReviewLike on Review.idx = ReviewLike.reviewIdx join Orders on Review.orderIdx = Orders.idx " +
-                "where Review.idx = ? and ReviewLike.status != 'N'";
+                "from Review join Store on Review.storeIdx = Store.idx left join (select * from ReviewLike where status != 'N') ReviewLike on Review.idx = ReviewLike.reviewIdx join Orders on Review.orderIdx = Orders.idx " +
+                "where Review.idx = ?";
 
         return this.jdbcTemplate.queryForObject(selectReviewPreview,
                 (rs,rowNum) -> new GetReviewPreviewRes(
