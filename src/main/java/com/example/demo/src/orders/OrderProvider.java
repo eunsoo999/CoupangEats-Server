@@ -80,14 +80,14 @@ public class OrderProvider {
         }
     }
 
-    public List<GetPastOrder> getUserPastOrders(int userIdx) throws BaseException {
+    public List<GetPastOrder> getUserPastOrders(int userIdx, String search) throws BaseException {
         // 유저 존재 확인
         if (userDao.checkUserIdx(userIdx) == 0) {
             throw new BaseException(USERS_NOT_FOUND);
         }
         try {
             // 과거 주문 내역 (+ 작성된 리뷰 정보 포함)
-            List<GetPastOrder> pastOrderList = orderDao.selectPastOrders(userIdx);
+            List<GetPastOrder> pastOrderList = orderDao.selectPastOrders(userIdx, search);
 
             // 과거 주문 내역 - 메뉴목록
             for (GetPastOrder pastOrders : pastOrderList) {

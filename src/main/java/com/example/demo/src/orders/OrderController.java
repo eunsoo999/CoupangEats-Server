@@ -132,14 +132,14 @@ public class OrderController {
      */
     @ResponseBody
     @GetMapping("/users/{userIdx}/orders/past")
-    public BaseResponse<List<GetPastOrder>> getUserPastOrders(@PathVariable int userIdx) {
+    public BaseResponse<List<GetPastOrder>> getUserPastOrders(@PathVariable int userIdx, @RequestParam(required = false) String search) {
         try {
             // 유저 JWT 확인
             int userIdxByJwt = jwtService.getUserIdx();
             if (userIdxByJwt != userIdx) {
                 return new BaseResponse<>(INVALID_USER_JWT);
             }
-            List<GetPastOrder> getPastOrders = orderProvider.getUserPastOrders(userIdx);
+            List<GetPastOrder> getPastOrders = orderProvider.getUserPastOrders(userIdx, search);
             return new BaseResponse<>(getPastOrders);
         } catch (BaseException exception) {
             logger.warn("#29-1 " + exception.getStatus().getMessage());

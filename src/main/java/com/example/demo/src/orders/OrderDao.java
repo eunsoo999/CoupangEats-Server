@@ -3,6 +3,7 @@ package com.example.demo.src.orders;
 import com.example.demo.src.orders.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Repository;
 
 import javax.sql.DataSource;
@@ -90,7 +91,7 @@ public class OrderDao {
         return this.jdbcTemplate.queryForObject(checkOrderByUserIdxQuery, int.class, orderIdx, userIdx);
     }
 
-    public List<GetPastOrder> selectPastOrders(int userIdx) {
+    public List<GetPastOrder> selectPastOrders(int userIdx, String search) {
         String selectPastOrdersQuery = "select Orders.idx as 'orderIdx', Store.idx as 'storeIdx', Store.storeName, " +
                 "FirstStoreImage.imageUrl, Orders.createdAt as 'orderDate', " +
                 "case Orders.status when 'FINISH' then '배달 완료' " +
@@ -104,8 +105,27 @@ public class OrderDao {
                 "from Orders join Store on Orders.storeIdx = Store.idx " +
                 "join (select storeIdx, min(idx) as 'firstReviewImage', imageUrl from StoreImage group by storeIdx) as FirstStoreImage on Store.idx = FirstStoreImage.storeIdx " +
                 "left join (select idx, orderIdx, rating from Review where status = 'Y') Review on Review.orderIdx = Orders.idx " +
-                "where Orders.userIdx = ? and (Orders.status = 'CANCEL' or Orders.status = 'FINISH') " +
-                "order by Orders.createdAt desc";
+                "where Orders.userIdx = ? ";
+
+        // 과거주문내역 검색 (가게이름 or 주문한 메뉴명에 검색한 키워드가 포함된 과거주문내역(+배달완료만))
+        if(search != null) {
+            selectPastOrdersQuery += "and Orders.status = 'FINISH' " +
+                    "and (Store.storeName like ? or " +
+                    "Orders.idx in (select distinct OrderMenu.orderIdx " +
+                    "from OrderMenu join Orders on OrderMenu.orderIdx = Orders.idx " +
+                    "where Orders.status = 'FINISH' and OrderMenu.menuName like ?)) ";
+        } else {
+            selectPastOrdersQuery += "and (Orders.status = 'CANCEL' or Orders.status = 'FINISH') ";
+        }
+        selectPastOrdersQuery += "order by Orders.createdAt desc";
+
+        Object[] params;
+        if(search != null) {
+            String searchKeyword = "%" + search + "%";
+            params = new Object[]{userIdx, searchKeyword, searchKeyword};
+        } else {
+            params = new Object[]{userIdx};
+        }
 
         return this.jdbcTemplate.query(selectPastOrdersQuery,
                 (rs,rowNum)-> new GetPastOrder(
@@ -121,7 +141,7 @@ public class OrderDao {
                         rs.getString("totalPrice"),
                         rs.getString("payType"),
                         rs.getObject("reviewIdx") != null ? rs.getInt("reviewIdx") : null,
-                        rs.getObject("rating") != null ? rs.getInt("rating") : null), userIdx);
+                        rs.getObject("rating") != null ? rs.getInt("rating") : null), params);
 
         // todo null
     }
