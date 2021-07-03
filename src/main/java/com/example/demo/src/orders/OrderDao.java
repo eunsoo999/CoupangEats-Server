@@ -103,7 +103,7 @@ public class OrderDao {
                 "Review.idx as 'reviewIdx', Review.rating " +
                 "from Orders join Store on Orders.storeIdx = Store.idx " +
                 "join (select storeIdx, min(idx) as 'firstReviewImage', imageUrl from StoreImage group by storeIdx) as FirstStoreImage on Store.idx = FirstStoreImage.storeIdx " +
-                "left join Review on Review.orderIdx = Orders.idx " +
+                "left join (select idx, orderIdx, rating from Review where status = 'Y') Review on Review.orderIdx = Orders.idx " +
                 "where Orders.userIdx = ? and (Orders.status = 'CANCEL' or Orders.status = 'FINISH') " +
                 "order by Orders.createdAt desc";
 

@@ -374,7 +374,7 @@ public class UserController {
     public BaseResponse<PhoneAuthInfo> sendfindUserEmailAuth(@RequestBody PostFindEmailAuthReq postFindEmailAuthReq) {
         if (postFindEmailAuthReq.getUserName() == null || postFindEmailAuthReq.getUserName().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_USERNAME);
-        } else if (postFindEmailAuthReq.getPhone() == null || postFindEmailAuthReq.getUserName().isEmpty()) {
+        } else if (postFindEmailAuthReq.getPhone() == null || postFindEmailAuthReq.getPhone().isEmpty()) {
             return new BaseResponse<>(POST_USERS_EMPTY_PHONE);
         } else if (!isRegexPhone(postFindEmailAuthReq.getPhone())) {
             return new BaseResponse<>(POST_USERS_INVALID_PHONE);
