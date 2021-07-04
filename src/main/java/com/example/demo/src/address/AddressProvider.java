@@ -41,15 +41,11 @@ public class AddressProvider {
             GetCompanyAddress companyAddress;
             if (userDao.checkUserCompanyAddress(userIdx) == 1) {
                 companyAddress = addressDao.selectCompanyAddress(userIdx);
-                getAddressesRes.setCompany(companyAddress); // 회사 주소
+                getAddressesRes.setCompany(companyAddress);
             }
             //전체 주소
-            List<GetAddressRes> getAddressRes = addressDao.selectAddressList(userIdx); //전체 주소
-            if (getAddressRes.isEmpty()) {
-                getAddressesRes.setAddressList(null);
-            } else {
-                getAddressesRes.setAddressList(getAddressRes);
-            }
+            List<GetAddressRes> getAddressRes = addressDao.selectAddressList(userIdx);
+            getAddressesRes.setAddressList(getAddressRes);
             //유저가 기본선택한 주소
             Integer seletedAddressIdx = userDao.selectUserAddressIdx(userIdx);
             if (seletedAddressIdx != null) {

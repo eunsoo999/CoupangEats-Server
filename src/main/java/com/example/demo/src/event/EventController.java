@@ -26,7 +26,7 @@ public class EventController {
     }
 
     /**
-     * 46. 이벤트 전체 조회 API
+     * 45. 이벤트 전체 조회 API
      * [GET] /events
      * @return BaseResponse<List<GetEvents>>
      */
@@ -40,13 +40,13 @@ public class EventController {
             }
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
-            logger.warn("#46. " + exception.getStatus().getMessage());
+            logger.warn("#45. " + exception.getStatus().getMessage());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 47. 이벤트 상세 조회 API
+     * 46. 이벤트 상세 조회 API
      * [GET] /events/:eventIdx
      * @return BaseResponse<GetEventContentsRes>
      */
@@ -57,7 +57,7 @@ public class EventController {
             GetEventContentsRes eventContents = eventProvider.getEventContents(eventIdx);
             return new BaseResponse<>(eventContents);
         } catch (BaseException exception) {
-            logger.warn("#47. " + exception.getStatus().getMessage());
+            logger.warn("#46. " + exception.getStatus().getMessage());
             logger.warn("(" + eventIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }

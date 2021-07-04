@@ -12,7 +12,6 @@ import com.example.demo.src.menu.model.GetMenus;
 import com.example.demo.src.review.ReviewDao;
 import com.example.demo.src.review.model.GetPhotoReview;
 import com.example.demo.src.store.model.*;
-import com.example.demo.utils.JwtService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,32 +56,20 @@ public class StoreProvider {
 
             // 할인중인 맛집
             List<GetStoreSmallBox> getStoreSmallBoxList = storeDao.selectOnsaleStoresUptoTen(searchOption.getLat(), searchOption.getLon());
-            if (getStoreSmallBoxList.isEmpty()) {
-                getMainRes.setOnSaleStores(null);
-            } else {
-                getMainRes.setOnSaleStores(getStoreSmallBoxList);
-            }
+            getMainRes.setOnSaleStores(getStoreSmallBoxList);
 
             // 새로 들어온 가게 (최근 2주)
             List<GetNewStoreBox> getNewStoreBoxList = storeDao.selectNewStoreBoxesUptoTen(searchOption.getLat(), searchOption.getLon());
-            if (getNewStoreBoxList.isEmpty()) {
-                getMainRes.setNewStores(null);
-            } else {
-                getMainRes.setNewStores(getNewStoreBoxList);
-            }
+            getMainRes.setNewStores(getNewStoreBoxList);
 
             // 주변맛집추천
             List<GetStoreMainBox> getStoreMainBoxList = storeDao.selectStoreMainBoxes(searchOption);
-            if (getStoreMainBoxList.isEmpty()) {
-                getMainRes.setRecommendStores(null); //주변맛집이 없다면 null
-            } else {
-                for (GetStoreMainBox storeMainBox : getStoreMainBoxList) {
-                    int storeIdx = storeMainBox.getStoreIdx();
-                    List<String> getImageUrls = storeDao.selectStoreImageUrls(storeIdx);
-                    storeMainBox.setImageUrls(getImageUrls);
-                }
-                getMainRes.setRecommendStores(getStoreMainBoxList);
+            for (GetStoreMainBox storeMainBox : getStoreMainBoxList) {
+                int storeIdx = storeMainBox.getStoreIdx();
+                List<String> getImageUrls = storeDao.selectStoreImageUrls(storeIdx);
+                storeMainBox.setImageUrls(getImageUrls);
             }
+            getMainRes.setRecommendStores(getStoreMainBoxList);
 
             // 주변맛집추천 가게 개수
             getMainRes.setTotalCount(getStoreMainBoxList.size());
@@ -162,7 +149,6 @@ public class StoreProvider {
             } else {
                 getStoreRes.setIsBookmarked("N");
             }
-
 
             // 가게 할인쿠폰 정보
             if (couponDao.checkCouponByStoreIdx(storeIdx) == 1) {

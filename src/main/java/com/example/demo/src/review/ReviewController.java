@@ -154,7 +154,7 @@ public class ReviewController {
     /**
      * 38. 리뷰 수정 API
      * [PATCH] /user/:userIdx/reviews/:reviewIdx
-     * @return BaseResponse<PatchReviewReq>
+     * @return BaseResponse<Map>
      */
     @ResponseBody
     @PatchMapping("/users/{userIdx}/reviews/{reviewIdx}")

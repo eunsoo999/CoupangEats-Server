@@ -123,7 +123,7 @@ public class StoreController {
     }
 
     /**
-     * 19. 새로 들어온 가게 전체 조회 API
+     * 20. 새로 들어온 가게 전체 조회 API
      * [GET] /stores/new?lat=&lon=&sort=&cheetah=&ordermin=&deliverymin=&coupon=&cursor=&numOfRows=
      * @return BaseResponse<GetNewStoresRes>
      */
@@ -150,7 +150,7 @@ public class StoreController {
             GetNewStoresRes getNewStoresRes = storeProvider.getNewStores(searchOption);
             return new BaseResponse<>(getNewStoresRes);
         } catch (BaseException exception) {
-            logger.warn("#19. " + exception.getStatus().getMessage());
+            logger.warn("#20. " + exception.getStatus().getMessage());
             logger.warn(searchOption.toString());
             return new BaseResponse<>(exception.getStatus());
         }

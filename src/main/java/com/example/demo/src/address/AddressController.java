@@ -47,8 +47,7 @@ public class AddressController {
             GetAddressesRes getAddressesRes = addressProvider.getAddreses(userIdx);
             return new BaseResponse<>(getAddressesRes);
         } catch (BaseException exception) {
-            logger.warn("#9. " +exception.getStatus().getMessage());
-            logger.warn("(" + userIdx + ")");
+            logger.warn("#9 {} - userIdx : {}", exception.getStatus().getMessage(), userIdx);
             return new BaseResponse<>(exception.getStatus());
         }
     }

@@ -90,7 +90,7 @@ public class ReviewLikeController {
             }
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
-            logger.warn("#44. " + exception.getStatus().getMessage());
+            logger.warn("#43. " + exception.getStatus().getMessage());
             logger.warn(postReviewLikeReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
@@ -119,6 +119,4 @@ public class ReviewLikeController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
-
 }

@@ -126,9 +126,9 @@ public class OrderController {
     }
 
     /**
-     * 29-1. 과거 주문 내역 조회 API
+     * 29. 과거 주문 내역 조회 API
      * [GET] /users/:userIdx/orders/past
-     * @return BaseResponse<GetUserOrdersRes>
+     * @return BaseResponse<List<GetPastOrder>>
      */
     @ResponseBody
     @GetMapping("/users/{userIdx}/orders/past")
@@ -142,16 +142,16 @@ public class OrderController {
             List<GetPastOrder> getPastOrders = orderProvider.getUserPastOrders(userIdx, search);
             return new BaseResponse<>(getPastOrders);
         } catch (BaseException exception) {
-            logger.warn("#29-1 " + exception.getStatus().getMessage());
+            logger.warn("#29 " + exception.getStatus().getMessage());
             logger.warn("(userIdx : " + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 29-2. 준비중 주문 내역 조회 API
+     * 30. 준비중 주문 내역 조회 API
      * [GET] /users/:userIdx/orders/preparing
-     * @return BaseResponse<GetUserOrdersRes>
+     * @return BaseResponse<List<GetPreparingOrder>>
      */
     @ResponseBody
     @GetMapping("/users/{userIdx}/orders/preparing")
@@ -165,14 +165,14 @@ public class OrderController {
             List<GetPreparingOrder> getPreparingOrders = orderProvider.getUserPreparingOrders(userIdx);
             return new BaseResponse<>(getPreparingOrders);
         } catch (BaseException exception) {
-            logger.warn("#29-2 " + exception.getStatus().getMessage());
+            logger.warn("#30 " + exception.getStatus().getMessage());
             logger.warn("(userIdx : " + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 53. 주문 상세 조회 API (리뷰 작성 화면)
+     * 31. 주문 상세 조회 API (리뷰 작성 화면)
      * [GET] /users/:userIdx/orders/orderIdx
      * @return BaseResponse<GetOrderRes>
      */
@@ -188,7 +188,7 @@ public class OrderController {
             GetOrderRes getOrderRes = orderProvider.getOrderDetail(userIdx, orderIdx);
             return new BaseResponse<>(getOrderRes);
         } catch (BaseException exception) {
-            logger.warn("#53 " + exception.getStatus().getMessage());
+            logger.warn("#31 " + exception.getStatus().getMessage());
             logger.warn("(userIdx : " + userIdx + ", " + orderIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }

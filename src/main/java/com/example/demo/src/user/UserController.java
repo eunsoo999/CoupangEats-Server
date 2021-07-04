@@ -44,7 +44,7 @@ public class UserController {
     }
 
     /**
-     * 0. 회원가입 API
+     * 1. 회원가입 API
      * [POST] /users
      * @return BaseResponse<PostUserRes>
      */
@@ -81,16 +81,16 @@ public class UserController {
             PostUserRes postUserRes = userService.createUser(postUserReq);
             return new BaseResponse<>(postUserRes);
         } catch(BaseException exception){
-            logger.warn("#0. " +exception.getStatus().getMessage());
+            logger.warn("#1. " +exception.getStatus().getMessage());
             logger.warn(postUserReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 1. 자동로그인 API
+     * 2. 자동로그인 API
      * [GET] /users/:userIdx/auto-login
-     * @return BaseResponse<>
+     * @return BaseResponse<CheckAutoLoginRes>
      */
     @ResponseBody
     @GetMapping("/{userIdx}/auto-login")
@@ -103,13 +103,13 @@ public class UserController {
             }
             return new BaseResponse<>(new CheckAutoLoginRes("Y"));
         } catch (BaseException exception) {
-            logger.warn("#1. " + exception.getStatus().getMessage());
+            logger.warn("#2. (userIdx : " + userIdx + ")" + exception.getStatus().getMessage());
             return new BaseResponse<>(NOT_LOGIN_STATUS);
         }
     }
 
     /**
-     * 2. 카카오 로그인 API
+     * 3. 카카오 로그인 API
      * [POST] /users/login/kakao
      */
     @ResponseBody
@@ -127,13 +127,14 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.kakaoLogin(kaKaoUserInfo);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception) {
-            logger.warn("#2. " + exception.getStatus().getMessage());
+            logger.warn("#3. " + exception.getStatus().getMessage());
+            logger.warn(postKakaoLogin.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 3. 로그인 API
+     * 4. 로그인 API
      * [POST] /users/login
      * @return BaseResponse<PostLoginRes>
      */
@@ -154,16 +155,16 @@ public class UserController {
             PostLoginRes postLoginRes = userProvider.logIn(postLoginReq);
             return new BaseResponse<>(postLoginRes);
         } catch (BaseException exception){
-            logger.warn("#3. " +exception.getStatus().getMessage());
+            logger.warn("#4. " +exception.getStatus().getMessage());
             logger.warn(postLoginReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 4. 이메일 중복 확인 API
+     * 5. 이메일 중복 확인 API
      * [GET] /users/email/check?email=silver@naver.com
-     * @return BaseResponse<GetDuplicatedRes>
+     * @return BaseResponse<GetDuplicatedEmailRes>
      */
     @ResponseBody
     @GetMapping("/email/check")
@@ -182,16 +183,16 @@ public class UserController {
             }
             return new BaseResponse<>(getDuplicatedRes);
         } catch (BaseException exception) {
-            logger.warn("#4. " +exception.getStatus().getMessage());
+            logger.warn("#5. " + exception.getStatus().getMessage());
             logger.warn("(" + email + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 5. 전화번호 중복 확인 API
+     * 6. 전화번호 중복 확인 API
      * [GET] /users/phone/check?phone=01029292929
-     * @return BaseResponse<GetDuplicatedRes>
+     * @return BaseResponse<GetDuplicatedPhoneRes>
      */
     @ResponseBody
     @GetMapping("/phone/check")
@@ -210,14 +211,13 @@ public class UserController {
             }
             return new BaseResponse<>(getDuplicatedPhoneRes);
         } catch (BaseException exception) {
-            logger.warn("#5. " +exception.getStatus().getMessage());
-            logger.warn("(" + phone + ")");
+            logger.warn("#6 {} - phone : {}", exception.getStatus().getMessage(), phone);
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 6. 휴대폰 인증번호 발송 API
+     * 7. 휴대폰 인증번호 발송 API
      * [POST] /users/auth/phone
      */
     @ResponseBody
@@ -237,13 +237,13 @@ public class UserController {
             //session.setAttribute(postUserPhoneRes.getPhone(), postUserPhoneRes.getAuthNumber()); // key-value 휴대폰번호-인증번호로 세션에 저장
             return new BaseResponse<>(new PostUserPhoneRes(postUserPhoneRes.getPhone(), postUserPhoneRes.getAuthNumber()));
         } catch(BaseException exception){
-            logger.warn(exception.getMessage());
+            logger.warn("#7 {} - phone : {}", exception.getStatus().getMessage(), postUserPhoneReq.getPhone());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
 //    /**
-//     * 7. 휴대폰 인증번호 확인 API
+//     * 7-2. 휴대폰 인증번호 확인 API
 //     * [GET] /users/auth/phone/confirm
 //     * @return BaseResponse<GetUserRes>
 //     */
@@ -286,8 +286,7 @@ public class UserController {
             GetUserRes getUserRes = userProvider.retrieveUser(userIdx);
             return new BaseResponse<>(getUserRes);
         } catch (BaseException exception) {
-            logger.warn("#8. " + exception.getStatus().getMessage());
-            logger.warn("(" + userIdx + ")");
+            logger.warn("#8 {} - userIdx : {}", exception.getStatus().getMessage(), userIdx);
             return new BaseResponse<>(exception.getStatus());
         }
     }

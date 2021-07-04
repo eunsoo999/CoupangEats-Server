@@ -37,7 +37,7 @@ public class BookmarkController {
     }
 
     /**
-     * 48. 가게 즐겨찾기 조회 및 정렬 API
+     * 47. 가게 즐겨찾기 조회 및 정렬 API
      * [GET] /users/:userIdx/bookmarks?sort=
      * @return BaseResponse<List<GetCouponsRes>>
      */
@@ -46,7 +46,7 @@ public class BookmarkController {
     public BaseResponse<List<GetBookmarkRes>> getBookmarks(@PathVariable int userIdx, @RequestParam String sort) {
         if (sort.isEmpty()) {
             return new BaseResponse<>(BOOKMARKS_EMPTY_SORT);
-        } else if (!(sort.equalsIgnoreCase("recentOrder") || sort.equalsIgnoreCase("recentAdd"))) {
+        } else if (!sort.equalsIgnoreCase("recentAdd")) {
             return new BaseResponse<>(BOOKMARKS_INVALID_SORT);
         }
 
@@ -59,14 +59,14 @@ public class BookmarkController {
             List<GetBookmarkRes> getBookmarkRes = bookmarkProvider.getBookmarks(userIdx, sort);
             return new BaseResponse<>(getBookmarkRes);
         } catch (BaseException exception) {
-            logger.warn("#48. " + exception.getStatus().getMessage());
+            logger.warn("#47. " + exception.getStatus().getMessage());
             logger.warn("(userIdx : " + userIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 49. 가게 즐겨찾기 추가 API
+     * 48. 가게 즐겨찾기 추가 API
      * [POST] /bookmarks
      * @return BaseResponse<Map>
      */
@@ -91,14 +91,14 @@ public class BookmarkController {
 
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
-            logger.warn("#49. " + exception.getStatus().getMessage());
+            logger.warn("#48. " + exception.getStatus().getMessage());
             logger.warn(postBookmarkReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 50. 가게 즐겨찾기 삭제 API
+     * 49. 가게 즐겨찾기 삭제 API
      * [POST] /users/:userIdx/bookmarks/status
      * @return BaseResponse<Map>
      */
@@ -121,7 +121,7 @@ public class BookmarkController {
             bookmarkService.updateBookmarksStatus(patchBookmarksStatusReq, userIdx);
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
-            logger.warn("#50. " + exception.getStatus().getMessage());
+            logger.warn("#49. " + exception.getStatus().getMessage());
             logger.warn("userIdx : " + userIdx + ",  " + patchBookmarksStatusReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }

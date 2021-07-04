@@ -32,7 +32,7 @@ public class CouponController {
     }
 
     /**
-     * 30. 가게에서 사용가능한 쿠폰 전체 조회 API
+     * 32. 가게에서 사용가능한 쿠폰 전체 조회 API
      * [GET] /stores/:storeIdx/users/:userIdx/coupons
      * @return BaseResponse<List<GetCouponsRes>>
      */
@@ -48,14 +48,14 @@ public class CouponController {
             List<GetCouponsRes> getCouponsRes = couponProvider.getUserCouponsInStore(userIdx, storeIdx);
             return new BaseResponse<>(getCouponsRes);
         } catch (BaseException exception) {
-            logger.warn("#30. " + exception.getStatus().getMessage());
+            logger.warn("#32. " + exception.getStatus().getMessage());
             logger.warn("(userIdx : " + userIdx + ", " + storeIdx + ")");
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
     /**
-     * 33. 가게 할인쿠폰 받기 API
+     * 32. 가게 할인쿠폰 받기 API
      * [POST] /stores/:storeIdx/coupons
      * @return BaseResponse<PostCouponRes>
      */

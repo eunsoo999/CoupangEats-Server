@@ -24,7 +24,7 @@ public class BookmarkDao {
                 "(select if (count(*) = 0, null, concat(truncate(avg(rating), 1), ' (', count(*), ')')) from Review where Review.storeIdx = bookmarkTable.storeIdx and Review.status != 'N') as 'totalReview', " +
                 "if (distance > 4, null, bookmarkTable.deliveryPrice) as 'deliveryPrice', " +
                 "if (distance > 4, null, bookmarkTable.deliveryTime) as 'deliveryTime', " +
-                "case when distance <= 0.1 then '0.1' " +
+                "case when distance <= 0.1 then '0.1km' " +
                 "when distance > 4 then '배달불가능' " +
                 "when distance > 0.1 then concat(distance, 'km') end 'distance', " +
                 "if (distance > 4, null, (select concat(FORMAT(Coupon.discountPrice , 0), '원 쿠폰') " +
