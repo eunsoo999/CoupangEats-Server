@@ -2,6 +2,8 @@ package com.example.demo.src.review;
 
 import com.example.demo.config.BaseException;
 import com.example.demo.src.orders.OrderDao;
+import com.example.demo.src.review.model.PatchMenuReviewReq;
+import com.example.demo.src.review.model.PatchReviewReq;
 import com.example.demo.src.review.model.PostMenuReviewReq;
 import com.example.demo.src.review.model.PostReviewReq;
 import com.example.demo.src.store.StoreDao;
@@ -84,8 +86,8 @@ public class ReviewService {
             int createdReviewIdx = reviewDao.insertReview(postReviewReq);
 
             // insert Review Images
-            if (postReviewReq.getImages() != null) {
-                for (String imageUrl : postReviewReq.getImages()) {
+            if (postReviewReq.getImageUrls() != null) {
+                for (String imageUrl : postReviewReq.getImageUrls()) {
                     reviewDao.insertReviewImage(createdReviewIdx, imageUrl);
                 }
             }
@@ -98,6 +100,41 @@ public class ReviewService {
             }
 
             return createdReviewIdx;
+        } catch (Exception exception){
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
+    public void updateReview(int userIdx, int reviewIdx, PatchReviewReq patchReviewReq) throws BaseException {
+        if (userDao.checkUserIdx(userIdx) == 0) {
+            throw new BaseException(USERS_NOT_FOUND); // 유저 존재 검증
+        } else if (reviewDao.checkReviewIdx(reviewIdx) == 0) {
+            throw new BaseException(REVIEWS_NOT_FOUND); // 리뷰 존재 검증
+        } else if (reviewDao.checkReviewByuserIdx(userIdx, reviewIdx) == 0) {
+            throw new BaseException(INVALID_USER_JWT); // 리뷰 작성자 == 유저 검증
+        }
+
+        try {
+            // 리뷰 수정
+            reviewDao.updateReview(reviewIdx, patchReviewReq);
+            // 리뷰 이미지가 수정된 기록이 있을 경우에만 update.
+            if (patchReviewReq.getModifiedImageFlag().equalsIgnoreCase("Y")) {
+                reviewDao.updateStatusReviewImages(reviewIdx); // 리뷰 이미지 삭제
+                // 리뷰 이미지 삽입
+                if (patchReviewReq.getImageUrls() != null) {
+                    for (String imageUrl : patchReviewReq.getImageUrls()) {
+                        System.out.println(imageUrl);
+                        reviewDao.insertReviewImage(reviewIdx, imageUrl);
+                    }
+                }
+            }
+
+            // insert MenuReviews(개별메뉴리뷰)
+            if (patchReviewReq.getMenuReviews() != null) {
+                for (PatchMenuReviewReq menuReview : patchReviewReq.getMenuReviews()) {
+                    reviewDao.updateMenuReviews(reviewIdx, menuReview);
+                }
+            }
         } catch (Exception exception){
             throw new BaseException(DATABASE_ERROR);
         }

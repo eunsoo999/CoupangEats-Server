@@ -220,7 +220,7 @@ public class ReviewDao {
     }
 
     public void insertMenuReview(int reviewIdx, PostMenuReviewReq menuReview) {
-        String insertMenuReviewQuery = "INSERT INTO MenuReview (OrderMenuIdx, reviewIdx, menuLiked, menuBadReason, comment) " +
+        String insertMenuReviewQuery = "INSERT INTO MenuReview (orderMenuIdx, reviewIdx, menuLiked, menuBadReason, comment) " +
                                         "VALUES (?, ?, ?, ?, ?)";
         Object[] params = new Object[]{menuReview.getOrderMenuIdx(), reviewIdx, menuReview.getMenuLiked(), menuReview.getBadReason(), menuReview.getMenuComment()};
 
@@ -271,5 +271,24 @@ public class ReviewDao {
                         rs.getInt("likeCount"),
                         rs.getInt("remainingReviewTime")), reviewIdx);
 
+    }
+
+    public int updateReview(int reviewIdx, PatchReviewReq patchReviewReq) {
+        String updateReiviewQuery = "update Review set contents = ?, rating = ?, storeBadReason = ?, " +
+                "deliveryLiked = ?, deliveryComment = ?, deliveryBadReason = ? where idx = ?";
+
+        Object[] params = new Object[]{patchReviewReq.getContents(), patchReviewReq.getRating(), patchReviewReq.getBadReason(),
+                patchReviewReq.getDeliveryReview().getDeliveryLiked(), patchReviewReq.getDeliveryReview().getDeliveryComment(),
+                patchReviewReq.getDeliveryReview().getDeliveryBadReason(), reviewIdx};
+
+        return this.jdbcTemplate.update(updateReiviewQuery, params);
+    }
+
+    public int updateMenuReviews(int reviewIdx, PatchMenuReviewReq menuReview) {
+        String query = "update MenuReview set menuLiked = ?, menuBadReason = ?, comment = ? where MenuReview.orderMenuIdx = ? and MenuReview.reviewIdx = ?";
+
+        Object[] params = new Object[]{menuReview.getMenuLiked(), menuReview.getMenuBadReason(), menuReview.getMenuComment(), menuReview.getOrderMenuIdx(), reviewIdx};
+
+        return this.jdbcTemplate.update(query, params);
     }
 }

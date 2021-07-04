@@ -106,9 +106,11 @@ public class ReviewController {
             return new BaseResponse<>(REVIEWS_LENGTH_BADREASON);
         } else if(postReviewReq.getUserIdx() == null) {
             return new BaseResponse<>(REVIEWS_EMPTY_USERIDX);
+        } else if(postReviewReq.getImageUrls() != null && postReviewReq.getImageUrls().size() > 5) {
+            return new BaseResponse<>(REVIEWS_IMAGE_COUNT);
         }
-        if(postReviewReq.getImages() != null) {
-            for (String url : postReviewReq.getImages()) {
+        if(postReviewReq.getImageUrls() != null) {
+            for (String url : postReviewReq.getImageUrls()) {
                 if(!isRegexImage(url)) {
                     return new BaseResponse<>(INVALID_IMAGE_URL);
                 }
@@ -143,8 +145,87 @@ public class ReviewController {
             result.put("createdIdx", createdIdx);
             return new BaseResponse<>(result);
         } catch (BaseException exception) {
-            logger.warn("#37. " +exception.getStatus().getMessage());
+            logger.warn("#37. " + exception.getStatus().getMessage());
             logger.warn(postReviewReq.toString());
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 38. 리뷰 수정 API
+     * [PATCH] /user/:userIdx/reviews/:reviewIdx
+     * @return BaseResponse<PatchReviewReq>
+     */
+    @ResponseBody
+    @PatchMapping("/users/{userIdx}/reviews/{reviewIdx}")
+    public BaseResponse<Map> patchReview(@PathVariable int userIdx, @PathVariable int reviewIdx, @RequestBody PatchReviewReq patchReviewReq) {
+        // Request 검증
+        if(patchReviewReq.getRating() == null) {
+            return new BaseResponse<>(REVIEWS_EMPTY_RATING);
+        } else if(patchReviewReq.getRating() != null && !(patchReviewReq.getRating() > 0 && patchReviewReq.getRating() <= 5)) {
+            return new BaseResponse<>(REVIEWS_INVALID_RATING);
+        } else if(patchReviewReq.getBadReason() != null && patchReviewReq.getBadReason().length() > 300) {
+            return new BaseResponse<>(REVIEWS_LENGTH_BADREASON);
+        } else if(patchReviewReq.getContents() == null || patchReviewReq.getContents().isEmpty()) {
+            return new BaseResponse<>(REVIEWS_EMPTY_CONTENTS);
+        } else if(patchReviewReq.getContents() != null && patchReviewReq.getContents().length() > 300) {
+            return new BaseResponse<>(REVIEWS_LENGTH_CONTENTS);
+        } else if(patchReviewReq.getDeliveryReview().getDeliveryLiked() != null
+                && !(patchReviewReq.getDeliveryReview().getDeliveryLiked().equalsIgnoreCase("GOOD")
+                || patchReviewReq.getDeliveryReview().getDeliveryLiked().equalsIgnoreCase("BAD"))) {
+            return new BaseResponse<>(REVIEWS_INVALID_DELIVERY_LIKED);
+        } else if(patchReviewReq.getDeliveryReview().getDeliveryBadReason() != null && patchReviewReq.getDeliveryReview().getDeliveryBadReason().length() > 300) {
+            return new BaseResponse<>(REVIEWS_LENGTH_BADREASON);
+        } else if(patchReviewReq.getDeliveryReview().getDeliveryComment() != null && patchReviewReq.getDeliveryReview().getDeliveryComment().length() > 80) {
+            return new BaseResponse<>(REVIEWS_LENGTH_DELIVERY);
+        } else if(patchReviewReq.getImageUrls() != null && patchReviewReq.getImageUrls().size() > 5) {
+            return new BaseResponse<>(REVIEWS_IMAGE_COUNT);
+        } else if(patchReviewReq.getModifiedImageFlag() == null) {
+            return new BaseResponse<>(REVIEWS_EMPTY_IMAGE_MODIFIEDFLAG);
+        } else if(!(patchReviewReq.getModifiedImageFlag().equalsIgnoreCase("Y") || patchReviewReq.getModifiedImageFlag().equalsIgnoreCase("N"))) {
+            return new BaseResponse<>(REVIEWS_INVALID_IMAGE_MODIFIEDFLAG);
+        }
+        if(patchReviewReq.getImageUrls() != null) {
+            for (String url : patchReviewReq.getImageUrls()) {
+                if(!isRegexImage(url)) {
+                    return new BaseResponse<>(INVALID_IMAGE_URL);
+                }
+            }
+        }
+
+        if (patchReviewReq.getImageUrls() != null) {
+            System.out.println(patchReviewReq.getImageUrls().size());
+        }
+        if(patchReviewReq.getMenuReviews() != null) {
+            for (PatchMenuReviewReq menuReview : patchReviewReq.getMenuReviews()) {
+                if(menuReview.getOrderMenuIdx() == null) {
+                    return new BaseResponse<>(REVIEWS_EMPTY_MENUIDX);
+                }
+                if(menuReview.getMenuComment() != null && menuReview.getMenuComment().length() > 80) {
+                    return new BaseResponse<>(REVIEWS_LENGTH_MENU);
+                }
+                if(menuReview.getMenuLiked() != null && !(menuReview.getMenuLiked().equalsIgnoreCase("GOOD")
+                        || menuReview.getMenuLiked().equalsIgnoreCase("BAD"))) {
+                    return new BaseResponse<>(REVIEWS_INVALID_MENU_LIKED);
+                }
+                if(menuReview.getMenuBadReason() != null && menuReview.getMenuBadReason().length() > 300) {
+                    return new BaseResponse<>(REVIEWS_LENGTH_BADREASON);
+                }
+            }
+        }
+
+        try {
+            // jwt 확인
+            int userIdxByJwt = jwtService.getUserIdx();
+            if (userIdx != userIdxByJwt) {
+                return new BaseResponse<>(INVALID_USER_JWT);
+            }
+            reviewService.updateReview(userIdx, reviewIdx, patchReviewReq);
+            Map<String, Integer> result = new HashMap<>();
+            return new BaseResponse<>(result);
+        } catch (BaseException exception) {
+            logger.warn("#38. " +exception.getStatus().getMessage());
+            logger.warn(reviewIdx + " - " + patchReviewReq.toString());
             return new BaseResponse<>(exception.getStatus());
         }
     }

@@ -14,7 +14,7 @@ public class PostReviewReq {
     private Integer rating;
     private String badReason;
     private String contents;
-    private List<String> images = new ArrayList<>();
+    private List<String> imageUrls = new ArrayList<>();
     private List<PostMenuReviewReq> menuReviews = new ArrayList<>();
     private PostDeliveryReviewReq deliveryReview;
     private Integer userIdx;

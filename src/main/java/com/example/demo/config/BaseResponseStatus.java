@@ -110,6 +110,9 @@ public enum BaseResponseStatus {
     REVIEWLIKES_EMPTY_REVIEWIDX(false, 2105, "리뷰번호를 입력해주세요."),
 
     REVIEWS_LENGTH_BADREASON(false, 2106, "낮은 평가 이유는 300자 이하만 가능합니다."),
+    REVIEWS_IMAGE_COUNT(false, 2107, "이미지는 5개까지 등록할 수 있습니다."),
+    REVIEWS_EMPTY_IMAGE_MODIFIEDFLAG(false, 2108, "이미지 수정 구분값을 입력해주세요."),
+    REVIEWS_INVALID_IMAGE_MODIFIEDFLAG(false, 2109, "잘못된 이미지 수정 구분값입니다."),
 
     /**
      * 3000 : Response 오류
