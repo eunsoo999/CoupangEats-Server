@@ -27,12 +27,12 @@ public class MenuDao {
                 "where OrderMenu.status != 'N' and m.storeIdx = Menu.storeIdx " +
                 "group by OrderMenu.menuIdx) as maxOrderCount), '주문많음', null) as 'bestOrderMenu', " +
                 "if ((select count(*) " +
-                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx " +
+                "from MenuReview inner join OrderMenu on MenuReview.orderMenuIdx = OrderMenu.idx " +
                 "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' and OrderMenu.menuIdx = Menu.idx) = " +
                 "(select max(maxReviewCount.count) from " +
                 "(select count(*) as count " +
-                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx " +
-                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' " +
+                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx join Review on MenuReview.reviewIdx = Review.idx " +
+                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' and Review.storeIdx = Menu.storeIdx " +
                 "group by OrderMenu.menuIdx) as maxReviewCount), '리뷰많음', null) as 'bestReview', " +
                 "Menu.idx as 'menuIdx', Menu.menuName, " +
                 "Menu.price, Menu.introduction, FirstImage.imageUrl " +
@@ -67,8 +67,8 @@ public class MenuDao {
                 "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' and OrderMenu.menuIdx = Menu.idx) = " +
                 "(select max(maxReviewCount.count) from " +
                 "(select count(*) as count " +
-                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx " +
-                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' " +
+                "from MenuReview inner join OrderMenu on MenuReview.OrderMenuIdx = OrderMenu.idx join Review on MenuReview.reviewIdx = Review.idx " +
+                "where MenuReview.status != 'N' and OrderMenu.status != 'N' and MenuReview.menuLiked = 'GOOD' and Review.storeIdx = Menu.storeIdx " +
                 "group by OrderMenu.menuIdx) as maxReviewCount), '리뷰많음', null) as 'bestReview',Menu.idx as 'menuIdx', Menu.menuName, Menu.price, Menu.introduction, imageUrl " +
                 "from BestMenu inner join Menu on BestMenu.menuIdx = Menu.idx left join (select menuIdx, min(idx), imageUrl from MenuImage " +
                 "group by menuIdx) as FirstImage on Menu.idx = FirstImage.menuIdx " +
