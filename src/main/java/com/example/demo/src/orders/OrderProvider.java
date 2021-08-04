@@ -72,6 +72,7 @@ public class OrderProvider {
             // 가게 배달비
             GetStoreRes getStoreRes = storeDao.selectStoreInfo(storeIdx);
             getCartInfo.setDeliveryPrice(getStoreRes.getDeliveryPrice());
+            getCartInfo.setCheetahDelivery(getStoreRes.getCheetahDelivery());
 
             getCartInfo.setCoupon(getCartCoupon);
             return getCartInfo;

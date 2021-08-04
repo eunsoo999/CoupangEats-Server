@@ -16,6 +16,7 @@ public class GetCartRes {
     private GetCartCoupon coupon;
     private String payType;
     private int deliveryPrice;
+    private String cheetahDelivery;
 
     public GetCartRes(String mainAddress, String address, String payType) {
         this.mainAddress = mainAddress;
